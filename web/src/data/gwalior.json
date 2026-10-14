@@ -1,0 +1,2414 @@
+{
+ "city": {
+  "id": "gwalior",
+  "name": {
+   "en": "Gwalior",
+   "hi": "ग्वालियर"
+  },
+  "dataVersion": "2026-10-14",
+  "readAt": "2026-10-13",
+  "tz": 5.5,
+  "center": [
+   26.2183,
+   78.1828
+  ]
+ },
+ "emergency": "112",
+ "sources": {
+  "amasr-fees": {
+   "name": "AMASR Rules 1959, Rule 6 as substituted by G.S.R. 1171(E), 4 Dec 2018 (w.e.f. 5 Dec 2018)",
+   "type": "custodian",
+   "evidence": "Consolidated rules on Casemine, current to G.S.R. 133(E), 21 Feb 2020",
+   "date": "2026-10-13"
+  },
+  "amasr-hours": {
+   "name": "AMASR Rules 1959: monuments open sunrise to sunset; Gwalior not named in the First Schedule (no weekly closure)",
+   "type": "custodian",
+   "evidence": "Consolidated rules on Casemine, current to Feb 2020",
+   "date": "2026-10-13"
+  },
+  "amasr-video": {
+   "name": "AMASR Rules 1959, Rule 42(2): ₹25 video filming fee, no still-camera fee",
+   "type": "custodian",
+   "evidence": "Consolidated rules on Casemine",
+   "date": "2026-10-13"
+  },
+  "asi-list": {
+   "name": "ASI Bhopal Circle list of monuments and Gwalior Sub Circle contacts",
+   "type": "official page",
+   "evidence": "ASI list (undated), read 13 Oct 2026",
+   "date": "2026-10-13"
+  },
+  "asi-fort-page": {
+   "name": "ASI Gwalior Fort page",
+   "type": "official page",
+   "evidence": "ASI fort page (undated)",
+   "date": "2026-10-13"
+  },
+  "npci": {
+   "name": "NPCI UPI 123PAY list: one code for the whole site, \"Gwalior Fort 036\"",
+   "type": "official page",
+   "evidence": "NPCI page (undated)",
+   "date": "2026-10-13"
+  },
+  "uni-draft": {
+   "name": "UNI report on the draft Second Schedule (Gazette, 8 Sep 2026)",
+   "type": "visitor report",
+   "evidence": "UNI, 9 Sep 2026 (Gazette itself not opened)",
+   "date": "2026-09-09"
+  },
+  "cag-mp": {
+   "name": "CAG Report No. 7 of 2022 (Madhya Pradesh)",
+   "type": "official page",
+   "evidence": "Tabled 13 Mar 2023",
+   "date": "2023-03-13"
+  },
+  "mpt-gujari": {
+   "name": "MP Tourism, Gujari Mahal page",
+   "type": "official page",
+   "evidence": "Page dated 31 Oct 2023",
+   "date": "2023-10-31"
+  },
+  "mpt-jv": {
+   "name": "MP Tourism, Jai Vilas page",
+   "type": "official page",
+   "evidence": "Page dated 7 Aug 2021",
+   "date": "2021-08-07"
+  },
+  "mpt-tansen": {
+   "name": "MP Tourism, Tansen Samaroh 2026",
+   "type": "official page",
+   "evidence": "Accessed 13 Oct 2026",
+   "date": "2026-10-13"
+  },
+  "ii-tansen": {
+   "name": "Incredible India, Tansen Samaroh",
+   "type": "official page",
+   "evidence": "Gives the venue as \"Behat village\"",
+   "date": "2026-10-13"
+  },
+  "jv-site": {
+   "name": "jaivilaspalace.in (custodian site), About and Team pages",
+   "type": "custodian",
+   "evidence": "No visible date; one pass recorded \"last modified 1 Apr 2026\"; read 13 Oct 2026",
+   "date": "2026-10-13"
+  },
+  "outlook-2024": {
+   "name": "Outlook Traveller",
+   "type": "visitor report",
+   "evidence": "Article of 15 Jun 2024",
+   "date": "2024-06-15"
+  },
+  "outlook-2017": {
+   "name": "Outlook Traveller",
+   "type": "visitor report",
+   "evidence": "Article of 11 Sep 2017",
+   "date": "2017-09-11"
+  },
+  "traveltriangle": {
+   "name": "TravelTriangle",
+   "type": "visitor report",
+   "evidence": "Page updated 2 Aug 2024",
+   "date": "2024-08-02"
+  },
+  "tticketpricing": {
+   "name": "tticketpricing",
+   "type": "visitor report",
+   "evidence": "Page of 29 Nov 2024",
+   "date": "2024-11-29"
+  },
+  "sailingstone": {
+   "name": "Sailingstone travel blog",
+   "type": "visitor report",
+   "evidence": "Post of 16 Feb 2026",
+   "date": "2026-02-16"
+  },
+  "tripadvisor-teli": {
+   "name": "TripAdvisor review, Teli ka Mandir",
+   "type": "visitor report",
+   "evidence": "Review of 5 Feb 2026",
+   "date": "2026-02-05"
+  },
+  "tripadvisor-night": {
+   "name": "TripAdvisor review, Gwalior Fort",
+   "type": "visitor report",
+   "evidence": "Review of 4 Oct 2026",
+   "date": "2026-10-04"
+  },
+  "airial": {
+   "name": "Airial travel listing",
+   "type": "visitor report",
+   "evidence": "Undated",
+   "date": "2026-10-13"
+  },
+  "chalbanjare": {
+   "name": "chalbanjare travel page",
+   "type": "visitor report",
+   "evidence": "Undated; gives ₹5 / ₹100 and \"usually no separate entry fee\" on the same page",
+   "date": "2026-10-13"
+  },
+  "livelaw": {
+   "name": "LiveLaw (court record)",
+   "type": "visitor report",
+   "evidence": "Report of 10 Mar 2026",
+   "date": "2026-03-10"
+  },
+  "sikhiwiki": {
+   "name": "SikhiWiki",
+   "type": "visitor report",
+   "evidence": "Page of 2011",
+   "date": "2011-01-01"
+  },
+  "bhaktibharat": {
+   "name": "BhaktiBharat",
+   "type": "visitor report",
+   "evidence": "Page of 28 Aug 2026",
+   "date": "2026-08-28"
+  },
+  "triveni": {
+   "name": "Triveni Cabs fare page",
+   "type": "visitor report",
+   "evidence": "Page of 14 Sep 2026 (one private operator)",
+   "date": "2026-09-14"
+  },
+  "goasia": {
+   "name": "GoAsia Gwalior guide",
+   "type": "visitor report",
+   "evidence": "11 Jun 2026; \"indicative, not live quotes\"",
+   "date": "2026-06-11"
+  },
+  "tripadvisor-top": {
+   "name": "TripAdvisor \"Top Attractions in Gwalior\" review counts",
+   "type": "official page",
+   "evidence": "Live listing, 13 Oct 2026",
+   "date": "2026-10-13"
+  },
+  "team-estimate": {
+   "name": "Argus team estimate (not sourced)",
+   "type": "team observation",
+   "evidence": "Approximate map position or planning default; replace with a surveyed value",
+   "date": "2026-10-14"
+  },
+  "patrika-mou": {
+   "name": "Patrika report on the state palaces MoU",
+   "type": "visitor report",
+   "evidence": "Report of 6 Mar 2025",
+   "date": "2025-03-06"
+  }
+ },
+ "landmarks": [
+  {
+   "id": "station",
+   "name": {
+    "en": "Gwalior Railway Station",
+    "hi": "ग्वालियर रेलवे स्टेशन"
+   },
+   "coord": [
+    26.2166,
+    78.1826
+   ]
+  },
+  {
+   "id": "fort",
+   "name": {
+    "en": "Gwalior Fort (Man Singh Palace)",
+    "hi": "ग्वालियर किला (मान सिंह महल)"
+   },
+   "coord": [
+    26.2309,
+    78.1692
+   ]
+  },
+  {
+   "id": "jaivilas",
+   "name": {
+    "en": "Jai Vilas Palace",
+    "hi": "जय विलास महल"
+   },
+   "coord": [
+    26.2033,
+    78.1677
+   ]
+  },
+  {
+   "id": "ghauspura",
+   "name": {
+    "en": "Ghauspura (Tansen tomb)",
+    "hi": "गौसपुरा (तानसेन मकबरा)"
+   },
+   "coord": [
+    26.2297,
+    78.1816
+   ]
+  }
+ ],
+ "fares": [
+  {
+   "mode": "auto",
+   "maxKm": 4,
+   "min": 50,
+   "max": 100,
+   "src": "goasia",
+   "s": "recently reported",
+   "ver": "2026-06-11",
+   "t": {
+    "en": "Auto, short ride (per vehicle)",
+    "hi": "ऑटो, छोटी दूरी (प्रति वाहन)"
+   },
+   "cls": "fare"
+  },
+  {
+   "mode": "auto",
+   "maxKm": 99,
+   "min": 150,
+   "max": 250,
+   "src": "goasia",
+   "s": "recently reported",
+   "ver": "2026-06-11",
+   "t": {
+    "en": "Auto, cross-town (per vehicle)",
+    "hi": "ऑटो, शहर के पार (प्रति वाहन)"
+   },
+   "cls": "fare"
+  },
+  {
+   "mode": "cab",
+   "maxKm": 5,
+   "min": 100,
+   "max": 250,
+   "src": "triveni",
+   "s": "recently reported",
+   "ver": "2026-09-14",
+   "t": {
+    "en": "Cab, short ride (Ola ₹100–200 per GoAsia; sedan ₹200–250 for 3–4 km per Triveni Cabs)",
+    "hi": "कैब, छोटी दूरी (GoAsia के अनुसार ओला ₹100–200; Triveni Cabs के अनुसार 3–4 किमी सेडान ₹200–250)"
+   },
+   "cls": "fare"
+  }
+ ],
+ "stationFares": [
+  {
+   "to": {
+    "en": "Gwalior Fort",
+    "hi": "ग्वालियर किला"
+   },
+   "t": {
+    "en": "4 km; sedan ₹250, SUV ₹400; about 12 min",
+    "hi": "4 किमी; सेडान ₹250, SUV ₹400; लगभग 12 मिनट"
+   },
+   "src": "triveni",
+   "s": "recently reported",
+   "ver": "2026-09-14",
+   "cls": "fare",
+   "place": "gwalior-fort"
+  },
+  {
+   "to": {
+    "en": "Jai Vilas Palace",
+    "hi": "जय विलास महल"
+   },
+   "t": {
+    "en": "3 km; sedan ₹200, SUV ₹350; about 10 min",
+    "hi": "3 किमी; सेडान ₹200, SUV ₹350; लगभग 10 मिनट"
+   },
+   "src": "triveni",
+   "s": "recently reported",
+   "ver": "2026-09-14",
+   "cls": "fare",
+   "place": "jai-vilas"
+  },
+  {
+   "to": {
+    "en": "Tansen tomb",
+    "hi": "तानसेन का मकबरा"
+   },
+   "t": {
+    "en": "5 km; no fare listed",
+    "hi": "5 किमी; किराया नहीं दिया गया"
+   },
+   "src": "triveni",
+   "s": "recently reported",
+   "ver": "2026-09-14",
+   "cls": "fare",
+   "place": "tansen-tomb"
+  },
+  {
+   "to": {
+    "en": "Urwai Gate (fort)",
+    "hi": "उरवाई गेट (किला)"
+   },
+   "t": {
+    "en": "Tuk-tuk or Uber, 15–20 min, \"a couple hundred rupees\"; tuk-tuks \"aren't allowed to take you beyond here\"",
+    "hi": "टुक-टुक या उबर, 15–20 मिनट, \"दो-तीन सौ रुपये\"; टुक-टुक इससे आगे नहीं जा सकते"
+   },
+   "src": "sailingstone",
+   "s": "recently reported",
+   "ver": "2026-02-16",
+   "cls": "fare",
+   "place": "gwalior-fort"
+  }
+ ],
+ "places": [
+  {
+   "id": "gwalior-fort",
+   "name": {
+    "en": "Gwalior Fort",
+    "hi": "ग्वालियर किला"
+   },
+   "type": {
+    "en": "Hill fort with sections under two custodians",
+    "hi": "दो संरक्षकों के अधीन भागों वाला पहाड़ी किला"
+   },
+   "tags": [
+    "architecture",
+    "royal",
+    "museums"
+   ],
+   "lesserKnown": false,
+   "insideFort": true,
+   "popularity": {
+    "t": {
+     "en": "Most-reviewed listing in Gwalior (36.8% of top-10 reviews)",
+     "hi": "ग्वालियर में सबसे अधिक समीक्षाएँ (शीर्ष 10 समीक्षाओं का 36.8%)"
+    },
+    "s": "officially confirmed",
+    "src": "tripadvisor-top",
+    "ver": "2026-10-13",
+    "cls": "status"
+   },
+   "guardrail": {
+    "visitorReady": true,
+    "dailyLimit": null,
+    "consentRequired": false,
+    "consent": null
+   },
+   "summary": {
+    "t": {
+     "en": "ASI protects Man Singh Palace and the temples; the MP Directorate of Archaeology, Archives and Museums runs Gujari Mahal and the state palaces. Tickets are separate. No combo ticket across custodians was found.",
+     "hi": "मान सिंह महल और मंदिर ASI के संरक्षण में हैं; गूजरी महल और राज्य महल मध्य प्रदेश पुरातत्व, अभिलेखागार एवं संग्रहालय संचालनालय चलाता है। टिकट अलग-अलग हैं। संरक्षकों के बीच कोई संयुक्त टिकट नहीं मिला।"
+    },
+    "s": "officially confirmed",
+    "src": "cag-mp",
+    "ver": "2026-10-13",
+    "cls": "history"
+   },
+   "contact": {
+    "t": {
+     "en": "ASI Gwalior Sub Circle: 0751-2480011, scgwalior.asi@gmail.com (ASI parts)",
+     "hi": "ASI ग्वालियर उप मंडल: 0751-2480011, scgwalior.asi@gmail.com (ASI भाग)"
+    },
+    "s": "officially confirmed",
+    "src": "asi-list",
+    "ver": "2026-10-13",
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "No official source found",
+     "hi": "कोई आधिकारिक स्रोत नहीं मिला"
+    },
+    "cls": "hours"
+   },
+   "rules": [
+    {
+     "kind": "mandatory",
+     "t": {
+      "en": "Still photography: no fee. Video filming: ₹25 (ASI monuments).",
+      "hi": "स्थिर फ़ोटोग्राफ़ी: कोई शुल्क नहीं। वीडियो फ़िल्मांकन: ₹25 (ASI स्मारक)।"
+     },
+     "s": "officially confirmed",
+     "src": "amasr-video",
+     "ver": "2026-10-13",
+     "cls": "rules"
+    },
+    {
+     "kind": "safety",
+     "t": {
+      "en": "After sunset the fort closes and public facilities inside are no longer accessible; the Light & Sound Show continues.",
+      "hi": "सूर्यास्त के बाद किला बंद हो जाता है और अंदर की सार्वजनिक सुविधाएँ उपलब्ध नहीं रहतीं; लाइट एंड साउंड शो चलता रहता है।"
+     },
+     "s": "recently reported",
+     "src": "tripadvisor-night",
+     "ver": "2026-10-04",
+     "cls": "rules"
+    }
+   ],
+   "notes": [
+    {
+     "t": {
+      "en": "Draft Second Schedule (Gazette, 8 Sep 2026) keeps Gwalior Fort in Category B; no fee amounts given. Objection window closes around 23 Oct 2026 (calculated).",
+      "hi": "ड्राफ्ट द्वितीय अनुसूची (गजट, 8 सितंबर 2026) में ग्वालियर किला श्रेणी B में है; शुल्क राशि नहीं दी गई। आपत्ति अवधि लगभग 23 अक्टूबर 2026 को समाप्त (गणना)।"
+     },
+     "s": "recently reported",
+     "src": "uni-draft",
+     "ver": "2026-09-09",
+     "cls": "fees"
+    },
+    {
+     "t": {
+      "en": "Mar 2025 MoU: MP Tourism & Culture with IndiGo (funder) and the Aga Khan Cultural Services Forum (conservator) for the state palaces. Progress unknown.",
+      "hi": "मार्च 2025 MoU: राज्य महलों के लिए MP पर्यटन व संस्कृति, IndiGo (वित्तदाता) और आगा खान कल्चरल सर्विसेज़ फ़ोरम (संरक्षक)। प्रगति अज्ञात।"
+     },
+     "s": "recently reported",
+     "src": "patrika-mou",
+     "ver": "2025-03-06",
+     "cls": "history"
+    }
+   ],
+   "units": [
+    {
+     "id": "fort-asi",
+     "name": {
+      "en": "Man Singh Palace & ASI monuments",
+      "hi": "मान सिंह महल और ASI स्मारक"
+     },
+     "custodian": {
+      "t": {
+       "en": "Archaeological Survey of India (Category B monument)",
+       "hi": "भारतीय पुरातत्व सर्वेक्षण (श्रेणी B स्मारक)"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-fees",
+      "ver": "2026-10-13",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2309,
+      78.1692
+     ],
+     "hours": {
+      "v": {
+       "kind": "sun"
+      },
+      "t": {
+       "en": "Sunrise to sunset, every day",
+       "hi": "सूर्योदय से सूर्यास्त तक, प्रतिदिन"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours",
+      "alt": [
+       {
+        "t": {
+         "en": "Counter clock times are not published. Reports vary: 6:00–17:30, 7:00–17:30, 9:00–18:00.",
+         "hi": "काउंटर का समय प्रकाशित नहीं। रिपोर्टें अलग-अलग: 6:00–17:30, 7:00–17:30, 9:00–18:00।"
+        },
+        "s": "recently reported",
+        "src": "traveltriangle",
+        "ver": "2024-12-03"
+       }
+      ]
+     },
+     "weeklyClosed": {
+      "v": [],
+      "t": {
+       "en": "No weekly closure",
+       "hi": "कोई साप्ताहिक बंदी नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours",
+      "alt": [
+       {
+        "t": {
+         "en": "\"Closed on Fridays\" (lower source; the statute takes precedence)",
+         "hi": "\"शुक्रवार को बंद\" (निचला स्रोत; कानून को प्राथमिकता)"
+        },
+        "s": "recently reported",
+        "src": "tticketpricing",
+        "ver": "2024-11-29",
+        "v": [
+         5
+        ]
+       }
+      ]
+     },
+     "lastEntry": {
+      "v": "none",
+      "t": {
+       "en": "No separate last entry under the rule; plan arrives early enough to finish before sunset",
+       "hi": "नियम में अलग अंतिम प्रवेश नहीं; योजना सूर्यास्त से पहले भ्रमण पूरा करने लायक समय रखती है"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "ticket": "asi-fort",
+     "fees": {
+      "v": {
+       "ticket": "asi-fort",
+       "rows": [
+        {
+         "who": "indian",
+         "label": {
+          "en": "Indian, SAARC, BIMSTEC, OCI",
+          "hi": "भारतीय, सार्क, बिम्सटेक, OCI"
+         },
+         "cash": 25,
+         "online": 20
+        },
+        {
+         "who": "foreign",
+         "label": {
+          "en": "Other foreigners",
+          "hi": "अन्य विदेशी"
+         },
+         "cash": 300,
+         "online": 250
+        },
+        {
+         "who": "child",
+         "label": {
+          "en": "Children aged 15 and under",
+          "hi": "15 वर्ष और कम आयु के बच्चे"
+         },
+         "cash": 0,
+         "online": 0
+        }
+       ]
+      },
+      "s": "officially confirmed",
+      "src": "amasr-fees",
+      "ver": "2026-10-13",
+      "cls": "fees",
+      "alt": [
+       {
+        "t": {
+         "en": "CAG gives ₹25 / ₹300 \"since 01.08.2018\"; the Gazette is dated 4 Dec 2018 (start date differs, amounts agree)",
+         "hi": "CAG ₹25 / ₹300 \"01.08.2018 से\" बताता है; गजट 4 दिसंबर 2018 का है (आरंभ तिथि अलग, राशि समान)"
+        },
+        "s": "officially confirmed",
+        "src": "cag-mp",
+        "ver": "2023-03-13"
+       },
+       {
+        "t": {
+         "en": "Many third-party pages quote ₹75 / ₹250, ₹15 / ₹200 or ₹5 / ₹100: no statutory basis or outdated",
+         "hi": "कई बाहरी पेज ₹75 / ₹250, ₹15 / ₹200 या ₹5 / ₹100 बताते हैं: कानूनी आधार नहीं या पुराना"
+        },
+        "s": "potentially outdated",
+        "src": "outlook-2017",
+        "ver": "2017-09-11"
+       }
+      ]
+     },
+     "coverage": {
+      "t": {
+       "en": "One ASI ticket covers Man Singh Palace, Sas-Bahu and Teli ka Mandir",
+       "hi": "एक ASI टिकट में मान सिंह महल, सास-बहू और तेली का मंदिर शामिल"
+      },
+      "s": "recently reported",
+      "src": "sailingstone",
+      "ver": "2026-02-16",
+      "cls": "fees"
+     },
+     "payment": {
+      "v": {
+       "cash": true,
+       "online": true
+      },
+      "t": {
+       "en": "Cash and cashless prices both exist. UPI 123PAY phone booking: code \"Gwalior Fort 036\".",
+       "hi": "नकद और कैशलेस दोनों दरें हैं। UPI 123PAY फ़ोन बुकिंग: कोड \"Gwalior Fort 036\"।"
+      },
+      "s": "officially confirmed",
+      "src": "npci",
+      "ver": "2026-10-13",
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 60,
+      "rec": 90,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    },
+    {
+     "id": "fort-asi-museum",
+     "name": {
+      "en": "ASI site museum (Hathi Pol)",
+      "hi": "ASI स्थल संग्रहालय (हाथी पोल)"
+     },
+     "custodian": {
+      "t": {
+       "en": "Archaeological Survey of India",
+       "hi": "भारतीय पुरातत्व सर्वेक्षण"
+      },
+      "s": "recently reported",
+      "src": "outlook-2024",
+      "ver": "2024-06-15",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2318,
+      78.1694
+     ],
+     "hours": {
+      "v": {
+       "kind": "fixed",
+       "open": "10:00",
+       "close": "17:00"
+      },
+      "t": {
+       "en": "10:00–17:00 (no official source found)",
+       "hi": "10:00–17:00 (कोई आधिकारिक स्रोत नहीं मिला)"
+      },
+      "s": "recently reported",
+      "src": "outlook-2024",
+      "ver": "2024-06-15",
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": [
+       5
+      ],
+      "t": {
+       "en": "Closed Fridays and government holidays",
+       "hi": "शुक्रवार और सरकारी छुट्टियों पर बंद"
+      },
+      "s": "conflicting",
+      "src": "outlook-2024",
+      "ver": "2024-06-15",
+      "cls": "hours",
+      "alt": [
+       {
+        "t": {
+         "en": "Closed Monday",
+         "hi": "सोमवार को बंद"
+        },
+        "s": "recently reported",
+        "src": "outlook-2017",
+        "ver": "2017-09-11",
+        "v": [
+         1
+        ]
+       }
+      ]
+     },
+     "lastEntry": {
+      "v": null,
+      "why": {
+       "en": "Not published by any source",
+       "hi": "किसी स्रोत में प्रकाशित नहीं"
+      },
+      "cls": "hours"
+     },
+     "ticket": "asi-museum",
+     "fees": {
+      "v": null,
+      "why": {
+       "en": "Museum fee not found in any source",
+       "hi": "संग्रहालय शुल्क किसी स्रोत में नहीं मिला"
+      },
+      "cls": "fees"
+     },
+     "payment": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 30,
+      "rec": 45,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    },
+    {
+     "id": "fort-gujari",
+     "name": {
+      "en": "Gujari Mahal museum",
+      "hi": "गूजरी महल संग्रहालय"
+     },
+     "custodian": {
+      "t": {
+       "en": "MP Directorate of Archaeology, Archives and Museums (state monument S-MP-102)",
+       "hi": "म.प्र. पुरातत्व, अभिलेखागार एवं संग्रहालय संचालनालय (राज्य स्मारक S-MP-102)"
+      },
+      "s": "officially confirmed",
+      "src": "cag-mp",
+      "ver": "2026-10-13",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2337,
+      78.1699
+     ],
+     "hours": {
+      "v": {
+       "kind": "fixed",
+       "open": "10:00",
+       "close": "17:00"
+      },
+      "t": {
+       "en": "10:00–17:00",
+       "hi": "10:00–17:00"
+      },
+      "s": "officially confirmed",
+      "src": "mpt-gujari",
+      "ver": "2023-10-31",
+      "cls": "hours",
+      "alt": [
+       {
+        "t": {
+         "en": "10:00–18:00 daily",
+         "hi": "10:00–18:00 प्रतिदिन"
+        },
+        "s": "recently reported",
+        "src": "airial",
+        "ver": "2026-10-13"
+       }
+      ]
+     },
+     "weeklyClosed": {
+      "v": [
+       1
+      ],
+      "t": {
+       "en": "Closed Mondays and MP government holidays",
+       "hi": "सोमवार और म.प्र. सरकारी छुट्टियों पर बंद"
+      },
+      "s": "officially confirmed",
+      "src": "mpt-gujari",
+      "ver": "2023-10-31",
+      "cls": "hours",
+      "alt": [
+       {
+        "t": {
+         "en": "\"Closed Fridays\"",
+         "hi": "\"शुक्रवार को बंद\""
+        },
+        "s": "recently reported",
+        "src": "traveltriangle",
+        "ver": "2024-08-02",
+        "v": [
+         5
+        ]
+       }
+      ]
+     },
+     "lastEntry": {
+      "v": "none",
+      "t": {
+       "en": "No separate last entry published",
+       "hi": "अलग अंतिम प्रवेश प्रकाशित नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "mpt-gujari",
+      "ver": "2023-10-31",
+      "cls": "hours"
+     },
+     "ticket": "state-gujari",
+     "fees": {
+      "v": {
+       "ticket": "state-gujari",
+       "rows": [
+        {
+         "who": "indian",
+         "label": {
+          "en": "Indian",
+          "hi": "भारतीय"
+         },
+         "any": 20
+        },
+        {
+         "who": "foreign",
+         "label": {
+          "en": "Foreign",
+          "hi": "विदेशी"
+         },
+         "any": 400
+        },
+        {
+         "who": "child",
+         "label": {
+          "en": "Children",
+          "hi": "बच्चे"
+         },
+         "any": null
+        }
+       ]
+      },
+      "s": "officially confirmed",
+      "src": "mpt-gujari",
+      "ver": "2023-10-31",
+      "cls": "fees"
+     },
+     "payment": {
+      "v": null,
+      "why": {
+       "en": "Payment modes not stated",
+       "hi": "भुगतान के तरीके नहीं बताए गए"
+      },
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 45,
+      "rec": 60,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    },
+    {
+     "id": "fort-state-palaces",
+     "name": {
+      "en": "State palaces (Karan, Vikram, Jahangir and Shahjahan Mahals)",
+      "hi": "राज्य महल (कर्ण, विक्रम, जहाँगीर और शाहजहाँ महल)"
+     },
+     "custodian": {
+      "t": {
+       "en": "MP Directorate of Archaeology, Archives and Museums",
+       "hi": "म.प्र. पुरातत्व, अभिलेखागार एवं संग्रहालय संचालनालय"
+      },
+      "s": "officially confirmed",
+      "src": "cag-mp",
+      "ver": "2026-10-13",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2324,
+      78.1688
+     ],
+     "hours": {
+      "v": null,
+      "why": {
+       "en": "No official timings found (one aggregator lists Karan Mahal as 9:00–17:00)",
+       "hi": "कोई आधिकारिक समय नहीं मिला (एक एग्रीगेटर कर्ण महल 9:00–17:00 बताता है)"
+      },
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "ticket": "state-palaces",
+     "fees": {
+      "v": {
+       "ticket": "state-palaces",
+       "rows": [
+        {
+         "who": "indian",
+         "label": {
+          "en": "Indian",
+          "hi": "भारतीय"
+         },
+         "any": null
+        },
+        {
+         "who": "foreign",
+         "label": {
+          "en": "Foreign (cash accepted)",
+          "hi": "विदेशी (नकद स्वीकार)"
+         },
+         "cash": 400,
+         "online": null
+        }
+       ]
+      },
+      "s": "recently reported",
+      "src": "sailingstone",
+      "ver": "2026-02-16",
+      "cls": "fees"
+     },
+     "coverage": {
+      "v": null,
+      "why": {
+       "en": "Which palaces one state ticket covers is unknown",
+       "hi": "एक राज्य टिकट में कौन से महल शामिल हैं, अज्ञात"
+      },
+      "cls": "fees"
+     },
+     "payment": {
+      "v": {
+       "cash": true,
+       "online": null
+      },
+      "t": {
+       "en": "Cash accepted",
+       "hi": "नकद स्वीकार"
+      },
+      "s": "recently reported",
+      "src": "sailingstone",
+      "ver": "2026-02-16",
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 30,
+      "rec": 60,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  },
+  {
+   "id": "sas-bahu",
+   "name": {
+    "en": "Sas-Bahu Temple",
+    "hi": "सास-बहू मंदिर"
+   },
+   "type": {
+    "en": "Temple group inside the fort (ASI)",
+    "hi": "किले के अंदर मंदिर समूह (ASI)"
+   },
+   "tags": [
+    "temples",
+    "architecture"
+   ],
+   "lesserKnown": false,
+   "insideFort": true,
+   "popularity": {
+    "t": {
+     "en": "567 reviews on TripAdvisor",
+     "hi": "TripAdvisor पर 567 समीक्षाएँ"
+    },
+    "s": "officially confirmed",
+    "src": "tripadvisor-top",
+    "ver": "2026-10-13",
+    "cls": "status"
+   },
+   "guardrail": {
+    "visitorReady": true,
+    "dailyLimit": null,
+    "consentRequired": false,
+    "consent": null
+   },
+   "summary": {
+    "t": {
+     "en": "ASI monument inside the fort. ASI notes the \"main sikhara is lost\".",
+     "hi": "किले के अंदर ASI स्मारक। ASI के अनुसार \"मुख्य शिखर नष्ट हो चुका है\"।"
+    },
+    "s": "officially confirmed",
+    "src": "asi-fort-page",
+    "ver": "2026-10-13",
+    "cls": "history"
+   },
+   "contact": {
+    "t": {
+     "en": "ASI Gwalior Sub Circle: 0751-2480011",
+     "hi": "ASI ग्वालियर उप मंडल: 0751-2480011"
+    },
+    "s": "officially confirmed",
+    "src": "asi-list",
+    "ver": "2026-10-13",
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "No official source found",
+     "hi": "कोई आधिकारिक स्रोत नहीं मिला"
+    },
+    "cls": "hours"
+   },
+   "rules": [
+    {
+     "kind": "mandatory",
+     "t": {
+      "en": "Still photography: no fee. Video filming: ₹25.",
+      "hi": "स्थिर फ़ोटोग्राफ़ी: कोई शुल्क नहीं। वीडियो: ₹25।"
+     },
+     "s": "officially confirmed",
+     "src": "amasr-video",
+     "ver": "2026-10-13",
+     "cls": "rules"
+    }
+   ],
+   "notes": [],
+   "units": [
+    {
+     "id": "sas-bahu",
+     "name": {
+      "en": "Sas-Bahu Temple",
+      "hi": "सास-बहू मंदिर"
+     },
+     "custodian": {
+      "t": {
+       "en": "Archaeological Survey of India",
+       "hi": "भारतीय पुरातत्व सर्वेक्षण"
+      },
+      "s": "officially confirmed",
+      "src": "asi-list",
+      "ver": "2026-10-13",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2236,
+      78.1702
+     ],
+     "hours": {
+      "v": {
+       "kind": "sun"
+      },
+      "t": {
+       "en": "Sunrise to sunset, every day",
+       "hi": "सूर्योदय से सूर्यास्त तक, प्रतिदिन"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": [],
+      "t": {
+       "en": "No weekly closure",
+       "hi": "कोई साप्ताहिक बंदी नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": "none",
+      "t": {
+       "en": "No separate last entry under the rule",
+       "hi": "नियम में अलग अंतिम प्रवेश नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "ticket": "asi-fort",
+     "fees": {
+      "v": {
+       "ticket": "asi-fort",
+       "rows": [
+        {
+         "who": "indian",
+         "label": {
+          "en": "Indian, SAARC, BIMSTEC, OCI",
+          "hi": "भारतीय, सार्क, बिम्सटेक, OCI"
+         },
+         "cash": 25,
+         "online": 20
+        },
+        {
+         "who": "foreign",
+         "label": {
+          "en": "Other foreigners",
+          "hi": "अन्य विदेशी"
+         },
+         "cash": 300,
+         "online": 250
+        },
+        {
+         "who": "child",
+         "label": {
+          "en": "Children aged 15 and under",
+          "hi": "15 वर्ष और कम आयु के बच्चे"
+         },
+         "cash": 0,
+         "online": 0
+        }
+       ]
+      },
+      "s": "officially confirmed",
+      "src": "amasr-fees",
+      "ver": "2026-10-13",
+      "cls": "fees"
+     },
+     "coverage": {
+      "t": {
+       "en": "On the same ASI ticket as Man Singh Palace",
+       "hi": "मान सिंह महल वाले ASI टिकट में शामिल"
+      },
+      "s": "recently reported",
+      "src": "sailingstone",
+      "ver": "2026-02-16",
+      "cls": "fees"
+     },
+     "payment": {
+      "v": {
+       "cash": true,
+       "online": true
+      },
+      "t": {
+       "en": "Cash and cashless prices both exist",
+       "hi": "नकद और कैशलेस दोनों दरें"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-fees",
+      "ver": "2026-10-13",
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 30,
+      "rec": 45,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  },
+  {
+   "id": "teli-ka-mandir",
+   "name": {
+    "en": "Teli ka Mandir",
+    "hi": "तेली का मंदिर"
+   },
+   "type": {
+    "en": "Temple inside the fort (ASI)",
+    "hi": "किले के अंदर मंदिर (ASI)"
+   },
+   "tags": [
+    "temples",
+    "architecture"
+   ],
+   "lesserKnown": true,
+   "insideFort": true,
+   "guardrail": {
+    "visitorReady": true,
+    "dailyLimit": 2,
+    "consentRequired": false,
+    "consent": null
+   },
+   "summary": {
+    "t": {
+     "en": "ASI monument inside the fort. A Feb 2026 visitor review says \"many of the sculptures are damaged\" (cause unstated).",
+     "hi": "किले के अंदर ASI स्मारक। फ़रवरी 2026 की एक समीक्षा: \"कई मूर्तियाँ क्षतिग्रस्त हैं\" (कारण नहीं बताया)।"
+    },
+    "s": "recently reported",
+    "src": "tripadvisor-teli",
+    "ver": "2026-02-05",
+    "cls": "history"
+   },
+   "contact": {
+    "t": {
+     "en": "ASI Gwalior Sub Circle: 0751-2480011",
+     "hi": "ASI ग्वालियर उप मंडल: 0751-2480011"
+    },
+    "s": "officially confirmed",
+    "src": "asi-list",
+    "ver": "2026-10-13",
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "No official source found",
+     "hi": "कोई आधिकारिक स्रोत नहीं मिला"
+    },
+    "cls": "hours"
+   },
+   "rules": [
+    {
+     "kind": "mandatory",
+     "t": {
+      "en": "Still photography: no fee. Video filming: ₹25.",
+      "hi": "स्थिर फ़ोटोग्राफ़ी: कोई शुल्क नहीं। वीडियो: ₹25।"
+     },
+     "s": "officially confirmed",
+     "src": "amasr-video",
+     "ver": "2026-10-13",
+     "cls": "rules"
+    }
+   ],
+   "notes": [],
+   "units": [
+    {
+     "id": "teli-ka-mandir",
+     "name": {
+      "en": "Teli ka Mandir",
+      "hi": "तेली का मंदिर"
+     },
+     "custodian": {
+      "t": {
+       "en": "Archaeological Survey of India",
+       "hi": "भारतीय पुरातत्व सर्वेक्षण"
+      },
+      "s": "officially confirmed",
+      "src": "asi-list",
+      "ver": "2026-10-13",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2207,
+      78.1676
+     ],
+     "hours": {
+      "v": {
+       "kind": "sun"
+      },
+      "t": {
+       "en": "Sunrise to sunset, every day",
+       "hi": "सूर्योदय से सूर्यास्त तक, प्रतिदिन"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": [],
+      "t": {
+       "en": "No weekly closure",
+       "hi": "कोई साप्ताहिक बंदी नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": "none",
+      "t": {
+       "en": "No separate last entry under the rule",
+       "hi": "नियम में अलग अंतिम प्रवेश नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "ticket": "asi-fort",
+     "fees": {
+      "v": {
+       "ticket": "asi-fort",
+       "rows": [
+        {
+         "who": "indian",
+         "label": {
+          "en": "Indian, SAARC, BIMSTEC, OCI",
+          "hi": "भारतीय, सार्क, बिम्सटेक, OCI"
+         },
+         "cash": 25,
+         "online": 20
+        },
+        {
+         "who": "foreign",
+         "label": {
+          "en": "Other foreigners",
+          "hi": "अन्य विदेशी"
+         },
+         "cash": 300,
+         "online": 250
+        },
+        {
+         "who": "child",
+         "label": {
+          "en": "Children aged 15 and under",
+          "hi": "15 वर्ष और कम आयु के बच्चे"
+         },
+         "cash": 0,
+         "online": 0
+        }
+       ]
+      },
+      "s": "officially confirmed",
+      "src": "amasr-fees",
+      "ver": "2026-10-13",
+      "cls": "fees"
+     },
+     "coverage": {
+      "t": {
+       "en": "On the same ASI ticket as Man Singh Palace",
+       "hi": "मान सिंह महल वाले ASI टिकट में शामिल"
+      },
+      "s": "recently reported",
+      "src": "sailingstone",
+      "ver": "2026-02-16",
+      "cls": "fees"
+     },
+     "payment": {
+      "v": {
+       "cash": true,
+       "online": true
+      },
+      "t": {
+       "en": "Cash and cashless prices both exist",
+       "hi": "नकद और कैशलेस दोनों दरें"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-fees",
+      "ver": "2026-10-13",
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 20,
+      "rec": 30,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  },
+  {
+   "id": "gurudwara-data-bandi-chhod",
+   "name": {
+    "en": "Gurudwara Data Bandi Chhod",
+    "hi": "गुरुद्वारा दाता बंदी छोड़"
+   },
+   "type": {
+    "en": "Gurudwara on the fort hill",
+    "hi": "किले की पहाड़ी पर गुरुद्वारा"
+   },
+   "tags": [
+    "spiritual"
+   ],
+   "lesserKnown": false,
+   "insideFort": true,
+   "popularity": {
+    "t": {
+     "en": "190 reviews on TripAdvisor (2nd in the top 10)",
+     "hi": "TripAdvisor पर 190 समीक्षाएँ (शीर्ष 10 में दूसरा)"
+    },
+    "s": "officially confirmed",
+    "src": "tripadvisor-top",
+    "ver": "2026-10-13",
+    "cls": "status"
+   },
+   "guardrail": {
+    "visitorReady": true,
+    "dailyLimit": null,
+    "consentRequired": true,
+    "consent": true
+   },
+   "summary": {
+    "t": {
+     "en": "Built under the Khadur Sahib sants; managing committee unknown.",
+     "hi": "खडूर साहिब के संतों के अधीन निर्मित; प्रबंधन समिति अज्ञात।"
+    },
+    "s": "unverified",
+    "src": "sikhiwiki",
+    "ver": "2011-01-01",
+    "cls": "history"
+   },
+   "contact": {
+    "v": null,
+    "why": {
+     "en": "Managing committee and contact not found",
+     "hi": "प्रबंधन समिति और संपर्क नहीं मिला"
+    },
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "No official source found",
+     "hi": "कोई आधिकारिक स्रोत नहीं मिला"
+    },
+    "cls": "hours"
+   },
+   "rules": [],
+   "notes": [],
+   "units": [
+    {
+     "id": "gurudwara-data-bandi-chhod",
+     "name": {
+      "en": "Gurudwara Data Bandi Chhod",
+      "hi": "गुरुद्वारा दाता बंदी छोड़"
+     },
+     "custodian": {
+      "v": null,
+      "why": {
+       "en": "Managing committee unknown",
+       "hi": "प्रबंधन समिति अज्ञात"
+      },
+      "cls": "rules"
+     },
+     "coord": [
+      26.2186,
+      78.1664
+     ],
+     "hours": {
+      "v": null,
+      "why": {
+       "en": "No source gives opening hours",
+       "hi": "किसी स्रोत में खुलने का समय नहीं"
+      },
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "ticket": "free-gurudwara",
+     "fees": {
+      "v": {
+       "ticket": "free-gurudwara",
+       "rows": [
+        {
+         "who": "indian",
+         "label": {
+          "en": "Everyone",
+          "hi": "सभी"
+         },
+         "any": 0
+        },
+        {
+         "who": "foreign",
+         "label": {
+          "en": "Everyone",
+          "hi": "सभी"
+         },
+         "any": 0
+        },
+        {
+         "who": "child",
+         "label": {
+          "en": "Everyone",
+          "hi": "सभी"
+         },
+         "any": 0
+        }
+       ]
+      },
+      "t": {
+       "en": "Free",
+       "hi": "निःशुल्क"
+      },
+      "s": "unverified",
+      "src": "sikhiwiki",
+      "ver": "2011-01-01",
+      "cls": "fees"
+     },
+     "payment": {
+      "v": null,
+      "why": {
+       "en": "Not applicable if free; unverified",
+       "hi": "निःशुल्क हो तो लागू नहीं; असत्यापित"
+      },
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 20,
+      "rec": 40,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  },
+  {
+   "id": "jai-vilas",
+   "name": {
+    "en": "Jai Vilas Palace",
+    "hi": "जय विलास महल"
+   },
+   "type": {
+    "en": "Palace museum (Scindia family residence)",
+    "hi": "महल संग्रहालय (सिंधिया परिवार निवास)"
+   },
+   "tags": [
+    "royal",
+    "museums",
+    "architecture"
+   ],
+   "lesserKnown": false,
+   "insideFort": false,
+   "popularity": {
+    "t": {
+     "en": "445 reviews on TripAdvisor",
+     "hi": "TripAdvisor पर 445 समीक्षाएँ"
+    },
+    "s": "officially confirmed",
+    "src": "tripadvisor-top",
+    "ver": "2026-10-13",
+    "cls": "status"
+   },
+   "guardrail": {
+    "visitorReady": true,
+    "dailyLimit": null,
+    "consentRequired": false,
+    "consent": null
+   },
+   "summary": {
+    "t": {
+     "en": "Scindia family residence; the museum was founded in 1964.",
+     "hi": "सिंधिया परिवार का निवास; संग्रहालय 1964 में स्थापित।"
+    },
+    "s": "recently reported",
+    "src": "jv-site",
+    "ver": "2026-10-13",
+    "cls": "history"
+   },
+   "contact": {
+    "t": {
+     "en": "+91 88271 56011, contact@jaivilaspalace.in",
+     "hi": "+91 88271 56011, contact@jaivilaspalace.in"
+    },
+    "s": "officially confirmed",
+    "src": "jv-site",
+    "ver": "2026-10-13",
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "Not stated by the custodian",
+     "hi": "संरक्षक ने नहीं बताया"
+    },
+    "cls": "hours"
+   },
+   "rules": [
+    {
+     "kind": "courtesy",
+     "t": {
+      "en": "The entrance is through a residential colony; the gate is \"sometimes\" closed for royal functions.",
+      "hi": "प्रवेश एक आवासीय कॉलोनी से होकर है; शाही आयोजनों के लिए गेट \"कभी-कभी\" बंद रहता है।"
+     },
+     "s": "recently reported",
+     "src": "airial",
+     "ver": "2026-10-13",
+     "cls": "rules"
+    }
+   ],
+   "notes": [],
+   "units": [
+    {
+     "id": "jai-vilas",
+     "name": {
+      "en": "Jai Vilas Palace museum",
+      "hi": "जय विलास महल संग्रहालय"
+     },
+     "custodian": {
+      "t": {
+       "en": "Scindia family trust (trust name unknown)",
+       "hi": "सिंधिया परिवार ट्रस्ट (ट्रस्ट का नाम अज्ञात)"
+      },
+      "s": "recently reported",
+      "src": "jv-site",
+      "ver": "2026-10-13",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2033,
+      78.1677
+     ],
+     "hours": {
+      "v": {
+       "kind": "fixed",
+       "open": "10:00",
+       "close": "18:00"
+      },
+      "t": {
+       "en": "Mon–Sun 10:00–18:00",
+       "hi": "सोम–रवि 10:00–18:00"
+      },
+      "s": "officially confirmed",
+      "src": "jv-site",
+      "ver": "2026-10-13",
+      "cls": "hours",
+      "alt": [
+       {
+        "t": {
+         "en": "10:00–18:00, \"Weekly off: Monday\" (state page from 2021)",
+         "hi": "10:00–18:00, \"साप्ताहिक अवकाश: सोमवार\" (2021 का राज्य पेज)"
+        },
+        "s": "potentially outdated",
+        "src": "mpt-jv",
+        "ver": "2021-08-07"
+       }
+      ]
+     },
+     "weeklyClosed": {
+      "v": [],
+      "t": {
+       "en": "No weekly closing day",
+       "hi": "कोई साप्ताहिक बंदी नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "jv-site",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": "none",
+      "t": {
+       "en": "No separate last entry published",
+       "hi": "अलग अंतिम प्रवेश प्रकाशित नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "jv-site",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "ticket": "jai-vilas",
+     "fees": {
+      "v": {
+       "ticket": "jai-vilas",
+       "rows": [
+        {
+         "who": "indian",
+         "label": {
+          "en": "Indian, excluding Darbar Hall",
+          "hi": "भारतीय, दरबार हॉल छोड़कर"
+         },
+         "any": 350
+        },
+        {
+         "who": "indian",
+         "label": {
+          "en": "Indian, full museum",
+          "hi": "भारतीय, पूरा संग्रहालय"
+         },
+         "any": 550
+        },
+        {
+         "who": "foreign",
+         "label": {
+          "en": "Foreign",
+          "hi": "विदेशी"
+         },
+         "any": 1000
+        },
+        {
+         "who": "child",
+         "label": {
+          "en": "Child and student rates",
+          "hi": "बच्चे और छात्र दरें"
+         },
+         "any": null
+        }
+       ]
+      },
+      "s": "officially confirmed",
+      "src": "jv-site",
+      "ver": "2026-10-13",
+      "cls": "fees",
+      "alt": [
+       {
+        "t": {
+         "en": "\"300/- per person\" (state page from 2021)",
+         "hi": "\"300/- प्रति व्यक्ति\" (2021 का राज्य पेज)"
+        },
+        "s": "potentially outdated",
+        "src": "mpt-jv",
+        "ver": "2021-08-07"
+       },
+       {
+        "t": {
+         "en": "₹850 for foreigners in Feb 2026, against ₹1000 now; change date unknown",
+         "hi": "फ़रवरी 2026 में विदेशियों के लिए ₹850, अब ₹1000; बदलाव की तिथि अज्ञात"
+        },
+        "s": "recently reported",
+        "src": "sailingstone",
+        "ver": "2026-02-16"
+       }
+      ]
+     },
+     "payment": {
+      "v": null,
+      "why": {
+       "en": "Payment modes and online booking not stated by the custodian",
+       "hi": "संरक्षक ने भुगतान के तरीके और ऑनलाइन बुकिंग नहीं बताई"
+      },
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 90,
+      "rec": 120,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  },
+  {
+   "id": "tansen-tomb",
+   "name": {
+    "en": "Tomb of Tansen",
+    "hi": "तानसेन का मकबरा"
+   },
+   "type": {
+    "en": "ASI monument at Ghauspura, outside the fort",
+    "hi": "गौसपुरा में ASI स्मारक, किले के बाहर"
+   },
+   "tags": [
+    "music",
+    "architecture"
+   ],
+   "lesserKnown": true,
+   "insideFort": false,
+   "popularity": {
+    "t": {
+     "en": "2 reviews on TripAdvisor",
+     "hi": "TripAdvisor पर 2 समीक्षाएँ"
+    },
+    "s": "officially confirmed",
+    "src": "tripadvisor-top",
+    "ver": "2026-10-13",
+    "cls": "status"
+   },
+   "guardrail": {
+    "visitorReady": true,
+    "dailyLimit": 25,
+    "consentRequired": false,
+    "consent": null
+   },
+   "summary": {
+    "t": {
+     "en": "Declared a monument of national importance on 23 Jan 1962. The tomb is open to visitors; a related case is pending before the Supreme Court.",
+     "hi": "23 जनवरी 1962 को राष्ट्रीय महत्व का स्मारक घोषित। मकबरा आगंतुकों के लिए खुला है; एक संबंधित मामला सर्वोच्च न्यायालय में लंबित है।"
+    },
+    "s": "recently reported",
+    "src": "livelaw",
+    "ver": "2026-03-10",
+    "cls": "history"
+   },
+   "contact": {
+    "t": {
+     "en": "ASI Gwalior Sub Circle: 0751-2480011",
+     "hi": "ASI ग्वालियर उप मंडल: 0751-2480011"
+    },
+    "s": "officially confirmed",
+    "src": "asi-list",
+    "ver": "2026-10-13",
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "No official source found",
+     "hi": "कोई आधिकारिक स्रोत नहीं मिला"
+    },
+    "cls": "hours"
+   },
+   "rules": [],
+   "notes": [
+    {
+     "t": {
+      "en": "Tansen Samaroh 2026: 14–19 Dec at Tansen Samadhi Sthal, no entry fee. Incredible India gives the venue as \"Behat village\".",
+      "hi": "तानसेन समारोह 2026: 14–19 दिसंबर, तानसेन समाधि स्थल, प्रवेश निःशुल्क। इनक्रेडिबल इंडिया स्थान \"बेहट गाँव\" बताता है।"
+     },
+     "s": "conflicting",
+     "src": "mpt-tansen",
+     "ver": "2026-10-13",
+     "cls": "status",
+     "alt": [
+      {
+       "t": {
+        "en": "Venue: Behat village",
+        "hi": "स्थान: बेहट गाँव"
+       },
+       "s": "officially confirmed",
+       "src": "ii-tansen",
+       "ver": "2026-10-13"
+      }
+     ]
+    }
+   ],
+   "units": [
+    {
+     "id": "tansen-tomb",
+     "name": {
+      "en": "Tomb of Tansen",
+      "hi": "तानसेन का मकबरा"
+     },
+     "custodian": {
+      "t": {
+       "en": "Archaeological Survey of India (sl. 158)",
+       "hi": "भारतीय पुरातत्व सर्वेक्षण (क्र. 158)"
+      },
+      "s": "officially confirmed",
+      "src": "asi-list",
+      "ver": "2026-10-13",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2297,
+      78.1816
+     ],
+     "hours": {
+      "v": {
+       "kind": "sun"
+      },
+      "t": {
+       "en": "Sunrise to sunset",
+       "hi": "सूर्योदय से सूर्यास्त तक"
+      },
+      "s": "officially confirmed",
+      "src": "asi-list",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": [],
+      "t": {
+       "en": "No weekly closure",
+       "hi": "कोई साप्ताहिक बंदी नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": "none",
+      "t": {
+       "en": "No separate last entry under the rule",
+       "hi": "नियम में अलग अंतिम प्रवेश नहीं"
+      },
+      "s": "officially confirmed",
+      "src": "amasr-hours",
+      "ver": "2026-10-13",
+      "cls": "hours"
+     },
+     "ticket": "tansen",
+     "fees": {
+      "v": null,
+      "t": {
+       "en": "₹5 / ₹100, and \"usually no separate entry fee\", on the same page",
+       "hi": "₹5 / ₹100, और \"आमतौर पर कोई अलग शुल्क नहीं\", एक ही पेज पर"
+      },
+      "s": "conflicting",
+      "src": "chalbanjare",
+      "ver": "2026-10-13",
+      "cls": "fees",
+      "why": {
+       "en": "No official fee found; the only source contradicts itself",
+       "hi": "कोई आधिकारिक शुल्क नहीं मिला; एकमात्र स्रोत स्वयं विरोधाभासी"
+      }
+     },
+     "payment": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 30,
+      "rec": 45,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  },
+  {
+   "id": "ghaus-tomb",
+   "name": {
+    "en": "Tomb of Mohammad Ghaus",
+    "hi": "मोहम्मद गौस का मकबरा"
+   },
+   "type": {
+    "en": "ASI monument at Ghauspura (separate entry from Tansen's tomb)",
+    "hi": "गौसपुरा में ASI स्मारक (तानसेन मकबरे से अलग प्रविष्टि)"
+   },
+   "tags": [
+    "architecture",
+    "spiritual"
+   ],
+   "lesserKnown": true,
+   "insideFort": false,
+   "guardrail": {
+    "visitorReady": true,
+    "dailyLimit": 25,
+    "consentRequired": false,
+    "consent": null
+   },
+   "summary": {
+    "t": {
+     "en": "Listed by ASI as a separate monument at Ghauspura.",
+     "hi": "ASI सूची में गौसपुरा का अलग स्मारक।"
+    },
+    "s": "officially confirmed",
+    "src": "asi-list",
+    "ver": "2026-10-13",
+    "cls": "history"
+   },
+   "contact": {
+    "t": {
+     "en": "ASI Gwalior Sub Circle: 0751-2480011",
+     "hi": "ASI ग्वालियर उप मंडल: 0751-2480011"
+    },
+    "s": "officially confirmed",
+    "src": "asi-list",
+    "ver": "2026-10-13",
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "No official source found",
+     "hi": "कोई आधिकारिक स्रोत नहीं मिला"
+    },
+    "cls": "hours"
+   },
+   "rules": [],
+   "notes": [],
+   "units": [
+    {
+     "id": "ghaus-tomb",
+     "name": {
+      "en": "Tomb of Mohammad Ghaus",
+      "hi": "मोहम्मद गौस का मकबरा"
+     },
+     "custodian": {
+      "t": {
+       "en": "Archaeological Survey of India",
+       "hi": "भारतीय पुरातत्व सर्वेक्षण"
+      },
+      "s": "officially confirmed",
+      "src": "asi-list",
+      "ver": "2026-10-13",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2301,
+      78.1823
+     ],
+     "hours": {
+      "v": null,
+      "why": {
+       "en": "Ticketing and timings not found in the ASI list",
+       "hi": "ASI सूची में टिकट और समय नहीं मिले"
+      },
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "ticket": "ghaus",
+     "fees": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "fees"
+     },
+     "payment": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 20,
+      "rec": 30,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  },
+  {
+   "id": "suraj-kund",
+   "name": {
+    "en": "Suraj Kund",
+    "hi": "सूरज कुंड"
+   },
+   "type": {
+    "en": "Tank inside the fort",
+    "hi": "किले के अंदर कुंड"
+   },
+   "tags": [
+    "architecture"
+   ],
+   "lesserKnown": true,
+   "insideFort": true,
+   "guardrail": {
+    "visitorReady": false,
+    "dailyLimit": null,
+    "consentRequired": false,
+    "consent": null
+   },
+   "summary": {
+    "t": {
+     "en": "Inside the fort; on neither the ASI list nor the state list.",
+     "hi": "किले के अंदर; न ASI सूची में, न राज्य सूची में।"
+    },
+    "s": "officially confirmed",
+    "src": "asi-list",
+    "ver": "2026-10-13",
+    "cls": "history"
+   },
+   "contact": {
+    "v": null,
+    "why": {
+     "en": "Custodian unknown",
+     "hi": "संरक्षक अज्ञात"
+    },
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "No source found",
+     "hi": "कोई स्रोत नहीं मिला"
+    },
+    "cls": "hours"
+   },
+   "rules": [],
+   "notes": [],
+   "units": [
+    {
+     "id": "suraj-kund",
+     "name": {
+      "en": "Suraj Kund",
+      "hi": "सूरज कुंड"
+     },
+     "custodian": {
+      "v": null,
+      "why": {
+       "en": "Custodian unknown",
+       "hi": "संरक्षक अज्ञात"
+      },
+      "cls": "rules"
+     },
+     "coord": [
+      26.2246,
+      78.1697
+     ],
+     "hours": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "ticket": "suraj-kund",
+     "fees": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "fees"
+     },
+     "payment": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 10,
+      "rec": 15,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  },
+  {
+   "id": "sun-temple",
+   "name": {
+    "en": "Sun Temple, Morar",
+    "hi": "सूर्य मंदिर, मुरार"
+   },
+   "type": {
+    "en": "Modern temple (Birla Group; not a protected monument)",
+    "hi": "आधुनिक मंदिर (बिड़ला समूह; संरक्षित स्मारक नहीं)"
+   },
+   "tags": [
+    "temples",
+    "spiritual"
+   ],
+   "lesserKnown": false,
+   "insideFort": false,
+   "popularity": {
+    "t": {
+     "en": "161 reviews on TripAdvisor",
+     "hi": "TripAdvisor पर 161 समीक्षाएँ"
+    },
+    "s": "officially confirmed",
+    "src": "tripadvisor-top",
+    "ver": "2026-10-13",
+    "cls": "status"
+   },
+   "guardrail": {
+    "visitorReady": true,
+    "dailyLimit": null,
+    "consentRequired": true,
+    "consent": true
+   },
+   "summary": {
+    "t": {
+     "en": "Built by the Birla Group; not a protected monument.",
+     "hi": "बिड़ला समूह द्वारा निर्मित; संरक्षित स्मारक नहीं।"
+    },
+    "s": "recently reported",
+    "src": "bhaktibharat",
+    "ver": "2026-08-28",
+    "cls": "history"
+   },
+   "contact": {
+    "v": null,
+    "why": {
+     "en": "Not found",
+     "hi": "नहीं मिला"
+    },
+    "cls": "rules"
+   },
+   "accessibility": {
+    "v": null,
+    "why": {
+     "en": "No sourced accessibility information",
+     "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+    },
+    "cls": "rules"
+   },
+   "facilities": {
+    "v": null,
+    "why": {
+     "en": "No source found",
+     "hi": "कोई स्रोत नहीं मिला"
+    },
+    "cls": "hours"
+   },
+   "rules": [],
+   "notes": [],
+   "units": [
+    {
+     "id": "sun-temple",
+     "name": {
+      "en": "Sun Temple, Morar",
+      "hi": "सूर्य मंदिर, मुरार"
+     },
+     "custodian": {
+      "t": {
+       "en": "Birla Group",
+       "hi": "बिड़ला समूह"
+      },
+      "s": "recently reported",
+      "src": "bhaktibharat",
+      "ver": "2026-08-28",
+      "cls": "rules"
+     },
+     "coord": [
+      26.2283,
+      78.2264
+     ],
+     "hours": {
+      "v": null,
+      "why": {
+       "en": "No source gives opening hours",
+       "hi": "किसी स्रोत में खुलने का समय नहीं"
+      },
+      "cls": "hours"
+     },
+     "weeklyClosed": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "lastEntry": {
+      "v": null,
+      "why": {
+       "en": "Not found",
+       "hi": "नहीं मिला"
+      },
+      "cls": "hours"
+     },
+     "ticket": "sun-temple",
+     "fees": {
+      "v": {
+       "ticket": "sun-temple",
+       "rows": [
+        {
+         "who": "indian",
+         "label": {
+          "en": "Everyone",
+          "hi": "सभी"
+         },
+         "any": 0
+        },
+        {
+         "who": "foreign",
+         "label": {
+          "en": "Everyone",
+          "hi": "सभी"
+         },
+         "any": 0
+        },
+        {
+         "who": "child",
+         "label": {
+          "en": "Everyone",
+          "hi": "सभी"
+         },
+         "any": 0
+        }
+       ]
+      },
+      "t": {
+       "en": "Free",
+       "hi": "निःशुल्क"
+      },
+      "s": "recently reported",
+      "src": "bhaktibharat",
+      "ver": "2026-08-28",
+      "cls": "fees"
+     },
+     "payment": {
+      "v": null,
+      "why": {
+       "en": "Not applicable if free",
+       "hi": "निःशुल्क हो तो लागू नहीं"
+      },
+      "cls": "fees"
+     },
+     "minVisit": {
+      "v": 30,
+      "rec": 45,
+      "s": "estimated",
+      "src": "team-estimate",
+      "ver": "2026-10-14",
+      "cls": "hours"
+     }
+    }
+   ]
+  }
+ ]
+}
