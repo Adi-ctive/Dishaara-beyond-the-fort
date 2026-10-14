@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { buildPlan, findAlternates, fmt, parseTrip, replan, type Alternate, type Leg, type Mode, type Plan as P } from '../core';
 import { useA } from '../store';
 import { Chip, FactRow, ModeIcon, Reasons, VerdictBadge, rupees } from '../ui/bits';
@@ -41,8 +41,11 @@ export default function Plan() {
 
   const build = (f = form) => { setPlan(buildPlan(a.data, { ...f, profile: a.profile, counts: a.counts })); setAlts(null); setSavedNote(''); };
 
-  const parse = () => {
-    const r = parseTrip(text, a.today);
+  // ?sample in the URL builds a sample plan straight away (judges' shortcut).
+  useEffect(() => { if (new URLSearchParams(location.search).has('sample')) build(); }, []); // eslint-disable-line
+
+  const parse = (src = text) => {
+    const r = parseTrip(src, a.today);
     if (r.uncoveredCity) { setMsg({ kind: 'nc' }); setPlan(null); return; }
     const next = { ...form, ...(r.date && { date: r.date }), ...(r.hours && { hours: r.hours }), ...(r.start && { start: r.start }), ...(r.startPoint && { startPoint: r.startPoint }) };
     setForm(next);
@@ -61,7 +64,7 @@ export default function Plan() {
       <section className="card">
         <label htmlFor="trip" className="lbl">{a.t('describe')}</label>
         <textarea id="trip" rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder={a.t('describePh')} />
-        <button className="btn" onClick={parse} disabled={!text.trim()}>{a.t('fill')}</button>
+        <button className="btn" onClick={() => parse()} disabled={!text.trim()}>{a.t('fill')}</button>
         {msg?.kind === 'ask' && msg.opts && (
           <div className="ask" role="alert">
             <p>{a.t('askDate', { date: a.date(msg.date!), actual: a.dow(msg.actual!), opt1: a.dateDow(msg.opts[0]), opt2: a.dateDow(msg.opts[1]) })}</p>

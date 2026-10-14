@@ -24,6 +24,7 @@ function usePersist<T>(k: string, init: T) {
 
 function useApp() {
   const [lang, setLang] = usePersist<Lang>('lang', 'en');
+  useEffect(() => { const q = new URLSearchParams(location.search).get('lang'); if (q === 'en' || q === 'hi') setLang(q); }, []); // eslint-disable-line
   const [user, setUser] = usePersist<{ name: string } | null>('user', null);
   const [profile, setProfile] = usePersist<Profile | null>('profile', null);
   const [plans, setPlans] = usePersist<SavedPlan[]>('plans', []);
