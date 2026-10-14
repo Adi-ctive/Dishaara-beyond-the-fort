@@ -55,6 +55,8 @@ export function parseTrip(text: string, today: string): Parsed {
     const mi = MONTHS.find(([re]) => re.test(m[1]));
     if (mi) { day = +m[2]; mon = mi[1]; year = m[3] ? +m[3] : undefined; break; }
   }
+  const isoM = s.match(/\b(20\d{2})-(\d{2})-(\d{2})\b/);
+  if (isoM) { year = +isoM[1]; mon = +isoM[2] - 1; day = +isoM[3]; }
   if (mon !== undefined && day !== undefined) {
     let y = year ?? +today.slice(0, 4);
     let d = iso(y, mon, day);

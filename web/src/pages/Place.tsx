@@ -3,7 +3,7 @@ import { checkUnit, fmt, guardrail, haversineKm, ROAD_FACTOR, sunTimes, toMin, t
 import { useA } from '../store';
 import { Chip, FactRow, Reasons, Section, VerdictBadge } from '../ui/bits';
 
-function FeeTable({ fees }: { fees: Fees }) {
+export function FeeTable({ fees }: { fees: Fees }) {
   const a = useA();
   const cell = (n?: number | null) => (n === null || n === undefined ? <span className="muted">—</span> : n === 0 ? a.t('free') : `₹${n}`);
   return (
@@ -56,7 +56,7 @@ export default function Place({ id }: { id: string }) {
 
   return (
     <div className="page place">
-      <a className="back" href="#/">← {a.t('back')}</a>
+      <a className="back" href="#/explore">← {a.t('back')}</a>
       <header className="place-head">
         <p className="eyebrow">{a.l(place.type)}</p>
         <h1>{a.l(place.name)}</h1>

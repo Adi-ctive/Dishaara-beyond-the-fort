@@ -24,6 +24,7 @@ export default function Home() {
 
   return (
     <div className="page">
+      <p className="demo-banner">{a.t('demoBanner')}</p>
       <section className="hero">
         <div className="hero-art" aria-hidden />
         <p className="eyebrow">{a.t('tagline')}</p>

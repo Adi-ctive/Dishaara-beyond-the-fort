@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { DEFAULT_PROFILE, SEED, runFreshness, withGuardrails, type Counts, type Guardrail, type Lang, type Profile } from './core';
 import { makeT } from './i18n';
+import type { Msg, Slots } from './chat/engine';
+import type { Plan } from './core';
 
 // App state. Everything personal stays in this browser (DPDP: no location history, nothing sent out).
 
@@ -24,6 +26,8 @@ function usePersist<T>(k: string, init: T) {
 
 function useApp() {
   const [lang, setLang] = usePersist<Lang>('lang', 'en');
+  // Deep links (?guest, ?sample) skip the welcome screen so a shared link opens straight on the content.
+  const deep = /[?&](guest|sample|ask)\b/.test(location.search);
   useEffect(() => { const q = new URLSearchParams(location.search).get('lang'); if (q === 'en' || q === 'hi') setLang(q); }, []); // eslint-disable-line
   const [user, setUser] = usePersist<{ name: string } | null>('user', null);
   const [profile, setProfile] = usePersist<Profile | null>('profile', null);
@@ -32,6 +36,12 @@ function useApp() {
   const [overrides, setOverrides] = usePersist<Record<string, Partial<Guardrail>>>('guardrails', {});
   const [log, setLog] = usePersist<LogEntry[]>('guardrailLog', []);
   const [asOf, setAsOf] = useState(today());
+  const [entered, setEntered] = usePersist<boolean>('entered', false); // signed in or chose guest
+  const [setupDone, setSetupDone] = usePersist<boolean>('setupDone', false);
+  const [groqKey, setGroqKey] = usePersist<string>('groqKey', ''); // stays in this browser, sent only to Groq
+  const [chat, setChat] = useState<Msg[]>([]);
+  const [slots, setSlots] = useState<Slots>({});
+  const [lastPlan, setLastPlan] = useState<Plan | null>(null);
 
   const { data, queue } = useMemo(() => runFreshness(withGuardrails(SEED, overrides), asOf), [overrides, asOf]);
   const counts = useMemo(() => {
@@ -51,7 +61,7 @@ function useApp() {
       setOverrides({ ...overrides, [placeId]: { ...overrides[placeId], ...g } });
       setLog([{ at: new Date().toISOString(), placeId, change }, ...log]);
     },
-    log,
+    log, entered: entered || deep, setEntered, setupDone: setupDone || deep, setSetupDone, groqKey, setGroqKey, chat, setChat, slots, setSlots, lastPlan, setLastPlan,
   };
 }
 

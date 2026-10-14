@@ -2,9 +2,19 @@
 
 Team Argus · AI Synergy Hackathon 2026 · Tourism case "Beyond the Fort" · Round 1 deliverable 5 (technical feasibility proof).
 
-**Live demo:** https://adi-ctive.github.io/Dishaara-beyond-the-fort/
-**Sample plan in one click:** https://adi-ctive.github.io/Dishaara-beyond-the-fort/?sample#/plan
-**Hindi:** https://adi-ctive.github.io/Dishaara-beyond-the-fort/?lang=hi#/
+**Live demo:** https://adi-ctive.github.io/Dishaara-beyond-the-fort/ (opens on the sign-in screen; "Continue as guest" works)
+
+One-click links that skip sign-in:
+- Ask a question: https://adi-ctive.github.io/Dishaara-beyond-the-fort/?ask=Is%20Gwalior%20Fort%20open%20tomorrow%3F
+- Get a plan: https://adi-ctive.github.io/Dishaara-beyond-the-fort/?ask=Plan%205%20hours%20tomorrow%20starting%20at%20the%20railway%20station
+- Hindi: https://adi-ctive.github.io/Dishaara-beyond-the-fort/?guest&lang=hi
+
+## How to use it
+
+1. Sign in (demo Google sign-in, first name only) or continue as a guest.
+2. Pick what you enjoy and how you like to travel, or skip.
+3. Chat. Try "Plan my day", "Is Jai Vilas open on Monday?" or "How much is the fort ticket?". Dishaara asks one simple question at a time (which day, how many hours, where you start) and answers with cards: a plan timeline, a visit verdict, or a fee table.
+4. Everything else sits in tabs: **Explore** (all places and full briefings), **Plan** (the same planner as a form), **You** (profile, language, optional AI key) and **More** (verification console, partner portal, what the labels mean).
 
 ## Problem and solution
 
@@ -12,9 +22,11 @@ Visitors to heritage cities plan a fixed time budget on Google, Maps and social 
 
 ## Screenshots
 
-| Places | Fort briefing | Plan timeline | Hindi |
-|---|---|---|---|
-| ![Places](docs/shots/home.png) | ![Briefing](docs/shots/briefing.png) | ![Plan](docs/shots/plan.png) | ![Hindi](docs/shots/hindi.png) |
+| Sign in | Chat home | Visit check | Plan in chat | Hindi |
+|---|---|---|---|---|
+| ![Welcome](docs/shots/welcome.png) | ![Chat](docs/shots/chat.png) | ![Place check](docs/shots/chat-place.png) | ![Plan](docs/shots/chat-plan.png) | ![Hindi](docs/shots/chat-hi.png) |
+
+![Fort briefing](docs/shots/briefing.png)
 
 ![Desktop](docs/shots/desktop.png)
 ![Verification console](docs/shots/console.png)
@@ -36,26 +48,35 @@ web/                 React 18 + Vite + TypeScript, deployed to GitHub Pages
     alternates.ts         "Can't make it" alternates and replan (FR-AL)
     geo.ts                leg distance, time and fare, labelled estimated (E6)
     parse.ts              trip text, date/weekday check (E19), coverage (E20)
-  src/pages/              Places, Briefing, Plan, Profile, Verify console, Partner portal, Ask
-backend/             FastAPI: POST /ask with tool calls and a grounding check
+    grounding.ts          blocks AI text with a time, date, fee, distance or phone not in tool results
+  src/chat/               chat engine: rule-based answers, or Groq with tool calls
+  src/pages/              Welcome, Setup, Chat (home), Explore, Briefing, Plan, You, More, Verify, Partners
+backend/             optional FastAPI /ask with the same tools and grounding check (local only)
 ```
 
-The live site needs no server. The briefing, verdicts and plans all run from the seed file and the core module in the browser. This is SRS fallback E7: the product still works when the AI is down. The AI panel only appears when `VITE_API_URL` points at a running backend.
+The live site needs no server. Briefings, verdicts and plans all run in the browser from the seed file and the core module.
+
+**The chat works in two modes:**
+- **Without a key (default):** a rule-based assistant reads the message, asks for any missing detail, and answers from the tools. This is SRS fallback E7.
+- **With a free Groq key:** the visitor pastes it in You → AI replies. The model (`openai/gpt-oss-120b`) calls the same five tools: search_places, get_place, check_feasibility, build_plan and find_alternates. Its reply must pass the grounding check. If it fails, the reply is regenerated once, then hidden, and the cards are shown on their own. If Groq is down or slower than 15 s, the rule-based answer is used.
+
+Some checks never reach the model: uncovered cities (E20), emergencies (E18) and date/weekday mismatches (E19). Cards are always built from tool results, never from model text. The key is stored only in that browser and sent only to Groq. GitHub Pages can't hide a key, so none is bundled into the site.
 
 ## What is real and what is mocked
 
 | Real (working code) | Mocked or estimated |
 |---|---|
-| Seed facts from official and reported sources, each with source, evidence, verified date, check-by and one of the 8 labels | Google sign-in: a name field, stored only in your browser |
+| Seed facts from official and reported sources, each with source, evidence, verified date, check-by and one of the 8 labels | Google sign-in: a first-name field, stored only in your browser |
 | Daily freshness job: past check-by becomes "potentially outdated" and joins the re-verify queue | Partner portal: custodian flag edits apply in your browser only; guide and driver forms don't submit |
 | Feasibility verdicts from explicit rules, with reasons, per Fort section | Routing API: legs are straight-line distance × 1.5 at a set speed, labelled "estimated" |
 | Planner: opening, latest arrival, closing, max(15 min, 20%) leg buffer, 10 min ticket buffer, total ≤ hours | Map positions of places: team estimates, labelled "estimated" |
 | Budget range by visitor type and cash/online, each ticket counted once, partial when a value is unknown | Visit durations: team planning defaults, labelled "estimated" |
 | Guardrail and daily limits from saved plans; unflagged places shown only on search | Visitor-ready flags and daily limits: **demo values**, marked as such in the data and UI |
 | "Can't make it": up to 3 alternates that pass the guardrail, are feasible and fit the remaining time | Visitor reports and saved plans: stored in localStorage, not a database |
-| Date/weekday mismatch question, "not covered yet" for other cities | LLM: `/ask` uses a deterministic writer until a provider is chosen; the tool calls and grounding check are real |
+| Date/weekday mismatch question, "not covered yet" for other cities | AI on the public site: off until a visitor adds their own Groq key; no shared key is bundled |
 | Full Hindi/English UI | |
-| Backend `/ask`: tool calls, a grounding check that blocks unknown times, fees, distances and phones, one regeneration, then a structured-only fallback | |
+| Chat: slot-filling planner, place verdict and fee cards, deep links (`?ask=`) | |
+| Groq AI mode: tool calls, grounding check, one regeneration, structured fallback | |
 
 ## Run locally
 
@@ -85,7 +106,9 @@ cd backend && .venv/Scripts/python -m uvicorn app.main:app --reload --port 8000
 cd backend && .venv/Scripts/python -m pytest -q
 ```
 
-On macOS or Linux, use `.venv/bin/` instead of `.venv/Scripts/`. To show the Ask panel, copy `web/.env.example` to `web/.env`, set `VITE_API_URL=http://localhost:8000`, and restart the dev server. No API key ever goes in the frontend. Backend settings go in `backend/.env` (see `backend/.env.example`).
+On macOS or Linux, use `.venv/bin/` instead of `.venv/Scripts/`.
+
+To try AI replies, get a free key at console.groq.com and paste it in the app under You → AI replies. To run the live Groq tests locally, set `GROQ_KEY` in your shell before `npm test`. They are skipped otherwise, including in CI. Never commit a key.
 
 ## Features, SRS requirements and tests
 
@@ -99,7 +122,8 @@ On macOS or Linux, use `.venv/bin/` instead of `.venv/Scripts/`. To show the Ask
 | Daily limit excludes a place from the third plan | FR-GR-04 | AT-07 |
 | Weekly holiday → "not feasible"; ≤ 3 eligible alternates; all 4 verdicts | FR-FC-01, AL-01, AL-02 | AT-08 (web and backend) |
 | Fort fees by visitor type and cash/online; separate section tickets | FR-KB-02, BR-01 | AT-09 |
-| Grounding check blocks an invented time, regenerates once, falls back, logs | FR-AI-04 | AT-10 `backend/tests/test_ai.py` |
+| Grounding check blocks an invented time, regenerates once, falls back, logs | FR-AI-04 | AT-10 `web/src/chat/chat.test.ts` and `backend/tests/test_ai.py` |
+| Chat asks one missing detail at a time, then builds the plan; works in Hindi | FR-AI-10, VO-05 | `web/src/chat/chat.test.ts` |
 | Works without the LLM and routing API; legs marked estimated | E6, E7 | AT-13 |
 | Chat-style trip text: date/weekday question, profile defaults, no disliked places, Hindi too | FR-VO-03, VO-07, AI-10, E19 | AT-16 |
 | Uncovered city → "not covered yet" | FR-AI-11, E20 | AT-17 (web and backend) |
