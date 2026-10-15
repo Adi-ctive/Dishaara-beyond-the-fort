@@ -65,6 +65,10 @@ export default function Place({ id }: { id: string }) {
           {place.tags.map((t) => <span key={t} className="tag">{a.t(`tag_${t}` as never)}</span>)}
         </div>
         {!g.ok && <p className="warn">{a.t('describedOnly')}</p>}
+        <div className="guard">
+          <p className="small"><strong>{a.t('guardTitle')}:</strong> {g.ok ? a.t(g.level === 2 ? 'g_level2' : 'g_level1') : place.guardrail.status === 'withdrawn' ? a.t('g_withdrawn') : place.guardrail.status === 'notEligible' ? a.t('g_notEligible') : a.t(`gr_${g.reason}` as never)}{place.guardrail.reason && <> · {a.l(place.guardrail.reason)}</>}{place.guardrail.demo && <span className="demo">{a.t('demoValue')}</span>}</p>
+          {place.guardrail.publication && <FactRow f={place.guardrail.publication} label={a.t('publication')} />}
+        </div>
       </header>
 
       <section className="card check" aria-labelledby="chk">

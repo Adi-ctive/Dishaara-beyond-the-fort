@@ -1,4 +1,4 @@
-import { buildPlan, checkUnit, findAlternates, fmt, guardrail, isUnavailable, toMin, type Data, type Fact, type Mode, type Place, type Plan, type Profile, type Counts, type Who } from '../core';
+import { buildPlan, checkUnit, findAlternates, fmt, guardrail, isUnavailable, promotable, toMin, type Data, type Fact, type Mode, type Place, type Plan, type Profile, type Counts, type Who } from '../core';
 import type { T } from '../i18n';
 
 // Tools the assistant may call (FR-AI-02). They run the same deterministic core as the rest of the app;
@@ -71,7 +71,7 @@ export const planSummary = (p: Plan, tr: T) => ({
 
 /** OpenAI-style tool schemas for the LLM. */
 export const TOOL_SCHEMAS = [
-  { type: 'function', function: { name: 'search_places', description: 'Find Gwalior places by name or interest. Only visitor-ready places may be recommended.', parameters: { type: 'object', properties: { query: { type: 'string' }, interest: { type: 'string', enum: ['architecture', 'temples', 'museums', 'royal', 'music', 'spiritual'] }, lesser_known_only: { type: 'boolean' } } } } },
+  { type: 'function', function: { name: 'search_places', description: 'Find Gwalior places by name or interest. Only plan-eligible places (guardrail Level 1 or 2) may be recommended; only Level 2 places may be promoted as lesser-known.', parameters: { type: 'object', properties: { query: { type: 'string' }, interest: { type: 'string', enum: ['architecture', 'temples', 'museums', 'royal', 'music', 'spiritual'] }, lesser_known_only: { type: 'boolean' } } } } },
   { type: 'function', function: { name: 'get_place', description: 'Full stamped briefing for one place: hours, fees by visitor type and payment mode, rules, contact.', parameters: { type: 'object', properties: { place_id: { type: 'string' } }, required: ['place_id'] } } },
   { type: 'function', function: { name: 'check_feasibility', description: 'Rules-engine verdict for visiting a place on a date (YYYY-MM-DD), optional arrival time HH:MM.', parameters: { type: 'object', properties: { place_id: { type: 'string' }, date: { type: 'string' }, arrival_time: { type: 'string' } }, required: ['place_id', 'date'] } } },
   { type: 'function', function: { name: 'build_plan', description: 'Build a one-day time-fit plan. Ask the visitor first for any of date, hours or start point that they did not give.', parameters: { type: 'object', properties: {
@@ -91,11 +91,11 @@ export function runTool(name: string, args: Record<string, unknown>, ctx: Ctx): 
       const q = String(args.query ?? '');
       const hits = q ? findPlaces(q) : [];
       const list = ctx.data.places.filter((p) => (hits.length ? hits.includes(p.id) : true)
-        && (!args.interest || p.tags.includes(String(args.interest))) && (!args.lesser_known_only || p.lesserKnown));
+        && (!args.interest || p.tags.includes(String(args.interest))) && (!args.lesser_known_only || (p.lesserKnown && promotable(p, ctx.today, ctx.counts))));
       const result = list.map((p) => {
         const g = guardrail(p, ctx.today, ctx.counts);
         return g.ok ? { id: p.id, name: ctx.tr.l(p.name), type: ctx.tr.l(p.type), tags: p.tags, lesser_known: p.lesserKnown }
-          : hits.includes(p.id) ? { id: p.id, name: ctx.tr.l(p.name), note: 'Describe only if asked. Do not recommend: not marked visitor-ready by the custodian.' } : null;
+          : hits.includes(p.id) ? { id: p.id, name: ctx.tr.l(p.name), note: `Describe only if asked. Do not recommend or plan: guardrail ${g.reason}.` } : null;
       }).filter(Boolean);
       return { result, placeIds: list.filter((p) => guardrail(p, ctx.today, ctx.counts).ok).map((p) => p.id) };
     }

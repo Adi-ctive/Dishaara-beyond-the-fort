@@ -47,7 +47,7 @@ export interface Plan {
   dataVersion: string;
 }
 
-export const LESSER_KNOWN_BOOST = 6; // FR-PL-09: capped boost
+export const LESSER_KNOWN_BOOST = 6; // FR-PL-09: capped boost, Level 2 places only (Decision 25)
 export const people = (g: Record<Who, number>) => g.indian + g.foreign + g.child;
 
 export const allUnits = (data: Data) => data.places.flatMap((place) => place.units.map((unit) => ({ unit, place })));
@@ -57,7 +57,7 @@ export function startCoord(data: Data, id: string): [number, number] {
 }
 
 export const score = (place: Place, likes: string[]) =>
-  (likes.length ? place.tags.filter((t) => likes.includes(t)).length * 10 : 5) + (place.lesserKnown ? LESSER_KNOWN_BOOST : 0);
+  (likes.length ? place.tags.filter((t) => likes.includes(t)).length * 10 : 5) + (place.lesserKnown && place.guardrail.status === 'level2' ? LESSER_KNOWN_BOOST : 0);
 
 /** Why a unit cannot be a candidate stop, or null if it can (FR-PL-01, FR-GR-02/03). */
 export function candidacy(data: Data, unit: Unit, place: Place, input: PlanInput): string | null {

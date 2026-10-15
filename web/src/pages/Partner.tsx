@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { guardrail, type GuardStatus } from '../core';
 import { useA } from '../store';
+import { Chip } from '../ui/bits';
 
 // Partner portal mock-up (FR-PT, FR-GR-05). Custodian flag changes apply at once and are logged.
 export default function Partner() {
@@ -19,16 +21,22 @@ export default function Partner() {
         <section className="card">
           <div className="table-wrap">
             <table className="guard">
-              <thead><tr><th></th><th>{a.t('visitorReady')}</th><th>{a.t('dailyLimit')}</th><th>{a.t('consent')}</th></tr></thead>
+              <thead><tr><th></th><th>{a.t('status_')}</th><th>{a.t('dailyLimit')}</th><th>{a.t('publication')}</th></tr></thead>
               <tbody>{a.data.places.map((p) => {
                 const g = p.guardrail;
+                const res = guardrail(p, a.today, a.counts);
                 return (
                   <tr key={p.id}>
-                    <th scope="row">{a.l(p.name)}<span className="demo">{a.t('demoValue')}</span></th>
-                    <td><input type="checkbox" checked={g.visitorReady} aria-label={a.t('visitorReady')} onChange={(e) => a.setGuardrail(p.id, { visitorReady: e.target.checked }, `visitorReady → ${e.target.checked}`)} /></td>
-                    <td><input type="number" min={0} className="num" value={g.dailyLimit ?? ''} placeholder={a.t('none')} aria-label={a.t('dailyLimit')}
-                      onChange={(e) => { const v = e.target.value === '' ? null : Math.max(0, +e.target.value); a.setGuardrail(p.id, { dailyLimit: v }, `dailyLimit → ${v ?? 'none'}`); }} /></td>
-                    <td>{g.consentRequired ? <input type="checkbox" checked={!!g.consent} aria-label={a.t('consent')} onChange={(e) => a.setGuardrail(p.id, { consent: e.target.checked }, `consent → ${e.target.checked}`)} /> : <span className="muted">—</span>}</td>
+                    <th scope="row">{a.l(p.name)}{g.demo && <span className="demo">{a.t('demoValue')}</span>}</th>
+                    <td>
+                      <select value={g.status} aria-label={a.t('status_')} onChange={(e) => a.setGuardrail(p.id, { status: e.target.value as GuardStatus }, `status → ${e.target.value}`)}>
+                        {(['level1', 'level2', 'withdrawn', 'notEligible'] as GuardStatus[]).map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                      {!res.ok && res.reason && res.reason !== 'notEligible' && res.reason !== 'withdrawn' && <span className="demo">{a.t(`gr_${res.reason}` as never)}</span>}
+                    </td>
+                    <td>{g.status === 'level2' ? <input type="number" min={0} className="num" value={g.dailyLimit ?? ''} placeholder={a.t('none')} aria-label={a.t('dailyLimit')}
+                      onChange={(e) => { const v = e.target.value === '' ? null : Math.max(0, +e.target.value); a.setGuardrail(p.id, { dailyLimit: v }, `dailyLimit → ${v ?? 'none'}`); }} /> : <span className="muted">—</span>}</td>
+                    <td className="small">{g.publication ? <><Chip s={g.publication.s} /> {a.data.sources[g.publication.src ?? '']?.name}</> : <span className="muted">{a.l(g.reason) || '—'}</span>}</td>
                   </tr>
                 );
               })}</tbody>

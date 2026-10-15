@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   SEED, allUnits, buildPlan, checkUnit, findAlternates, latestArrival, parseTrip, runFreshness, isCovered,
-  visitMinutes, windowFor, withGuardrails, type Mode, type PlanInput, type Plan, DEFAULT_PROFILE,
+  visitMinutes, windowFor, withGuardrails, guardrail, promotable, score, LESSER_KNOWN_BOOST, type Mode, type PlanInput, type Plan, DEFAULT_PROFILE,
 } from './index';
 
 const TODAY = '2026-10-14'; // Wednesday
@@ -72,27 +72,85 @@ describe('AT-04 stale fact is flagged (FR-VF-05, FR-PL-07)', () => {
   });
 });
 
-describe('AT-06 guardrail: unflagged place never promoted (FR-GR-02/03)', () => {
-  it('X without visitor-ready flag appears 0 times in 30 plans and 30 alternate requests', () => {
-    const d = withGuardrails(DATA, { 'tansen-tomb': { visitorReady: false } });
-    const like = { ...DEFAULT_PROFILE, likes: ['music'] };
+describe('AT-06 guardrail: not-eligible places never planned, Level 2 only promoted (FR-GR-02/03, Decision 25)', () => {
+  const NOT = ['tansen-tomb', 'ghaus-tomb', 'gurudwara-data-bandi-chhod', 'sun-temple', 'suraj-kund'];
+  const runs = (d: typeof DATA, ids: string[]) => {
     let seen = 0;
     for (let i = 0; i < 30; i++) {
-      const p = buildPlan(d, base({ profile: like, startPoint: 'ghauspura', start: ['08:00', '10:00', '13:00'][i % 3], hours: 2 + (i % 10) }));
-      seen += p.stops.filter((s) => s.place.id === 'tansen-tomb').length;
-      if (p.stops.length) seen += findAlternates(d, p, i % p.stops.length).filter((a) => a.place.id === 'tansen-tomb').length;
+      const p = buildPlan(d, base({ profile: { ...DEFAULT_PROFILE, likes: [['music'], ['spiritual'], ['temples', 'architecture']][i % 3] }, startPoint: ['ghauspura', 'fort', 'station'][i % 3], start: ['08:00', '10:00', '13:00'][i % 3], hours: 2 + (i % 10) }));
+      seen += p.stops.filter((s) => ids.includes(s.place.id)).length;
+      if (p.stops.length) seen += findAlternates(d, p, i % p.stops.length).filter((a) => ids.includes(a.place.id)).length;
     }
-    expect(seen).toBe(0);
-    expect(d.places.some((p) => p.id === 'tansen-tomb')).toBe(true); // still viewable by search
+    return seen;
+  };
+  it('notEligible places appear 0 times in 30 plans and 30 alternate requests, and stay describable', () => {
+    expect(runs(DATA, NOT)).toBe(0);
+    for (const id of NOT) {
+      expect(DATA.places.some((p) => p.id === id)).toBe(true); // still viewable by search
+      expect(guardrail(DATA.places.find((p) => p.id === id)!, '2026-10-21').reason).toBe('notEligible');
+    }
+  });
+  it('the check is not vacuous: the same place at Level 1 does get planned', () => {
+    const pub = DATA.places.find((p) => p.id === 'jai-vilas')!.guardrail.publication;
+    const d = withGuardrails(DATA, { 'tansen-tomb': { status: 'level1', publication: pub } });
+    expect(runs(d, ['tansen-tomb'])).toBeGreaterThan(0);
+  });
+  it('the lesser-known boost applies to Level 2 only', () => {
+    const teli = DATA.places.find((p) => p.id === 'teli-ka-mandir')!;
+    const asLevel1 = { ...teli, guardrail: { ...teli.guardrail, status: 'level1' as const } };
+    expect(score(teli, ['temples']) - score(asLevel1, ['temples'])).toBe(LESSER_KNOWN_BOOST);
+    expect(promotable(teli, '2026-10-21')).toBe(true);
+    expect(promotable(asLevel1, '2026-10-21')).toBe(false);
   });
 });
 
-describe('AT-07 guardrail: daily limit (FR-GR-04)', () => {
-  it('Teli ka Mandir (limit 2, demo value) is excluded from the third plan that date', () => {
+describe('AT-07 guardrail: daily limit, Level 2 only (FR-GR-04)', () => {
+  it('Teli ka Mandir (demo Level 2, limit 2) is excluded from the third plan that date', () => {
     const inp = base({ profile: { ...DEFAULT_PROFILE, likes: ['temples'] }, startPoint: 'fort' });
     expect(buildPlan(DATA, inp).stops.some((s) => s.place.id === 'teli-ka-mandir')).toBe(true);
     const third = buildPlan(DATA, { ...inp, counts: { [inp.date]: { 'teli-ka-mandir': 2 } } });
     expect(third.stops.some((s) => s.place.id === 'teli-ka-mandir')).toBe(false);
+  });
+  it('a Level 1 place has no daily limit', () => {
+    const inp = base({ profile: { ...DEFAULT_PROFILE, likes: ['royal'] }, startPoint: 'jaivilas', start: '10:00' });
+    const p = buildPlan(DATA, { ...inp, counts: { [inp.date]: { 'jai-vilas': 999 } } });
+    expect(p.stops.some((s) => s.place.id === 'jai-vilas')).toBe(true);
+  });
+});
+
+describe('AT-19 Level 1 ends on stale, conflicting or withdrawn status (FR-GR-02, Decision 25)', () => {
+  const count = (d: typeof DATA) => {
+    let seen = 0;
+    for (let i = 0; i < 10; i++) {
+      const p = buildPlan(d, base({ profile: { ...DEFAULT_PROFILE, likes: ['royal', 'museums'] }, startPoint: ['jaivilas', 'station', 'fort'][i % 3], start: ['10:00', '11:00', '12:00'][i % 3], hours: 4 + (i % 5) }));
+      seen += p.stops.filter((s) => s.place.id === 'jai-vilas').length;
+      if (p.stops.length) seen += findAlternates(d, p, i % p.stops.length).filter((a) => a.place.id === 'jai-vilas').length;
+    }
+    return seen;
+  };
+  const mutate = (f: (jv: Record<string, any>) => void) => {
+    const d = JSON.parse(JSON.stringify(SEED));
+    f(d.places.find((p: { id: string }) => p.id === 'jai-vilas').guardrail);
+    return runFreshness(d, TODAY).data;
+  };
+  it('baseline: Jai Vilas at Level 1 is planned', () => {
+    expect(guardrail(DATA.places.find((p) => p.id === 'jai-vilas')!, '2026-10-21')).toEqual({ ok: true, level: 1 });
+    expect(count(DATA)).toBeGreaterThan(0);
+  });
+  it('stale publication (past check-by after the daily job): 0 in 10 plans and 10 alternate requests', () => {
+    const d = mutate((g) => { g.publication.ver = '2026-01-01'; });
+    expect(guardrail(d.places.find((p) => p.id === 'jai-vilas')!, '2026-10-21').reason).toBe('publicationStale');
+    expect(count(d)).toBe(0);
+  });
+  it('conflicting publication: 0 in 10 plans and 10 alternate requests', () => {
+    const d = mutate((g) => { g.publication.s = 'conflicting'; });
+    expect(guardrail(d.places.find((p) => p.id === 'jai-vilas')!, '2026-10-21').reason).toBe('publicationConflict');
+    expect(count(d)).toBe(0);
+  });
+  it('withdrawn by the custodian: 0 in 10 plans and 10 alternate requests', () => {
+    const d = mutate((g) => { g.status = 'withdrawn'; });
+    expect(guardrail(d.places.find((p) => p.id === 'jai-vilas')!, '2026-10-21').reason).toBe('withdrawn');
+    expect(count(d)).toBe(0);
   });
 });
 
@@ -108,7 +166,7 @@ describe('AT-08 closed place → not feasible + alternates (FR-FC-01, FR-AL-01/0
     const alts = findAlternates(DATA, p, 1);
     expect(alts.length).toBeLessThanOrEqual(3);
     for (const a of alts) {
-      expect(a.place.guardrail.visitorReady).toBe(true);
+      expect(guardrail(a.place, p.input.date).ok).toBe(true);
       expect(a.verdict).not.toBe('not');
       expect(p.stops.some((s) => s.unit.id === a.unit.id)).toBe(false);
       expect(a.arrive).toBeLessThan(p.endMin);

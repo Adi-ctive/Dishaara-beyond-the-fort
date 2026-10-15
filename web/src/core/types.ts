@@ -54,7 +54,9 @@ export interface Unit {
   minVisit: Fact<number>;
 }
 
-export interface Guardrail { visitorReady: boolean; dailyLimit: number | null; consentRequired: boolean; consent: boolean | null }
+export type GuardStatus = 'level1' | 'level2' | 'withdrawn' | 'notEligible';
+/** Decision 25. publication: the custodian's own current publication showing the place open and ticketed (Level 1 evidence). */
+export interface Guardrail { status: GuardStatus; publication?: Fact; dailyLimit: number | null; reason?: L10n; demo?: boolean }
 
 export interface Place {
   id: string;

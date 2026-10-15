@@ -377,10 +377,18 @@
     "cls": "status"
    },
    "guardrail": {
-    "visitorReady": true,
-    "dailyLimit": null,
-    "consentRequired": false,
-    "consent": null
+    "status": "level1",
+    "publication": {
+     "t": {
+      "en": "AMASR Rules 1959: open sunrise to sunset, ticketed (G.S.R. 1171(E))",
+      "hi": "AMASR नियम 1959: सूर्योदय से सूर्यास्त तक खुला, टिकट सहित (G.S.R. 1171(E))"
+     },
+     "s": "officially confirmed",
+     "src": "amasr-fees",
+     "ver": "2026-10-13",
+     "cls": "fees"
+    },
+    "dailyLimit": null
    },
    "summary": {
     "t": {
@@ -1003,10 +1011,18 @@
     "cls": "status"
    },
    "guardrail": {
-    "visitorReady": true,
-    "dailyLimit": null,
-    "consentRequired": false,
-    "consent": null
+    "status": "level1",
+    "publication": {
+     "t": {
+      "en": "AMASR Rules 1959: open sunrise to sunset, ticketed (G.S.R. 1171(E))",
+      "hi": "AMASR नियम 1959: सूर्योदय से सूर्यास्त तक खुला, टिकट सहित (G.S.R. 1171(E))"
+     },
+     "s": "officially confirmed",
+     "src": "amasr-fees",
+     "ver": "2026-10-13",
+     "cls": "fees"
+    },
+    "dailyLimit": null
    },
    "summary": {
     "t": {
@@ -1205,10 +1221,23 @@
    "lesserKnown": true,
    "insideFort": true,
    "guardrail": {
-    "visitorReady": true,
+    "status": "level2",
+    "publication": {
+     "t": {
+      "en": "AMASR Rules 1959: open sunrise to sunset, ticketed (G.S.R. 1171(E))",
+      "hi": "AMASR नियम 1959: सूर्योदय से सूर्यास्त तक खुला, टिकट सहित (G.S.R. 1171(E))"
+     },
+     "s": "officially confirmed",
+     "src": "amasr-fees",
+     "ver": "2026-10-13",
+     "cls": "fees"
+    },
     "dailyLimit": 2,
-    "consentRequired": false,
-    "consent": null
+    "demo": true,
+    "reason": {
+     "en": "Demo Level 2 flag for the daily-limit test, not a real custodian flag",
+     "hi": "दैनिक सीमा परीक्षण के लिए डेमो स्तर 2 फ़्लैग, असली संरक्षक फ़्लैग नहीं"
+    }
    },
    "summary": {
     "t": {
@@ -1416,10 +1445,12 @@
     "cls": "status"
    },
    "guardrail": {
-    "visitorReady": true,
+    "status": "notEligible",
     "dailyLimit": null,
-    "consentRequired": true,
-    "consent": true
+    "reason": {
+     "en": "Active place of worship: never Level 1",
+     "hi": "सक्रिय पूजा स्थल: कभी स्तर 1 नहीं"
+    }
    },
    "summary": {
     "t": {
@@ -1587,10 +1618,18 @@
     "cls": "status"
    },
    "guardrail": {
-    "visitorReady": true,
-    "dailyLimit": null,
-    "consentRequired": false,
-    "consent": null
+    "status": "level1",
+    "publication": {
+     "t": {
+      "en": "jaivilaspalace.in: Mon–Sun 10:00–18:00, tickets ₹350 / ₹550 / ₹1000",
+      "hi": "jaivilaspalace.in: सोम–रवि 10:00–18:00, टिकट ₹350 / ₹550 / ₹1000"
+     },
+     "s": "officially confirmed",
+     "src": "jv-site",
+     "ver": "2026-10-13",
+     "cls": "fees"
+    },
+    "dailyLimit": null
    },
    "summary": {
     "t": {
@@ -1821,10 +1860,12 @@
     "cls": "status"
    },
    "guardrail": {
-    "visitorReady": true,
-    "dailyLimit": 25,
-    "consentRequired": false,
-    "consent": null
+    "status": "notEligible",
+    "dailyLimit": null,
+    "reason": {
+     "en": "Contested site; no custodian publication shows it ticketed",
+     "hi": "विवादित स्थल; कोई संरक्षक प्रकाशन इसे टिकट सहित नहीं दिखाता"
+    }
    },
    "summary": {
     "t": {
@@ -1994,10 +2035,12 @@
    "lesserKnown": true,
    "insideFort": false,
    "guardrail": {
-    "visitorReady": true,
-    "dailyLimit": 25,
-    "consentRequired": false,
-    "consent": null
+    "status": "notEligible",
+    "dailyLimit": null,
+    "reason": {
+     "en": "Contested site; no custodian publication shows it ticketed",
+     "hi": "विवादित स्थल; कोई संरक्षक प्रकाशन इसे टिकट सहित नहीं दिखाता"
+    }
    },
    "summary": {
     "t": {
@@ -2126,10 +2169,12 @@
    "lesserKnown": true,
    "insideFort": true,
    "guardrail": {
-    "visitorReady": false,
+    "status": "notEligible",
     "dailyLimit": null,
-    "consentRequired": false,
-    "consent": null
+    "reason": {
+     "en": "Custodian unknown; no publication",
+     "hi": "संरक्षक अज्ञात; कोई प्रकाशन नहीं"
+    }
    },
    "summary": {
     "t": {
@@ -2265,10 +2310,12 @@
     "cls": "status"
    },
    "guardrail": {
-    "visitorReady": true,
+    "status": "notEligible",
     "dailyLimit": null,
-    "consentRequired": true,
-    "consent": true
+    "reason": {
+     "en": "Active place of worship: never Level 1",
+     "hi": "सक्रिय पूजा स्थल: कभी स्तर 1 नहीं"
+    }
    },
    "summary": {
     "t": {

@@ -70,7 +70,7 @@ export default function Home() {
                         {p.units.length > 1 && <span className="tag">{p.units.length} {a.t('sections')}</span>}
                       </div>
                       <div className="today"><span className="muted">{a.t('todayVerdict')}:</span> <VerdictBadge v={v} small /></div>
-                      {!g.ok && <p className="warn small">{a.t('describedOnly')}</p>}
+                      {!g.ok && <p className="warn small">{a.t('describedOnly')} {p.guardrail.reason ? a.l(p.guardrail.reason) : g.reason ? a.t(`gr_${g.reason}` as never) : ''}</p>}
                     </div>
                   </a>
                 </li>

@@ -1,4 +1,4 @@
-import { guardrail, groundingCheck, parseTrip, type Plan } from '../core';
+import { groundingCheck, parseTrip, promotable, type Plan } from '../core';
 import { findPlaces, makePlan, runTool, TOOL_SCHEMAS, type Ctx, type ToolOut } from './tools';
 
 // Chat engine. Deterministic guards run first (coverage E20, emergency E18, date/weekday E19).
@@ -71,8 +71,9 @@ export function respondLocal(text: string, ctx: Ctx, slots: Slots): { msg: BotMs
   const planish = slots.active || PLAN_WORDS.test(s) || parsed.hours !== undefined;
 
   if (LESSER.test(s) && !slots.active) {
-    const ids = ctx.data.places.filter((p) => p.lesserKnown && guardrail(p, ctx.today, ctx.counts).ok).map((p) => p.id);
-    return { msg: { role: 'bot', text: t('c_lesser'), cards: [{ kind: 'places', ids }], chips: [{ label: t('c_s1'), send: t('c_s1') }] }, slots };
+    // Discovery lists are Level 2 only (Decision 25).
+    const ids = ctx.data.places.filter((p) => p.lesserKnown && promotable(p, ctx.today, ctx.counts)).map((p) => p.id);
+    return { msg: { role: 'bot', text: t(ids.length ? 'c_lesser' : 'c_lesserNone'), cards: ids.length ? [{ kind: 'places', ids }] : [], chips: [{ label: t('c_s1'), send: t('c_s1') }] }, slots };
   }
 
   if (places.length && !(planish && (slots.active || /\bplan|योजना|प्लान/.test(s)))) {
@@ -155,7 +156,7 @@ function system(ctx: Ctx): string {
     '4. After a key fact, put its status label in brackets, for example: ₹25 cash [officially confirmed].',
     '5. Only Gwalior is covered. For any other city say "Not covered yet".',
     '6. Before build_plan you need the date, the number of hours and the start point (station, fort, jaivilas or ghauspura). If one is missing, ask one short question.',
-    '7. Do not recommend places that tools say are not visitor-ready.',
+    '7. Never recommend or plan places that tools mark as not plan-eligible; only promote lesser-known places that search_places returns with lesser_known_only.',
     '8. Keep replies under 80 words, friendly and plain. No tables or long lists: the app shows cards with the full details under your reply.',
     `9. Reply in ${ctx.tr.lang === 'hi' ? 'Hindi (Devanagari script)' : 'English'}.`,
     `Visitor profile: likes ${p.likes.join(', ') || 'none set'}; dislikes ${p.dislikes.join(', ') || 'none'}; pace ${p.pace}; walking ${p.walking}; budget ${p.budget}.`,

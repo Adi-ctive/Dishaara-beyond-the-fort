@@ -61,7 +61,7 @@ def search_places(data: dict, query: str) -> list[dict]:
         names = [p["name"]["en"].lower(), p["name"]["hi"], *(u["name"]["en"].lower() for u in p["units"])]
         words = [w for n in names for w in n.replace("(", " ").replace(")", " ").split() if len(w) > 3]
         if any(n in q for n in names) or any(w in q for w in words if w not in {"tomb", "temple", "palace", "mahal", "gwalior"}):
-            out.append({"id": p["id"], "name": p["name"], "visitor_ready": p["guardrail"]["visitorReady"]})
+            out.append({"id": p["id"], "name": p["name"], "guardrail": p["guardrail"]["status"]})  # Decision 25
     return out
 
 
