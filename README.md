@@ -18,7 +18,7 @@ One-click links that skip sign-in:
 
 ## Problem and solution
 
-Visitors to heritage cities plan a fixed time budget on Google, Maps and social media. Famous sites are easy to find. What is missing, in one trusted and current place, is lesser-known places matched to interests, realistic travel time and cost between places, and current site details (hours, closures, fees by payment mode, entry rules). Official facts exist, but they are split across custodians (ASI, MP State Archaeology, trusts, the tourism board), undated and hard to find. Gwalior Fort alone has two custodians with separate tickets. Dishaara keeps one verified, dated record per place, with every fact showing its source and one of eight status labels. It answers "Can I actually visit on this date?" with explicit rules, and builds a plan that fits the visitor's hours. It only recommends places within the limits their custodians set.
+Visitors to heritage cities plan a fixed time budget on Google, Maps and social media. Famous sites are easy to find. What is missing, in one trusted and current place, is lesser-known places matched to interests, realistic travel time and cost between places, and current site details (hours, closures, fees by payment mode, entry rules). Official facts exist, but they are split across custodians (ASI, MP State Archaeology, trusts, the tourism board), undated and hard to find. Gwalior Fort alone has two custodians with separate tickets. Dishaara keeps one verified, dated record per place, with every fact showing its source and one of eight status labels. It answers "Can I actually visit on this date?" with explicit rules, and builds a plan that fits the visitor's hours. The SRS now specifies a two-level guardrail (Decision 25, 15 Oct 2026): a place may appear in plans and alternates only when its custodian's own current publication shows it open and ticketed (Level 1), and the lesser-known boost, discovery lists and daily limits need an explicit custodian flag (Level 2). **This prototype still implements the earlier single-flag guardrail (Decision 23) with demo values**; see "Guardrail: prototype vs current design" below.
 
 ## Screenshots
 
@@ -44,7 +44,7 @@ web/                 React 18 + Vite + TypeScript, deployed to GitHub Pages
     facts.ts              fact stamps, check-by intervals, daily freshness job
     feasibility.ts        "Can I actually visit?" verdicts (SRS §6.4)
     planner.ts            time-fit plan, buffers, budget (FR-PL)
-    guardrail.ts          visitor-ready flag, consent, daily limit (FR-GR)
+    guardrail.ts          single demo flag, consent, daily limit (earlier FR-GR; not yet the two-level rule)
     alternates.ts         "Can't make it" alternates and replan (FR-AL)
     geo.ts                leg distance, time and fare, labelled estimated (E6)
     parse.ts              trip text, date/weekday check (E19), coverage (E20)
@@ -71,12 +71,23 @@ Some checks never reach the model: uncovered cities (E20), emergencies (E18) and
 | Feasibility verdicts from explicit rules, with reasons, per Fort section | Routing API: legs are straight-line distance × 1.5 at a set speed, labelled "estimated" |
 | Planner: opening, latest arrival, closing, max(15 min, 20%) leg buffer, 10 min ticket buffer, total ≤ hours | Map positions of places: team estimates, labelled "estimated" |
 | Budget range by visitor type and cash/online, each ticket counted once, partial when a value is unknown | Visit durations: team planning defaults, labelled "estimated" |
-| Guardrail and daily limits from saved plans; unflagged places shown only on search | Visitor-ready flags and daily limits: **demo values**, marked as such in the data and UI |
+| Guardrail and daily limits from saved plans; unflagged places shown only on search | Visitor-ready flags and daily limits: **demo values**, marked as such in the data and UI; one flag, not the two-level rule (Decision 25) |
 | "Can't make it": up to 3 alternates that pass the guardrail, are feasible and fit the remaining time | Visitor reports and saved plans: stored in localStorage, not a database |
 | Date/weekday mismatch question, "not covered yet" for other cities | AI on the public site: off until a visitor adds their own Groq key; no shared key is bundled |
 | Full Hindi/English UI | |
 | Chat: slot-filling planner, place verdict and fee cards, deep links (`?ask=`) | |
 | Groq AI mode: tool calls, grounding check, one regeneration, structured fallback | |
+
+## Guardrail: prototype vs current design
+
+The SRS and brief were updated on 15 Oct 2026 to the two-level guardrail (Decision 25, which relaxes Decision 23). The prototype has not been updated yet:
+
+| | Current design (SRS FR-GR-01–05) | This prototype |
+|---|---|---|
+| Plan eligibility | Level 1: the custodian's own current publication shows the place open and ticketed; ends if that status is potentially outdated, conflicting or withdrawn | One `visitorReady` flag, set to demo values by the team |
+| Boost, discovery lists, daily limits | Level 2 only: explicit custodian flag | Any flagged place |
+| Never Level 1 | Active places of worship, residential or contested sites, and sites with no custodian publication showing them ticketed | Not enforced: the demo data flags the Ghaus and Tansen tombs, Gurudwara Data Bandi Chhod and the Sun Temple as visitor-ready |
+| Tests | AT-06, AT-07 (rewritten) and AT-19 (new) | AT-06 and AT-07 in their earlier single-flag form; AT-19 not implemented |
 
 ## Run locally
 
@@ -118,8 +129,8 @@ To try AI replies, get a free key at console.groq.com and paste it in the app un
 | Plans fit the time budget, including the return leg | FR-PL-04 | AT-02 |
 | Missing fact is not invented; answer gives the official contact | FR-AI-05, KB-03 | AT-03 `backend/tests/test_ai.py` |
 | Stale fact flagged, queued, plan "needs confirmation" | FR-VF-05, PL-07 | AT-04 |
-| Unflagged place never promoted, still searchable | FR-GR-02, GR-03 | AT-06 |
-| Daily limit excludes a place from the third plan | FR-GR-04 | AT-07 |
+| Unflagged place never promoted, still searchable (earlier single-flag version) | FR-GR-02, GR-03 | AT-06 (earlier version) |
+| Daily limit excludes a place from the third plan (earlier single-flag version) | FR-GR-04 | AT-07 (earlier version) |
 | Weekly holiday → "not feasible"; ≤ 3 eligible alternates; all 4 verdicts | FR-FC-01, AL-01, AL-02 | AT-08 (web and backend) |
 | Fort fees by visitor type and cash/online; separate section tickets | FR-KB-02, BR-01 | AT-09 |
 | Grounding check blocks an invented time, regenerates once, falls back, logs | FR-AI-04 | AT-10 `web/src/chat/chat.test.ts` and `backend/tests/test_ai.py` |
