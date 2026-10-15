@@ -145,6 +145,10 @@ To try AI replies, get a free key at console.groq.com and paste it in the app un
 | Briefing in SRS order; every fact shows its label and date; tap for source; report a fact | FR-BR-01, BR-02, VF-07, FB-03 | UI: place page |
 | Verification console: conflicts, stale facts, reports, unavailable fields | FR-AD, VF-05 | UI: Verify page |
 
+## AI usage log
+
+The full Claude Code conversation that built this repository is in [`docs/ai-log/claude-code-session.md`](docs/ai-log/claude-code-session.md). It includes every user message and every Claude reply, plus a one-line entry for each tool call. API keys and personal email addresses are redacted.
+
 ## Data sources and labels
 
 - Facts come from the team's data-validation report (read 13 Oct 2026). The main sources are the AMASR Rules 1959 (ASI fees and hours, G.S.R. 1171(E), 4 Dec 2018), ASI lists, NPCI, CAG Report 7 of 2022 (MP), MP Tourism pages, and jaivilaspalace.in. Third-party pages are kept as "recently reported" or lower and never override a custodian.
