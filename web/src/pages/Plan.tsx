@@ -14,7 +14,7 @@ export default function Plan() {
   });
   const [plan, setPlan] = useState<P | null>(null);
 
-  const build = (f = form) => { setPlan(buildPlan(a.data, { ...f, profile: a.profile, counts: a.counts })); };
+  const build = (f = form) => { setPlan(buildPlan(a.data, { ...f, profile: a.profile, counts: a.counts, added: a.added })); };
 
   // ?sample in the URL builds a sample plan straight away (judges' shortcut).
   useEffect(() => { if (new URLSearchParams(location.search).has('sample')) build(); }, []); // eslint-disable-line
@@ -82,6 +82,14 @@ export default function Plan() {
             <button key={p} type="button" className={`pill${form.payment === p ? ' on' : ''}`} aria-pressed={form.payment === p} onClick={() => setForm({ ...form, payment: p })}>{a.t(p)}</button>
           ))}</div>
         </fieldset>
+        <div className="span2 added-list">
+          <p className="lbl">{a.t('yourAdded')}</p>
+          {a.added.length ? (
+            <div className="chips-row">{a.added.map((id) => (
+              <span key={id} className="tag added">{a.l(a.data.places.find((p) => p.id === id)?.name)} <button type="button" className="x" aria-label={a.t('removeFromPlan')} onClick={() => a.removePlace(id)}>×</button></span>
+            ))}</div>
+          ) : <p className="muted small">{a.t('noneAdded')} <a href="#/explore">{a.t('findByName')}</a></p>}
+        </div>
         <p className="span2 muted small">
           {a.hasProfile ? `${a.t('usingProfile')}: ${[...a.profile.likes.map((t) => '+' + a.t(`tag_${t}` as never)), ...a.profile.dislikes.map((t) => '−' + a.t(`tag_${t}` as never))].join(' ') || '—'} · ${a.t(`p_${a.profile.pace}`)}` : a.t('noProfile')}
           {' '}<a href="#/you">{a.t('editProfile')}</a>

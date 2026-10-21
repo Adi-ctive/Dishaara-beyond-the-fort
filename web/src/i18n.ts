@@ -10,7 +10,6 @@ const D = {
   notCoveredBody: ['Dishaara covers Gwalior only in this version. We do not plan other cities from memory.', 'इस संस्करण में दिशारा केवल ग्वालियर को कवर करता है। हम दूसरे शहरों की योजना अनुमान से नहीं बनाते।'],
   search: ['Search places', 'स्थान खोजें'], all: ['All', 'सभी'],
   lesserKnown: ['Lesser-known', 'कम प्रसिद्ध'], sections: ['sections', 'भाग'], todayVerdict: ['Today', 'आज'],
-  describedOnly: ['Shown because you searched for it. Dishaara describes it but never plans or promotes it.', 'आपने खोजा इसलिए दिखाया गया। दिशारा इसकी जानकारी देता है, पर इसे योजना में नहीं जोड़ता और न प्रचारित करता है।'],
   guardTitle: ['Planning status (custodian guardrail)', 'योजना स्थिति (संरक्षक गार्डरेल)'],
   g_level1: ['Level 1: can be planned (custodian publication shows it open and ticketed)', 'स्तर 1: योजना में जुड़ सकता है (संरक्षक प्रकाशन इसे खुला और टिकट सहित दिखाता है)'],
   g_level2: ['Level 2: custodian flag (can be planned, boosted and listed)', 'स्तर 2: संरक्षक फ़्लैग (योजना, बढ़ावा और सूची में)'],
@@ -142,6 +141,25 @@ const D = {
   more_howBody: ['Every fact carries one of eight labels and the date it was last checked. "Officially confirmed" comes from the custodian or an official page. "Potentially outdated" means its check date has passed. "Conflicting" means sources disagree, and both are shown. Missing facts say "unavailable" instead of a guess.', 'हर तथ्य पर आठ में से एक लेबल और अंतिम जाँच की तारीख होती है। "आधिकारिक रूप से पुष्ट" संरक्षक या आधिकारिक पेज से है। "संभवतः पुराना" का अर्थ है जाँच तिथि बीत चुकी है। "विरोधाभासी" का अर्थ है स्रोत असहमत हैं, और दोनों दिखाए जाते हैं। अनुपलब्ध तथ्य अनुमान की जगह "उपलब्ध नहीं" दिखाते हैं।'],
   more_about: ['About this prototype', 'इस प्रोटोटाइप के बारे में'], more_aboutBody: ['Team Argus, AI Synergy Hackathon 2026. Gwalior only, single-day plans.', 'टीम आर्गस, AI Synergy Hackathon 2026। केवल ग्वालियर, एक दिन की योजनाएँ।'], sourceCode: ['Source code on GitHub', 'GitHub पर सोर्स कोड'],
   planAdvanced: ['Prefer a form? Set every detail yourself here, or just ask in Chat.', 'फ़ॉर्म पसंद है? यहाँ हर विवरण खुद चुनें, या बस चैट में पूछें।'],
+  // Decision 28: name-only search, visitor-added places, rules first
+  searchByName: ['Search a place by its name', 'स्थान का नाम लिखकर खोजें'], find: ['Find', 'खोजें'],
+  nameOnly: ['Search works on place names only, so type the full name. Interests shape your plan instead.', 'खोज केवल स्थान के नाम से होती है, इसलिए पूरा नाम लिखें। आपकी रुचियाँ योजना बनाने में काम आती हैं।'],
+  resultsFor: ['Places named "{q}"', '"{q}" नाम वाले स्थान'], flaggedList: ['Suggested by custodians', 'संरक्षकों द्वारा सुझाए गए'],
+  noNameMatch: ['No place with that name. Check the spelling or type the full name.', 'इस नाम का कोई स्थान नहीं। वर्तनी जाँचें या पूरा नाम लिखें।'],
+  noFlagged: ['No custodian has flagged a place yet. Search by name, or ask in Chat for a plan.', 'अभी किसी संरक्षक ने कोई स्थान फ़्लैग नहीं किया। नाम से खोजें, या चैट में योजना माँगें।'],
+  describedOnly: ['Dishaara does not suggest this place. You can still add it to your own plan.', 'दिशारा यह स्थान नहीं सुझाता। आप इसे अपनी योजना में खुद जोड़ सकते हैं।'],
+  addToPlan: ['Add to my plan', 'मेरी योजना में जोड़ें'], inYourPlan: ['In your plan', 'आपकी योजना में'], removeFromPlan: ['Remove', 'हटाएँ'],
+  addedNote: ['Your choice: it gets times and costs, but is never suggested to others.', 'आपकी पसंद: इसे समय और खर्च मिलेगा, पर यह दूसरों को कभी नहीं सुझाया जाएगा।'],
+  addedByVisitor: ['Added by you, not suggested', 'आपने जोड़ा, सुझाया नहीं गया'],
+  yourAdded: ['Places you added', 'आपके जोड़े स्थान'], noneAdded: ['None yet.', 'अभी कोई नहीं।'], findByName: ['Find a place by name', 'नाम से स्थान खोजें'],
+  addAfterRules: ["I've read this. Add it", 'मैंने पढ़ लिया, जोड़ें'], cancel: ['Cancel', 'रद्द करें'],
+  rulesFirst: ['Before you go: rules for this place', 'जाने से पहले: इस स्थान के नियम'],
+  sens_worship: ['This is an active place of worship. Visit with respect for those who come to pray.', 'यह एक सक्रिय पूजा स्थल है। प्रार्थना करने आए लोगों का सम्मान रखते हुए जाएँ।'],
+  sens_contested: ['Different groups hold different views about this site. Dishaara gives only its current, sourced access status.', 'इस स्थल के बारे में अलग-अलग समुदायों के अलग विचार हैं। दिशारा केवल इसकी वर्तमान, स्रोत सहित प्रवेश स्थिति बताता है।'],
+  sens_residential: ['People live here. Keep noise down and do not photograph homes or residents.', 'यहाँ लोग रहते हैं। शोर कम रखें और घरों या निवासियों की फ़ोटो न लें।'],
+  accessNow: ['Current access status', 'वर्तमान प्रवेश स्थिति'], dress: ['Dress', 'पहनावा'], worshipTimes: ['Worship timings', 'पूजा का समय'],
+  noFlaggedNearby: ['No other custodian-flagged place yet.', 'अभी कोई और संरक्षक-फ़्लैग स्थान नहीं।'],
+  addedVisits: ['Plans to visitor-added places (counted apart)', 'आगंतुक द्वारा जोड़े स्थानों की योजनाएँ (अलग गिनी गईं)'],
 } as const;
 
 export type Key = keyof typeof D;

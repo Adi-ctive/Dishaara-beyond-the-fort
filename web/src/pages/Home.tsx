@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { bestVerdict, checkUnit, guardrail, isCovered } from '../core';
+import { bestVerdict, checkUnit, guardrail, isCovered, promotable, searchByName } from '../core';
 import { useA } from '../store';
+import { AddToPlan } from '../ui/Added';
 import { VerdictBadge } from '../ui/bits';
 
 export const TAGS = ['architecture', 'temples', 'museums', 'royal', 'music', 'spiritual'] as const;
@@ -10,17 +11,14 @@ export default function Home() {
   const [city, setCity] = useState(a.l(a.data.city.name));
   const [cityOk, setCityOk] = useState(true);
   const [q, setQ] = useState('');
-  const [tag, setTag] = useState<string | null>(null);
+  const [draft, setDraft] = useState('');
 
-  const list = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    return a.data.places.filter((p) => {
-      const hit = !needle || [p.name.en, p.name.hi, p.type.en, p.type.hi].some((s) => s.toLowerCase().includes(needle));
-      // FR-GR-03: unflagged places appear only when searched for, never in discovery lists.
-      if (!guardrail(p, a.today).ok && (!needle || !hit)) return false;
-      return hit && (!tag || p.tags.includes(tag));
-    });
-  }, [a.data, a.today, q, tag]);
+  // Decision 28 (FR-VO-08): search by name only, exact or near match, no suggestions while typing.
+  // With no search, the only list is custodian-flagged (Level 2) places: Level 1 gets no list placement (Decision 25).
+  const needle = q.trim();
+  const list = useMemo(() => needle
+    ? searchByName(a.data, needle).map((id) => a.data.places.find((p) => p.id === id)!)
+    : a.data.places.filter((p) => promotable(p, a.today, a.counts)), [a.data, a.today, a.counts, needle]);
 
   return (
     <div className="page">
@@ -44,15 +42,15 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <div className="filters">
-            <input type="search" placeholder={a.t('search')} value={q} onChange={(e) => setQ(e.target.value)} aria-label={a.t('search')} />
-            <div className="chips-row" role="group">
-              <button className={`pill${!tag ? ' on' : ''}`} onClick={() => setTag(null)} aria-pressed={!tag}>{a.t('all')}</button>
-              {TAGS.map((t) => (
-                <button key={t} className={`pill${tag === t ? ' on' : ''}`} onClick={() => setTag(tag === t ? null : t)} aria-pressed={tag === t}>{a.t(`tag_${t}`)}</button>
-              ))}
+          <form className="filters" onSubmit={(e) => { e.preventDefault(); setQ(draft); }} role="search">
+            <div className="row">
+              <input type="search" placeholder={a.t('searchByName')} value={draft} onChange={(e) => { setDraft(e.target.value); if (!e.target.value) setQ(''); }} aria-label={a.t('searchByName')} autoComplete="off" />
+              <button className="btn">{a.t('find')}</button>
             </div>
-          </div>
+            <p className="muted small">{a.t('nameOnly')}</p>
+          </form>
+          <h2 className="list-title">{needle ? a.t('resultsFor', { q: needle }) : a.t('flaggedList')}</h2>
+          {!list.length && <p className="card muted">{needle ? a.t('noNameMatch') : a.t('noFlagged')}</p>}
           <ul className="place-grid">
             {list.map((p, i) => {
               const g = guardrail(p, a.today);
@@ -73,6 +71,7 @@ export default function Home() {
                       {!g.ok && <p className="warn small">{a.t('describedOnly')} {p.guardrail.reason ? a.l(p.guardrail.reason) : g.reason ? a.t(`gr_${g.reason}` as never) : ''}</p>}
                     </div>
                   </a>
+                  {needle && <AddToPlan place={p} />}
                 </li>
               );
             })}

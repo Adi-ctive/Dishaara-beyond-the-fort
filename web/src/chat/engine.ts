@@ -1,4 +1,4 @@
-import { groundingCheck, parseTrip, promotable, type Plan } from '../core';
+import { groundingCheck, mentionCheck, namedPlaces, parseTrip, promotable, type Plan } from '../core';
 import { findPlaces, makePlan, runTool, TOOL_SCHEMAS, type Ctx, type ToolOut } from './tools';
 
 // Chat engine. Deterministic guards run first (coverage E20, emergency E18, date/weekday E19).
@@ -67,7 +67,7 @@ export function respondLocal(text: string, ctx: Ctx, slots: Slots): { msg: BotMs
   if (RESET.test(s)) slots = {};
   const parsed = parseTrip(text, ctx.today);
   if (slots.awaiting === 'hours' && /^\s*\d{1,2}(\.\d)?\s*$/.test(s)) parsed.hours = Math.min(14, Math.max(1, +s));
-  const places = findPlaces(text);
+  const places = findPlaces(ctx.data, text);
   const planish = slots.active || PLAN_WORDS.test(s) || parsed.hours !== undefined;
 
   if (LESSER.test(s) && !slots.active) {
@@ -157,10 +157,22 @@ function system(ctx: Ctx): string {
     '5. Only Gwalior is covered. For any other city say "Not covered yet".',
     '6. Before build_plan you need the date, the number of hours and the start point (station, fort, jaivilas or ghauspura). If one is missing, ask one short question.',
     '7. Never recommend or plan places that tools mark as not plan-eligible; only promote lesser-known places that search_places returns with lesser_known_only.',
-    '8. Keep replies under 80 words, friendly and plain. No tables or long lists: the app shows cards with the full details under your reply.',
-    `9. Reply in ${ctx.tr.lang === 'hi' ? 'Hindi (Devanagari script)' : 'English'}.`,
+    '8. Never name a place the visitor did not name, unless it is a stop in a plan you built or search_places returned it with no query. If asked "what else is nearby?", call search_places with no query.',
+    '9. Keep replies under 80 words, friendly and plain. No tables or long lists: the app shows cards with the full details under your reply.',
+    `10. Reply in ${ctx.tr.lang === 'hi' ? 'Hindi (Devanagari script)' : 'English'}.`,
     `Visitor profile: likes ${p.likes.join(', ') || 'none set'}; dislikes ${p.dislikes.join(', ') || 'none'}; pace ${p.pace}; walking ${p.walking}; budget ${p.budget}.`,
   ].join('\n');
+}
+
+/** Places the assistant may name this turn (FR-AI-12). */
+export function allowedPlaces(ctx: Ctx, userTexts: string[], outs: ToolOut[]): Set<string> {
+  const ok = new Set<string>(userTexts.flatMap((t) => namedPlaces(ctx.data, t)));
+  for (const o of outs) for (const s of o.plan?.stops ?? []) ok.add(s.place.id);
+  for (const s of ctx.lastPlan?.stops ?? []) ok.add(s.place.id);
+  for (const id of ctx.added ?? []) ok.add(id);
+  for (const l of ctx.data.landmarks) for (const id of namedPlaces(ctx.data, ctx.tr.l(l.name))) ok.add(id);
+  for (const p of ctx.data.places) if (promotable(p, ctx.today, ctx.counts)) ok.add(p.id);
+  return ok;
 }
 
 /** Model-led turn with tool calls and the grounding check (FR-AI-02/04). Throws if Groq fails. */
@@ -187,12 +199,22 @@ export async function respondAI(text: string, history: Msg[], ctx: Ctx, slots: S
     answer = (m.content ?? '').trim();
     break;
   }
-  const sources = [outs.map((o) => o.result), history.filter((h) => h.role === 'user').map((h) => h.text), text, ctx.today];
-  let check = groundingCheck(answer, sources);
+  const userTexts = [...history.filter((h) => h.role === 'user').map((h) => h.text), text];
+  const sources = [outs.map((o) => o.result), userTexts, ctx.today];
+  const allowed = allowedPlaces(ctx, userTexts, outs);
+  const verify = (a: string) => {
+    const g = groundingCheck(a, sources);
+    const m = mentionCheck(ctx.data, a, allowed); // FR-AI-12: no unflagged place the visitor did not name
+    return { ok: g.ok && m.ok, missing: [...g.missing, ...m.extra.map((id) => `place:${id}`)], fix: [
+      ...(g.ok ? [] : [`values that are not in the tool results: ${g.missing.join(', ')}`]),
+      ...(m.ok ? [] : [`places the visitor did not ask about: ${m.extra.map((id) => ctx.tr.l(ctx.data.places.find((p) => p.id === id)!.name)).join(', ')}`]),
+    ] };
+  };
+  let check = verify(answer);
   if (answer && !check.ok) { // regenerate once
-    messages.push({ role: 'assistant', content: answer }, { role: 'user', content: `Your reply used values that are not in the tool results: ${check.missing.join(', ')}. Rewrite it using only values from the tool results.` });
+    messages.push({ role: 'assistant', content: answer }, { role: 'user', content: `Your reply used ${check.fix.join(' and ')}. Rewrite it without them, using only the tool results.` });
     answer = ((await groq(key, messages, false)).content ?? '').trim();
-    check = groundingCheck(answer, sources);
+    check = verify(answer);
   }
   const cards = cardsFrom(outs);
   if (!answer || !check.ok) {

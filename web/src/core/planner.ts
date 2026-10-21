@@ -18,6 +18,7 @@ export interface PlanInput {
   profile: Profile;
   counts?: Counts;
   exclude?: string[]; // unit ids
+  added?: string[]; // place ids the visitor added by name (Decision 28, FR-PL-12)
 }
 
 export interface Stop {
@@ -31,6 +32,7 @@ export interface Stop {
   depart: number;
   check: CheckResult;
   needsConfirmation: boolean;
+  added: boolean; // added by visitor, not suggested
 }
 
 export interface Range { min: number; max: number; partial: boolean }
@@ -56,14 +58,18 @@ export function startCoord(data: Data, id: string): [number, number] {
   return (data.landmarks.find((l) => l.id === id) ?? data.landmarks[0]).coord;
 }
 
+export const isAdded = (place: Place, input: PlanInput) => !!input.added?.includes(place.id);
+const ADDED_FIRST = 1000; // a visitor-added place is placed whenever it fits
+
 export const score = (place: Place, likes: string[]) =>
   (likes.length ? place.tags.filter((t) => likes.includes(t)).length * 10 : 5) + (place.lesserKnown && place.guardrail.status === 'level2' ? LESSER_KNOWN_BOOST : 0);
 
 /** Why a unit cannot be a candidate stop, or null if it can (FR-PL-01, FR-GR-02/03). */
 export function candidacy(data: Data, unit: Unit, place: Place, input: PlanInput): string | null {
   if (input.exclude?.includes(unit.id)) return 'excluded';
-  if (!guardrail(place, input.date, input.counts).ok) return 'guardrail';
-  if (place.tags.some((t) => input.profile.dislikes.includes(t))) return 'dislike';
+  const added = isAdded(place, input); // FR-PL-12: the visitor chose it, so the guardrail and dislikes do not filter it
+  if (!added && !guardrail(place, input.date, input.counts).ok) return 'guardrail';
+  if (!added && place.tags.some((t) => input.profile.dislikes.includes(t))) return 'dislike';
   if (!windowFor(data, unit, input.date)) return 'hoursUnavailable';
   if (checkUnit(data, unit, input.date, { pace: input.profile.pace }).verdict === 'not') return 'notFeasible';
   return null;
@@ -89,7 +95,7 @@ function tryStop(data: Data, input: PlanInput, cur: Cursor, unit: Unit, place: P
   } else if (depart > endMin) return null;
   const check = checkUnit(data, unit, input.date, { arrival: arrive, pace: input.profile.pace, payment: input.payment });
   if (check.verdict === 'not') return null;
-  return { unit, place, leg, arrive, wait: arrive - reach, ticket: TICKET_BUFFER, visit, depart, check, needsConfirmation: check.verdict === 'confirm' };
+  return { unit, place, leg, arrive, wait: arrive - reach, ticket: TICKET_BUFFER, visit, depart, check, needsConfirmation: check.verdict === 'confirm', added: isAdded(place, input) };
 }
 
 function feeFor(fees: Fees | null | undefined, who: Who, payment: 'cash' | 'online'): { min: number; max: number } | null {
@@ -158,7 +164,7 @@ export function buildPlan(data: Data, input: PlanInput): Plan {
     for (const { unit, place } of pool) {
       const s = tryStop(data, input, cur, unit, place, endMin, home);
       if (!s) continue;
-      const value = score(place, input.profile.likes) * 8 - (s.leg.minutes + s.leg.buffer) - s.wait / 2;
+      const value = (s.added ? ADDED_FIRST : score(place, input.profile.likes) * 8) - (s.leg.minutes + s.leg.buffer) - s.wait / 2;
       if (!best || value > best.value || (value === best.value && unit.id < best.s.unit.id)) best = { s, value };
     }
     if (!best) break;

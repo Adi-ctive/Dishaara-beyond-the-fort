@@ -58,6 +58,9 @@ export type GuardStatus = 'level1' | 'level2' | 'withdrawn' | 'notEligible';
 /** Decision 25. publication: the custodian's own current publication showing the place open and ticketed (Level 1 evidence). */
 export interface Guardrail { status: GuardStatus; publication?: Fact; dailyLimit: number | null; reason?: L10n; demo?: boolean }
 
+/** Decision 28, FR-BR-08: excluded categories. A visitor may add these by name; the rules are shown first. */
+export interface Sensitive { kind: 'worship' | 'contested' | 'residential'; dress: Fact; worship?: Fact }
+
 export interface Place {
   id: string;
   name: L10n;
@@ -67,6 +70,7 @@ export interface Place {
   insideFort: boolean;
   popularity?: Fact;
   guardrail: Guardrail;
+  sensitive?: Sensitive;
   summary: Fact;
   contact: Fact;
   accessibility: Fact;

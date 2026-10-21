@@ -49,6 +49,9 @@ export default function Console() {
           ))}</ul> : <p className="muted">{a.t('emptyQueue')}</p>}
         </section>
         <section className="card queue">
+          <h2>{a.t('addedVisits')} <span className="count">{a.addedVisits}</span></h2>
+        </section>
+        <section className="card queue">
           <h2>{a.t('q_unavailable')} <span className="count">{unavailable.length}</span></h2>
           <ul className="compact">{unavailable.map((u, i) => (
             <li key={i}><strong>{name(u.placeId)}</strong> <code>{u.path.split('.').slice(1).join('.')}</code> <span className="muted small">{a.l(u.f.why)}</span></li>

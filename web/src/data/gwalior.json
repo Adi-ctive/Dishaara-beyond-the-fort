@@ -233,8 +233,8 @@
   {
    "id": "ghauspura",
    "name": {
-    "en": "Ghauspura (Tansen tomb)",
-    "hi": "गौसपुरा (तानसेन मकबरा)"
+    "en": "Ghauspura",
+    "hi": "गौसपुरा"
    },
    "coord": [
     26.2297,
@@ -1452,6 +1452,25 @@
      "hi": "सक्रिय पूजा स्थल: कभी स्तर 1 नहीं"
     }
    },
+   "sensitive": {
+    "kind": "worship",
+    "dress": {
+     "v": null,
+     "cls": "rules",
+     "why": {
+      "en": "Not yet sourced from the custodian. Ask at the site before you go.",
+      "hi": "संरक्षक से अभी प्राप्त नहीं। जाने से पहले स्थल पर पूछें।"
+     }
+    },
+    "worship": {
+     "v": null,
+     "cls": "rules",
+     "why": {
+      "en": "Not yet sourced from the custodian. Ask at the site before you go.",
+      "hi": "संरक्षक से अभी प्राप्त नहीं। जाने से पहले स्थल पर पूछें।"
+     }
+    }
+   },
    "summary": {
     "t": {
      "en": "Built under the Khadur Sahib sants; managing committee unknown.",
@@ -1867,6 +1886,17 @@
      "hi": "विवादित स्थल; कोई संरक्षक प्रकाशन इसे टिकट सहित नहीं दिखाता"
     }
    },
+   "sensitive": {
+    "kind": "contested",
+    "dress": {
+     "v": null,
+     "cls": "rules",
+     "why": {
+      "en": "Not yet sourced from the custodian. Ask at the site before you go.",
+      "hi": "संरक्षक से अभी प्राप्त नहीं। जाने से पहले स्थल पर पूछें।"
+     }
+    }
+   },
    "summary": {
     "t": {
      "en": "Declared a monument of national importance on 23 Jan 1962. The tomb is open to visitors; a related case is pending before the Supreme Court.",
@@ -2040,6 +2070,17 @@
     "reason": {
      "en": "Contested site; no custodian publication shows it ticketed",
      "hi": "विवादित स्थल; कोई संरक्षक प्रकाशन इसे टिकट सहित नहीं दिखाता"
+    }
+   },
+   "sensitive": {
+    "kind": "contested",
+    "dress": {
+     "v": null,
+     "cls": "rules",
+     "why": {
+      "en": "Not yet sourced from the custodian. Ask at the site before you go.",
+      "hi": "संरक्षक से अभी प्राप्त नहीं। जाने से पहले स्थल पर पूछें।"
+     }
     }
    },
    "summary": {
@@ -2315,6 +2356,25 @@
     "reason": {
      "en": "Active place of worship: never Level 1",
      "hi": "सक्रिय पूजा स्थल: कभी स्तर 1 नहीं"
+    }
+   },
+   "sensitive": {
+    "kind": "worship",
+    "dress": {
+     "v": null,
+     "cls": "rules",
+     "why": {
+      "en": "Not yet sourced from the custodian. Ask at the site before you go.",
+      "hi": "संरक्षक से अभी प्राप्त नहीं। जाने से पहले स्थल पर पूछें।"
+     }
+    },
+    "worship": {
+     "v": null,
+     "cls": "rules",
+     "why": {
+      "en": "Not yet sourced from the custodian. Ask at the site before you go.",
+      "hi": "संरक्षक से अभी प्राप्त नहीं। जाने से पहले स्थल पर पूछें।"
+     }
     }
    },
    "summary": {

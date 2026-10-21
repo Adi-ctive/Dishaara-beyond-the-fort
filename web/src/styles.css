@@ -182,6 +182,14 @@ legend { font-weight: 600; font-size: .92rem; margin-bottom: 6px; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .tag { font-size: .74rem; padding: 2px 8px; border-radius: 6px; background: var(--sand-2); color: var(--ink-2); font-weight: 500; }
 .tag.lk { background: #fbe3dc; color: var(--terracotta-d); font-weight: 700; }
+.tag.added { background: #dcefeb; color: var(--teal, #0f4c45); font-weight: 700; }
+.tag.added .x { border: 0; background: none; color: inherit; font: inherit; cursor: pointer; padding: 0 0 0 4px; }
+.add-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.add-confirm { margin-top: 10px; }
+.add-confirm .row { gap: 8px; margin-top: 8px; }
+.rules-first { border-left: 4px solid var(--terracotta-d); }
+.list-title { margin: 18px 0 8px; font-size: 1.1rem; }
+.place-grid li > .add-row { padding: 0 12px 12px; }
 .today { display: flex; align-items: center; gap: 6px; font-size: .85rem; }
 
 /* Place */

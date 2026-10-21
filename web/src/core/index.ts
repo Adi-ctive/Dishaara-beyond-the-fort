@@ -11,6 +11,7 @@ export * from './planner';
 export * from './alternates';
 export * from './parse';
 export * from './grounding';
+export * from './names';
 
 export const SEED = seed as unknown as Data;
 

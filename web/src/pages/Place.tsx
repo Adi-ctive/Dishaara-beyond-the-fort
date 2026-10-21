@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { checkUnit, fmt, guardrail, haversineKm, ROAD_FACTOR, sunTimes, toMin, type Fees, type Place as P, type Unit } from '../core';
+import { checkUnit, fmt, guardrail, haversineKm, promotable, ROAD_FACTOR, sunTimes, toMin, type Fees, type Place as P, type Unit } from '../core';
 import { useA } from '../store';
+import { AddToPlan, SensitiveRules } from '../ui/Added';
 import { Chip, FactRow, Reasons, Section, VerdictBadge } from '../ui/bits';
 
 export function FeeTable({ fees }: { fees: Fees }) {
@@ -46,8 +47,10 @@ export default function Place({ id }: { id: string }) {
   const g = guardrail(place, date, a.counts);
   const results = place.units.map((u) => ({ u, r: checkUnit(a.data, u, date, { arrival: arrival ? toMin(arrival) : undefined, pace: a.profile.pace }) }));
   const station = a.data.landmarks.find((l) => l.id === 'station')!;
+  // Leak fix 2 (FR-BR-07): only a custodian-flagged (Level 2) page gets a nearby panel, and it lists only Level 2 places.
+  const showNearby = promotable(place, date, a.counts);
   const nearby = a.data.places
-    .filter((p) => p.id !== place.id && guardrail(p, date, a.counts).ok)
+    .filter((p) => showNearby && p.id !== place.id && promotable(p, date, a.counts))
     .map((p) => ({ p, km: Math.round(haversineKm(place.units[0].coord, p.units[0].coord) * ROAD_FACTOR * 10) / 10 }))
     .sort((x, y) => x.km - y.km).slice(0, 3);
   const srcIds = new Set<string>();
@@ -69,7 +72,10 @@ export default function Place({ id }: { id: string }) {
           <p className="small"><strong>{a.t('guardTitle')}:</strong> {g.ok ? a.t(g.level === 2 ? 'g_level2' : 'g_level1') : place.guardrail.status === 'withdrawn' ? a.t('g_withdrawn') : place.guardrail.status === 'notEligible' ? a.t('g_notEligible') : a.t(`gr_${g.reason}` as never)}{place.guardrail.reason && <> · {a.l(place.guardrail.reason)}</>}{place.guardrail.demo && <span className="demo">{a.t('demoValue')}</span>}</p>
           {place.guardrail.publication && <FactRow f={place.guardrail.publication} label={a.t('publication')} />}
         </div>
+        <AddToPlan place={place} rulesShown={!!place.sensitive} />
       </header>
+
+      <SensitiveRules place={place} />
 
       <section className="card check" aria-labelledby="chk">
         <h2 id="chk">{a.t('canIVisit')}</h2>
@@ -155,13 +161,17 @@ export default function Place({ id }: { id: string }) {
         </ul>
       </Section>
 
-      <Section n={9} title={a.t('b_nearby')}>
-        <ul className="nearby">
-          {nearby.map(({ p, km }) => (
-            <li key={p.id}><a href={`#/place/${p.id}`}>{a.l(p.name)}</a><span className="muted">≈ {km} {a.t('km')} <Chip s="estimated" /></span></li>
-          ))}
-        </ul>
-      </Section>
+      {showNearby && (
+        <Section n={9} title={a.t('b_nearby')}>
+          {nearby.length ? (
+            <ul className="nearby">
+              {nearby.map(({ p, km }) => (
+                <li key={p.id}><a href={`#/place/${p.id}`}>{a.l(p.name)}</a><span className="muted">≈ {km} {a.t('km')} <Chip s="estimated" /></span></li>
+              ))}
+            </ul>
+          ) : <p className="muted small">{a.t('noFlaggedNearby')}</p>}
+        </Section>
+      )}
 
       <Section n={10} title={a.t('b_sources')}>
         <ul className="sources">

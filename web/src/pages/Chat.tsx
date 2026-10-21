@@ -63,7 +63,7 @@ export default function Chat() {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const end = useRef<HTMLDivElement>(null);
-  const ctx = (): Ctx => ({ data: a.data, today: a.today, profile: a.profile, counts: a.counts, tr: a, lastPlan: a.lastPlan });
+  const ctx = (): Ctx => ({ data: a.data, today: a.today, profile: a.profile, counts: a.counts, tr: a, lastPlan: a.lastPlan, added: a.added });
   const greeting: BotMsg = { role: 'bot', text: `${a.t('c_hello', { name: a.user ? ', ' + a.user.name : '' })}\n\n${a.t('c_intro')}`, cards: [], chips: suggestions(ctx()) };
   const msgs: Msg[] = [greeting, ...a.chat];
 

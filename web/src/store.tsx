@@ -6,7 +6,7 @@ import type { Plan } from './core';
 
 // App state. Everything personal stays in this browser (DPDP: no location history, nothing sent out).
 
-export interface SavedPlan { id: string; date: string; places: string[]; at: string }
+export interface SavedPlan { id: string; date: string; places: string[]; added?: string[]; at: string }
 export interface Report { id: string; placeId: string; field: string; text: string; at: string }
 export interface LogEntry { at: string; placeId: string; change: string }
 
@@ -32,6 +32,7 @@ function useApp() {
   const [user, setUser] = usePersist<{ name: string } | null>('user', null);
   const [profile, setProfile] = usePersist<Profile | null>('profile', null);
   const [plans, setPlans] = usePersist<SavedPlan[]>('plans', []);
+  const [added, setAdded] = usePersist<string[]>('added', []); // places the visitor added by name (Decision 28)
   const [reports, setReports] = usePersist<Report[]>('reports', []);
   const [overrides, setOverrides] = usePersist<Record<string, Partial<Guardrail>>>('guardrails', {});
   const [log, setLog] = usePersist<LogEntry[]>('guardrailLog', []);
@@ -46,15 +47,18 @@ function useApp() {
   const { data, queue } = useMemo(() => runFreshness(withGuardrails(SEED, overrides), asOf), [overrides, asOf]);
   const counts = useMemo(() => {
     const c: Counts = {};
-    for (const p of plans) for (const id of new Set(p.places)) { c[p.date] ??= {}; c[p.date][id] = (c[p.date][id] ?? 0) + 1; }
+    // Visitor-added visits are counted apart (harm metric), not against custodian daily limits.
+    for (const p of plans) for (const id of new Set(p.places)) if (!p.added?.includes(id)) { c[p.date] ??= {}; c[p.date][id] = (c[p.date][id] ?? 0) + 1; }
     return c;
   }, [plans]);
+  const addedVisits = plans.reduce((n, p) => n + (p.added?.length ?? 0), 0);
   const tr = useMemo(() => makeT(lang), [lang]);
   useEffect(() => { document.documentElement.lang = lang === 'en' ? 'en' : 'hi'; }, [lang]);
 
   return {
     ...tr, setLang, today: today(), asOf, setAsOf, data, queue, counts,
     user, setUser, profile: profile ?? { ...DEFAULT_PROFILE, lang }, hasProfile: !!profile, setProfile,
+    added, addPlace: (id: string) => setAdded(added.includes(id) ? added : [...added, id]), removePlace: (id: string) => setAdded(added.filter((x) => x !== id)), addedVisits,
     plans, savePlan: (p: Omit<SavedPlan, 'id' | 'at'>) => setPlans([...plans, { ...p, id: crypto.randomUUID(), at: new Date().toISOString() }]),
     reports, addReport: (r: Omit<Report, 'id' | 'at'>) => setReports([...reports, { ...r, id: crypto.randomUUID(), at: new Date().toISOString() }]),
     overrides, setGuardrail: (placeId: string, g: Partial<Guardrail>, change: string) => {

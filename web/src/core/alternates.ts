@@ -17,7 +17,7 @@ export function findAlternates(data: Data, plan: Plan, index: number): Alternate
   const used = new Set(plan.stops.map((s) => s.unit.id));
   const out: Alternate[] = [];
   for (const { unit, place } of allUnits(data)) {
-    if (used.has(unit.id) || input.exclude?.includes(unit.id)) continue;
+    if (used.has(unit.id) || input.exclude?.includes(unit.id) || input.added?.includes(place.id)) continue; // FR-PL-12: never an alternate
     if (!guardrail(place, input.date, input.counts).ok) continue; // FR-AL-02, FR-GR-02
     if (place.tags.some((t) => input.profile.dislikes.includes(t))) continue;
     const w = windowFor(data, unit, input.date);

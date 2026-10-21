@@ -56,7 +56,7 @@ export default function PlanView({ plan, onChange, compact }: { plan: Plan; onCh
                   <div className="stop-time">{fmt(s.arrive)}–{fmt(s.depart)}</div>
                   <h3><a href={`#/place/${s.place.id}`}>{a.l(s.unit.name)}</a></h3>
                   {s.place.units.length > 1 && <p className="muted small">{a.l(s.place.name)}</p>}
-                  <div className="row wrap"><VerdictBadge v={s.check.verdict} small />{s.place.lesserKnown && <span className="tag lk">{a.t('lesserKnown')}</span>}</div>
+                  <div className="row wrap"><VerdictBadge v={s.check.verdict} small />{s.added ? <span className="tag added">{a.t('addedByVisitor')}</span> : s.place.lesserKnown && <span className="tag lk">{a.t('lesserKnown')}</span>}</div>
                   {s.wait > 0 && <p className="small">{a.t('wait', { n: s.wait })}</p>}
                   <p className="muted small">{a.t('ticketVisit', { t: s.ticket, v: s.visit })}</p>
                   {s.check.verdict !== 'good' && <Reasons reasons={s.check.reasons} />}
@@ -95,7 +95,7 @@ export default function PlanView({ plan, onChange, compact }: { plan: Plan; onCh
       <div className="save-row">
         <button className="btn" onClick={() => {
           if (!a.user) { setSavedNote(a.t('signInToSave')); return; }
-          a.savePlan({ date: plan.input.date, places: plan.stops.map((s) => s.place.id) });
+          a.savePlan({ date: plan.input.date, places: plan.stops.map((s) => s.place.id), added: plan.stops.filter((s) => s.added).map((s) => s.place.id) });
           setSavedNote(a.t('saved'));
         }}>{a.t('save')}</button>
         {savedNote && <span className="muted small">{savedNote}</span>}

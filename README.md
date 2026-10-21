@@ -14,11 +14,11 @@ One-click links that skip sign-in:
 1. Sign in (demo Google sign-in, first name only) or continue as a guest.
 2. Pick what you enjoy and how you like to travel, or skip.
 3. Chat. Try "Plan my day", "Is Jai Vilas open on Monday?" or "How much is the fort ticket?". Dishaara asks one simple question at a time (which day, how many hours, where you start) and answers with cards: a plan timeline, a visit verdict, or a fee table.
-4. Everything else sits in tabs: **Explore** (all places and full briefings), **Plan** (the same planner as a form), **You** (profile, language, optional AI key) and **More** (verification console, partner portal, what the labels mean).
+4. Everything else sits in tabs: **Explore** (find a place by name, add it to your plan, open its full briefing), **Plan** (the same planner as a form), **You** (profile, language, optional AI key) and **More** (verification console, partner portal, what the labels mean).
 
 ## Problem and solution
 
-Visitors to heritage cities plan a fixed time budget on Google, Maps and social media. Famous sites are easy to find. What is missing, in one trusted and current place, is lesser-known places matched to interests, realistic travel time and cost between places, and current site details (hours, closures, fees by payment mode, entry rules). Official facts exist, but they are split across custodians (ASI, MP State Archaeology, trusts, the tourism board), undated and hard to find. Gwalior Fort alone has two custodians with separate tickets. Dishaara keeps one verified, dated record per place, with every fact showing its source and one of eight status labels. It answers "Can I actually visit on this date?" with explicit rules, and builds a plan that fits the visitor's hours. The SRS now specifies a two-level guardrail (Decision 25, 15 Oct 2026): a place may appear in plans and alternates only when its custodian's own current publication shows it open and ticketed (Level 1), and the lesser-known boost, discovery lists and daily limits need an explicit custodian flag (Level 2). The prototype follows this two-level rule; see "Guardrail: prototype vs current design" below.
+Visitors to heritage cities plan a fixed time budget on Google, Maps and social media. Famous sites are easy to find. What is missing, in one trusted and current place, is lesser-known places matched to interests, realistic travel time and cost between places, and current site details (hours, closures, fees by payment mode, entry rules). Official facts exist, but they are split across custodians (ASI, MP State Archaeology, trusts, the tourism board), undated and hard to find. Gwalior Fort alone has two custodians with separate tickets. Dishaara keeps one verified, dated record per place, with every fact showing its source and one of eight status labels. It answers "Can I actually visit on this date?" with explicit rules, and builds a plan that fits the visitor's hours. The SRS now specifies a two-level guardrail (Decision 25, 15 Oct 2026): a place may appear in plans and alternates only when its custodian's own current publication shows it open and ticketed (Level 1), and the lesser-known boost, discovery lists and daily limits need an explicit custodian flag (Level 2). The prototype follows this two-level rule; see "Guardrail: prototype vs current design" below. It also follows Decision 28 (16 Oct 2026): a visitor may add any recorded place they find by name to their own plan, and three leak fixes stop unflagged places from being suggested; see "Visitor-added places (Decision 28)" below.
 
 ## Screenshots
 
@@ -47,6 +47,7 @@ web/                 React 18 + Vite + TypeScript, deployed to GitHub Pages
     guardrail.ts          two-level guardrail (Decision 25): Level 1 publication, Level 2 flag, withdrawn, not eligible
     alternates.ts         "Can't make it" alternates and replan (FR-AL)
     geo.ts                leg distance, time and fare, labelled estimated (E6)
+    names.ts              name-only search with near matches (Decision 28), and the check that the AI names no unflagged place unasked
     parse.ts              trip text, date/weekday check (E19), coverage (E20)
     grounding.ts          blocks AI text with a time, date, fee, distance or phone not in tool results
   src/chat/               chat engine: rule-based answers, or Groq with tool calls
@@ -90,7 +91,19 @@ The prototype now follows the two-level guardrail in the SRS (Decision 25, 15 Oc
 | Custodian control | Custodians set and withdraw levels at any time | Partner portal mock: status and Level 2 limit edits apply at once in this browser and are logged |
 | Tests | AT-06, AT-07 (rewritten) and AT-19 (new) | AT-06, AT-07 and AT-19 in `web/src/core/core.test.ts` |
 
-The Explore tab lists the places that can be planned (Level 1 or 2) as a directory. Places that are not eligible appear there only when searched by name. The curated discovery list ("Show me something lesser-known" in chat) is Level 2 only.
+The only lists are Level 2: the Explore tab's "Suggested by custodians", the nearby panel and "Show me something lesser-known" in chat. Every other place, Level 1 included, is found by name.
+
+## Visitor-added places (Decision 28)
+
+| Rule | SRS | In the prototype | Test |
+|---|---|---|---|
+| A visitor may add any recorded place found by name, whatever its guardrail level. It gets its record, time fit and leg costs, labelled "added by visitor, not suggested". It is never an alternate and never in a list | FR-PL-12 | Add to my plan on Explore search results and place pages. The planner places added stops first when they fit. An added place with no hours on record is left out with that reason, never timed on a guess. Plans to added places are counted apart in the Verify console, not against daily limits | AT-20 |
+| Leak fix 1: search by name only, exact or near match (typos), no autocomplete. Interests are not searchable; they only shape plans | FR-VO-08, PL-01 | Explore has no interest filters. Search runs on submit. "sas" or "temples" find nothing, "jai vilas palce" finds Jai Vilas Palace. The chat tool search_places lost its interest parameter | AT-21 |
+| Leak fix 2: no "nearby places" on the page of an unflagged place | FR-BR-07 | The nearby panel shows only on Level 2 pages and lists only Level 2 places | AT-22 |
+| Leak fix 3: the assistant does not mention an unflagged place unless the visitor names it | FR-AI-12 | Rule-based chat never volunteers one. With Groq, the reply is checked like the grounding check: a place the visitor did not name, not in a plan stop, not added and not Level 2 means one rewrite, then the structured fallback. The Ghauspura start point no longer carries the Tansen tomb in its name | AT-23 (20 requests, plus the AI path with a mocked Groq reply) |
+| Places of worship and contested or residential sites can be added, with the rules shown first: neutral wording, current access status, dress and worship timings | FR-BR-08 | Gurudwara and Sun Temple (worship), Ghaus and Tansen tombs (contested). Dress and worship timings are not sourced yet, so they show "unavailable" with a reason | AT-24 |
+
+Decision 28 tests are in `web/src/core/decision28.test.ts` and `web/src/chat/chat.test.ts`.
 
 ## Run locally
 
@@ -135,6 +148,11 @@ To try AI replies, get a free key at console.groq.com and paste it in the app un
 | Not-eligible places never planned or in alternates, still searchable; lesser-known boost for Level 2 only | FR-GR-02, GR-03 | AT-06 |
 | Daily limit (Level 2 only) excludes a place from the third plan; Level 1 has no limit | FR-GR-04 | AT-07 |
 | Level 1 ends on a stale or conflicting publication, or on withdrawal: 0 appearances in 10 plans and 10 alternate requests each | FR-GR-02, Decision 25 | AT-19 |
+| Visitor-added place: in the plan with times and costs, labelled, 0 times as an alternate or in a list | FR-PL-12, GR-03, Decision 28 | AT-20 `web/src/core/decision28.test.ts` |
+| Name-only search: exact or near matches, nothing for partial names or interest words | FR-VO-08 | AT-21 |
+| No nearby panel on unflagged pages | FR-BR-07 | AT-22 |
+| Assistant names no unflagged place unless the visitor does: 20 requests, 0 mentions; AI reply rewritten once, then falls back | FR-AI-12 | AT-23 `web/src/chat/chat.test.ts` |
+| Worship and contested sites can be added; rules shown first; unsourced rules "unavailable" | FR-BR-08 | AT-24 |
 | Weekly holiday → "not feasible"; ≤ 3 eligible alternates; all 4 verdicts | FR-FC-01, AL-01, AL-02 | AT-08 (web and backend) |
 | Fort fees by visitor type and cash/online; separate section tickets | FR-KB-02, BR-01 | AT-09 |
 | Grounding check blocks an invented time, regenerates once, falls back, logs | FR-AI-04 | AT-10 `web/src/chat/chat.test.ts` and `backend/tests/test_ai.py` |
