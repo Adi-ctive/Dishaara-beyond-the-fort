@@ -1,5 +1,8 @@
 # Dishaara: beyond the fort
 
+> **Round 2 app (28 Oct 2026):** the full Dishaara app (React + Vite frontend, FastAPI backend, Gwalior and Indore data) is in [`app/`](app/). Live at https://dishaara.vercel.app. Start with `app/README.md`. The Round 1 prototype below (`web/`, `backend/`) is kept as submitted. Keys live only in the server environment; none are in this repository.
+
+
 Team Argus · AI Synergy Hackathon 2026 · Tourism case "Beyond the Fort" · Round 1 deliverable 5 (technical feasibility proof).
 
 **Live demo:** https://adi-ctive.github.io/Dishaara-beyond-the-fort/ (opens on the sign-in screen; "Continue as guest" works)

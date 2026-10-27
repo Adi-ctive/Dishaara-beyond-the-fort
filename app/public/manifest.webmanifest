@@ -1,0 +1,17 @@
+{
+  "name": "Dishaara",
+  "short_name": "Dishaara",
+  "description": "Checked, dated facts from local saarthis and a day plan that fits your time.",
+  "start_url": "./#chat",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF7EA",
+  "theme_color": "#26346B",
+  "lang": "en-IN",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

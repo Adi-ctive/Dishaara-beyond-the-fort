@@ -1,0 +1,385 @@
+{
+ "gwalior:gwalior-fort": {
+  "qid": "Q2487545",
+  "file": "Gwalior Fort - Morning View.jpg",
+  "km": 0.07,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Gwalior_Fort_-_Morning_View.jpg/960px-Gwalior_Fort_-_Morning_View.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Gwalior_Fort_-_Morning_View.jpg",
+  "author": "Abhishek Dwivedi",
+  "license": "CC BY-SA 4.0"
+ },
+ "gwalior:sas-bahu": {
+  "qid": "Q7424948",
+  "file": "Saas Bahu Ka Mandir 01 (2).jpg",
+  "km": 0.04,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Saas_Bahu_Ka_Mandir_01_%282%29.jpg/960px-Saas_Bahu_Ka_Mandir_01_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Saas_Bahu_Ka_Mandir_01_(2).jpg",
+  "author": "Suyash Dwivedi",
+  "license": "CC BY-SA 4.0"
+ },
+ "gwalior:teli-ka-mandir": {
+  "qid": "Q1800304",
+  "file": "Teli Ka Mandir, Gwalior Fort.JPG",
+  "km": 0.18,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Teli_Ka_Mandir%2C_Gwalior_Fort.JPG/960px-Teli_Ka_Mandir%2C_Gwalior_Fort.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Teli_Ka_Mandir,_Gwalior_Fort.JPG",
+  "author": "Sanchari5491",
+  "license": "CC BY-SA 3.0"
+ },
+ "gwalior:gurudwara-data-bandi-chhod": {
+  "qid": null,
+  "file": "Data Bandi Chhod Gurudwara Gwalior Fort - panoramio.jpg",
+  "km": 0.37,
+  "via": "commons-geo",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Data_Bandi_Chhod_Gurudwara_Gwalior_Fort_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:Data_Bandi_Chhod_Gurudwara_Gwalior_Fort_-_panoramio.jpg",
+  "author": "Gyanendra_Singh_Chau…",
+  "license": "CC BY 3.0"
+ },
+ "gwalior:jai-vilas": {
+  "qid": "Q6123487",
+  "file": "Jai Vilas Palace ( Scindia Palace).jpg",
+  "km": 0.18,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Jai_Vilas_Palace_%28_Scindia_Palace%29.jpg/960px-Jai_Vilas_Palace_%28_Scindia_Palace%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Jai_Vilas_Palace_(_Scindia_Palace).jpg",
+  "author": "Mohitkjain123",
+  "license": "CC BY-SA 3.0"
+ },
+ "gwalior:tansen-tomb": {
+  "qid": "Q97946701",
+  "file": "Tansen Tomb - panoramio.jpg",
+  "km": 0.3,
+  "img": "https://upload.wikimedia.org/wikipedia/commons/2/24/Tansen_Tomb_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:Tansen_Tomb_-_panoramio.jpg",
+  "author": "Gyanendrasinghchauha…",
+  "license": "CC BY 3.0"
+ },
+ "gwalior:ghaus-tomb": {
+  "qid": null,
+  "file": "Mohammad Gaus Tomb - panoramio.jpg",
+  "km": 0.26,
+  "via": "commons-geo",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Mohammad_Gaus_Tomb_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:Mohammad_Gaus_Tomb_-_panoramio.jpg",
+  "author": "Gyanendrasinghchauha…",
+  "license": "CC BY 3.0"
+ },
+ "gwalior:suraj-kund": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:sun-temple": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:light-sound-show": {
+  "qid": null,
+  "tried": "commons-geo",
+  "rejected": "Man Singh Palace Foot Path at Gwalior Fort - panoramio.jpg (wrong subject, checked by hand 25 Oct)"
+ },
+ "gwalior:tighra-dam": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:db-city-mall": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:phool-bagh": {
+  "qid": null,
+  "file": "Mahatma Gandhi statue at Phool Bagh Gwalior - panoramio.jpg",
+  "km": 0.03,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Mahatma_Gandhi_statue_at_Phool_Bagh_Gwalior_-_panoramio.jpg/960px-Mahatma_Gandhi_statue_at_Phool_Bagh_Gwalior_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Mahatma_Gandhi_statue_at_Phool_Bagh_Gwalior_-_panoramio.jpg",
+  "author": "Gyanendra_Singh_Chau…",
+  "license": "CC BY 3.0"
+ },
+ "indore:rajwada": {
+  "qid": "Q7286493",
+  "file": "Rajwada Palace, Indore.jpg",
+  "km": 0.06,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Rajwada_Palace%2C_Indore.jpg/960px-Rajwada_Palace%2C_Indore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Rajwada_Palace,_Indore.jpg",
+  "author": "Bernard Gagnon",
+  "license": "CC BY-SA 3.0"
+ },
+ "indore:lal-bagh": {
+  "qid": "Q66363783",
+  "file": "Lalbagh Palace IndoreR0010278s.jpg",
+  "km": 0.39,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Lalbagh_Palace_IndoreR0010278s.jpg/960px-Lalbagh_Palace_IndoreR0010278s.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Lalbagh_Palace_IndoreR0010278s.jpg",
+  "author": "Amit Nimade",
+  "license": "CC BY-SA 4.0"
+ },
+ "indore:central-museum": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:sarafa": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:kanch-mandir": {
+  "qid": null,
+  "file": "Kanch Mandir, Indore.jpg",
+  "km": 0.02,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Kanch_Mandir%2C_Indore.jpg/960px-Kanch_Mandir%2C_Indore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Kanch_Mandir,_Indore.jpg",
+  "author": "Bernard Gagnon",
+  "license": "CC BY-SA 3.0"
+ },
+ "indore:khajrana": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:bada-ganpati": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:annapurna": {
+  "qid": null,
+  "file": "010272 Annapurna Temple Indore MP 03.jpg",
+  "km": 0.03,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/010272_Annapurna_Temple_Indore_MP_03.jpg/960px-010272_Annapurna_Temple_Indore_MP_03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:010272_Annapurna_Temple_Indore_MP_03.jpg",
+  "author": "Ms Sarah Welch",
+  "license": "CC0"
+ },
+ "indore:krishnapura-chhatri": {
+  "qid": null,
+  "file": "Krishnapura Chhatri - sculptures.jpg",
+  "km": 0.17,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Krishnapura_Chhatri_-_sculptures.jpg/960px-Krishnapura_Chhatri_-_sculptures.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Krishnapura_Chhatri_-_sculptures.jpg",
+  "author": "Bernard Gagnon",
+  "license": "CC BY-SA 3.0"
+ },
+ "indore:56-dukan": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:phoenix-citadel": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:treasure-island": {
+  "qid": null,
+  "tried": "commons-geo",
+  "rejected": "M G Road from foot overbridge in front of Treasure Island, Indore.jpg (wrong subject, checked by hand 25 Oct)"
+ },
+ "indore:meghdoot-garden": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:mrignayani": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:gulawat-lotus-valley": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:ralamandal": {
+  "qid": null,
+  "file": "Entrance to Ralamandal sanctuary, near Indore.JPG",
+  "km": 0.97,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Entrance_to_Ralamandal_sanctuary%2C_near_Indore.JPG/960px-Entrance_to_Ralamandal_sanctuary%2C_near_Indore.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Entrance_to_Ralamandal_sanctuary,_near_Indore.JPG",
+  "author": "Prateek Karandikar",
+  "license": "CC BY-SA 4.0"
+ },
+ "indore:patalpani": {
+  "qid": "Q15653559",
+  "file": "Patalpani waterfall.jpg",
+  "km": 0.0,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Patalpani_waterfall.jpg/960px-Patalpani_waterfall.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Patalpani_waterfall.jpg",
+  "author": "Ankittambe05",
+  "license": "CC BY-SA 3.0"
+ },
+ "indore:choral-dam": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:indore-zoo": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:regional-park": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:gandhi-hall": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:bhim-janmabhoomi": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:bijasan-mata": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:gwalior-zoo": {
+  "qid": null,
+  "tried": "commons-geo",
+  "rejected": "Mahatma Gandhi statue at Phool Bagh Gwalior - panoramio.jpg (wrong subject, checked by hand 25 Oct)"
+ },
+ "gwalior:chaturbhuj-temple": {
+  "qid": "Q44545847",
+  "file": "Chaturbhuj Temple at Gwalior Fort 2011-08-14.jpg",
+  "km": 0.0,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Chaturbhuj_Temple_at_Gwalior_Fort_2011-08-14.jpg/960px-Chaturbhuj_Temple_at_Gwalior_Fort_2011-08-14.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Chaturbhuj_Temple_at_Gwalior_Fort_2011-08-14.jpg",
+  "author": "Geek 007",
+  "license": "CC BY-SA 3.0"
+ },
+ "gwalior:gopachal": {
+  "qid": null,
+  "file": "0121521 Gopachal Patthar ki Baoli Jain monuments, Gwalior 11.jpg",
+  "km": 0.01,
+  "via": "commons-geo",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/8/80/0121521_Gopachal_Patthar_ki_Baoli_Jain_monuments%2C_Gwalior_11.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:0121521_Gopachal_Patthar_ki_Baoli_Jain_monuments,_Gwalior_11.jpg",
+  "author": "Ms Sarah Welch",
+  "license": "CC0"
+ },
+ "gwalior:assi-khamba-bawri": {
+  "qid": null,
+  "file": "Assi Khamba Ki Bawadis.jpg",
+  "km": 0.03,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Assi_Khamba_Ki_Bawadis.jpg/960px-Assi_Khamba_Ki_Bawadis.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Assi_Khamba_Ki_Bawadis.jpg",
+  "author": "Davide Mauro",
+  "license": "CC BY-SA 4.0"
+ },
+ "gwalior:moti-mahal": {
+  "qid": "Q98927541",
+  "file": "Moti Mahal.JPG",
+  "km": 0.03,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Moti_Mahal.JPG/960px-Moti_Mahal.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Moti_Mahal.JPG",
+  "author": "VidhuKhare",
+  "license": "CC BY-SA 3.0"
+ },
+ "gwalior:maharaj-bada": {
+  "qid": null,
+  "file": "Maharaj Bada Gwalior.jpg",
+  "km": 0.04,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6d/Maharaj_Bada_Gwalior.jpg/960px-Maharaj_Bada_Gwalior.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Maharaj_Bada_Gwalior.jpg",
+  "author": "Neerajshivpuri",
+  "license": "CC BY-SA 4.0"
+ },
+ "gwalior:bateshwar": {
+  "qid": "Q4868834",
+  "file": "Ruins is the new beautiful.jpg",
+  "km": 0.0,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Ruins_is_the_new_beautiful.jpg/960px-Ruins_is_the_new_beautiful.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Ruins_is_the_new_beautiful.jpg",
+  "author": "Shivaligupta",
+  "license": "CC BY-SA 4.0"
+ },
+ "gwalior:padavali": {
+  "qid": null,
+  "file": "Garhi Padavali 02.jpg",
+  "km": 0.03,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Garhi_Padavali_02.jpg/960px-Garhi_Padavali_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Garhi_Padavali_02.jpg",
+  "author": "Suyash Dwivedi",
+  "license": "CC BY-SA 4.0"
+ },
+ "gwalior:mitaoli": {
+  "qid": "Q20751086",
+  "file": "0121621 Chausath Yogini and Shiva Temple, Mitaoli Madhya Pradesh.jpg",
+  "km": 0.0,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/0121621_Chausath_Yogini_and_Shiva_Temple%2C_Mitaoli_Madhya_Pradesh.jpg/960px-0121621_Chausath_Yogini_and_Shiva_Temple%2C_Mitaoli_Madhya_Pradesh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:0121621_Chausath_Yogini_and_Shiva_Temple,_Mitaoli_Madhya_Pradesh.jpg",
+  "author": "Ms Sarah Welch",
+  "license": "CC0"
+ },
+ "gwalior:gohad-fort": {
+  "qid": "Q5577562",
+  "file": "Gohad fort field (senik sabha sthal).jpg",
+  "km": 0.0,
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Gohad_fort_field_%28senik_sabha_sthal%29.jpg/960px-Gohad_fort_field_%28senik_sabha_sthal%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Gohad_fort_field_(senik_sabha_sthal).jpg",
+  "author": "Pradhumn soni gohad",
+  "license": "CC BY-SA 4.0"
+ },
+ "gwalior:ghatigaon": {
+  "qid": "Q5555916",
+  "file": "Sonchiriya.jpg",
+  "km": 0.0,
+  "img": "https://upload.wikimedia.org/wikipedia/commons/0/05/Sonchiriya.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:Sonchiriya.jpg",
+  "author": "LRBurdak at English Wikipedia",
+  "license": "CC BY-SA 3.0"
+ },
+ "gwalior:geoscience-museum": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:sirpur-lake": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:jam-gate": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:rani-samadhi": {
+  "qid": null,
+  "file": "Rani Lakshmi Bai Samadhi Sthal Gwalior.jpg",
+  "km": 0.06,
+  "via": "commons-geo",
+  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/Rani_Lakshmi_Bai_Samadhi_Sthal_Gwalior.jpg/960px-Rani_Lakshmi_Bai_Samadhi_Sthal_Gwalior.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "page": "https://commons.wikimedia.org/wiki/File:Rani_Lakshmi_Bai_Samadhi_Sthal_Gwalior.jpg",
+  "author": "Utkarsh Nandan Oreya",
+  "license": "CC BY-SA 4.0"
+ },
+ "gwalior:scindia-chhatris": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:italian-garden": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:sarod-ghar": {
+  "qid": null,
+  "file": "Sarod Ghar Jiwajiganj Gwalior - panoramio.jpg",
+  "km": 0.0,
+  "via": "commons-geo",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/5/53/Sarod_Ghar_Jiwajiganj_Gwalior_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "page": "https://commons.wikimedia.org/wiki/File:Sarod_Ghar_Jiwajiganj_Gwalior_-_panoramio.jpg",
+  "author": "Gyanendra_Singh_Chau…",
+  "license": "CC BY 3.0"
+ },
+ "gwalior:sarafa-gwalior": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "gwalior:abul-fazal-tomb": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:pitra-parvat": {
+  "qid": null,
+  "tried": "commons-geo"
+ },
+ "indore:gommatgiri": {
+  "qid": null,
+  "tried": "commons-geo"
+ }
+}

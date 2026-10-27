@@ -1,0 +1,11 @@
+node_modules
+dist
+backend/.venv
+backend/.tts_cache
+backend/tests
+**/__pycache__
+.env*
+!.env.example
+scripts
+docs
+*.log

@@ -1,0 +1,246 @@
+{
+  "_note": "Demo content only. Same samples as app/src/data/demo.ts, labelled Sample or Demo in the UI. No fact here is about a real place.",
+  "saarthis": [
+    {
+      "id": "s-aditya",
+      "name": "Aditya",
+      "region": "Gwalior Fort area",
+      "rating": 4.8,
+      "checks": 41,
+      "since": "Oct 2026",
+      "demo": true
+    },
+    {
+      "id": "s-priyangi",
+      "name": "Priyangi",
+      "region": "Gwalior old city",
+      "rating": 4.9,
+      "checks": 57,
+      "since": "Oct 2026",
+      "demo": true
+    },
+    {
+      "id": "s-pranjal",
+      "name": "Pranjal",
+      "region": "Indore Rajwada area",
+      "rating": 4.7,
+      "checks": 12,
+      "since": "Oct 2026",
+      "demo": true
+    }
+  ],
+  "indore": [
+    {
+      "id": "rajwada",
+      "name": {
+        "en": "Rajwada",
+        "hi": "राजवाड़ा"
+      }
+    },
+    {
+      "id": "lal-bagh",
+      "name": {
+        "en": "Lal Bagh Palace",
+        "hi": "लाल बाग पैलेस"
+      }
+    },
+    {
+      "id": "kanch-mandir",
+      "name": {
+        "en": "Kanch Mandir",
+        "hi": "कांच मंदिर"
+      }
+    },
+    {
+      "id": "sarafa",
+      "name": {
+        "en": "Sarafa Bazaar",
+        "hi": "सराफ़ा बाज़ार"
+      }
+    },
+    {
+      "id": "chhatri-bagh",
+      "name": {
+        "en": "Chhatri Bagh",
+        "hi": "छत्री बाग"
+      }
+    }
+  ],
+  "tickets": [
+    {
+      "id": "t1",
+      "place": "jai-vilas",
+      "from": "Raahi (sample)",
+      "text": "Counter said Monday is open now. Your page says it is unclear.",
+      "status": "open"
+    },
+    {
+      "id": "t2",
+      "place": "gwalior-fort",
+      "from": "Raahi (sample)",
+      "text": "Sample: the auto fare from the station was higher than your estimate.",
+      "status": "open",
+      "proof": "photo"
+    },
+    {
+      "id": "t3",
+      "place": "sas-bahu",
+      "from": "Saarthi Priyangi (demo)",
+      "text": "Fee board photo attached, matches ₹25 cash.",
+      "status": "answered",
+      "proof": "photo",
+      "answer": "Matches our record. Stamp refreshed."
+    }
+  ],
+  "verify": [
+    {
+      "id": "v1",
+      "place": "teli-ka-mandir",
+      "field": "Photography rule",
+      "value": "No fee for still photos. Video ₹25.",
+      "by": "Priyangi (demo)",
+      "risk": "low",
+      "status": "pending"
+    },
+    {
+      "id": "v2",
+      "place": "gwalior-fort",
+      "field": "Last entry",
+      "value": "Not published at the counter",
+      "by": "Pranjal (demo)",
+      "risk": "high",
+      "status": "pending"
+    }
+  ],
+  "posts": [
+    {
+      "id": "p1",
+      "by": "s-priyangi",
+      "kind": "fact",
+      "placeId": "sas-bahu",
+      "text": "Sample post: photo of the fee board taken today.",
+      "status": "live"
+    },
+    {
+      "id": "p2",
+      "by": "s-aditya",
+      "kind": "video",
+      "placeId": "gwalior-fort",
+      "text": "Sample video: the walk up from Urwai Gate, 60 seconds.",
+      "status": "live"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "a1",
+      "kind": "crowd",
+      "en": "Sample: Gwalior Fort is busiest 11:00 to 13:00 today. Go before 10:00 for a calmer visit.",
+      "source": "Planned visits in Dishaara",
+      "at": "08:10",
+      "hi": "नमूना: आज ग्वालियर किले में 11:00 से 13:00 सबसे ज़्यादा भीड़। शांति से देखने के लिए 10:00 से पहले जाएँ।"
+    },
+    {
+      "id": "a2",
+      "kind": "news",
+      "en": "Sample: A rally may slow traffic near Maharaj Bada after 16:00.",
+      "source": "Local news, needs moderator approval",
+      "at": "07:40",
+      "hi": "नमूना: 16:00 के बाद महाराज बाड़ा के पास रैली से ट्रैफ़िक धीमा हो सकता है।"
+    },
+    {
+      "id": "a3",
+      "kind": "weather",
+      "en": "Sample: Hot afternoon. Carry water for the fort climb.",
+      "source": "Weather service",
+      "at": "06:30",
+      "hi": "नमूना: दोपहर गर्म रहेगी। किले की चढ़ाई के लिए पानी रखें।"
+    }
+  ],
+  "bazaar": [
+    {
+      "id": "b1",
+      "name": "Sample: Kachori stall",
+      "kind": "food",
+      "near": "gwalior-fort",
+      "tags": [
+        "clean",
+        "cash only",
+        "quick"
+      ],
+      "comments": 12
+    },
+    {
+      "id": "b2",
+      "name": "Sample: Stone carving workshop",
+      "kind": "craft",
+      "near": "sas-bahu",
+      "tags": [
+        "handmade",
+        "card accepted"
+      ],
+      "sponsored": true,
+      "comments": 5
+    },
+    {
+      "id": "b3",
+      "name": "Sample: Family thali house",
+      "kind": "food",
+      "near": "jai-vilas",
+      "tags": [
+        "good for groups",
+        "veg"
+      ],
+      "comments": 31
+    },
+    {
+      "id": "b4",
+      "name": "Sample: Chanderi weaver shop",
+      "kind": "shop",
+      "near": "jai-vilas",
+      "tags": [
+        "handmade",
+        "fixed prices"
+      ],
+      "comments": 8
+    },
+    {
+      "id": "b5",
+      "name": "Sample: Heritage homestay",
+      "kind": "stay",
+      "near": "teli-ka-mandir",
+      "tags": [
+        "quiet",
+        "card accepted"
+      ],
+      "comments": 4
+    }
+  ],
+  "queue": [
+    {
+      "id": "m1",
+      "kind": "application",
+      "title": "Saarthi application: Rakesh (sample)",
+      "detail": "Licensed guide. Licence check with the issuing body pending.",
+      "status": "pending"
+    },
+    {
+      "id": "m2",
+      "kind": "flag",
+      "title": "Flagged entry: Gwalior Fort last entry",
+      "detail": "High risk field, second saarthi disagrees.",
+      "status": "pending"
+    },
+    {
+      "id": "m3",
+      "kind": "business",
+      "title": "Business listing: Sample stone carving workshop",
+      "detail": "New photos to review.",
+      "status": "pending"
+    }
+  ],
+  "comments": [
+    "Sample: very clean, helpful owner",
+    "Sample: card accepted, fixed prices",
+    "Sample: hard to find the entrance"
+  ]
+}

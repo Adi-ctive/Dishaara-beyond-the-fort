@@ -1,0 +1,117 @@
+{
+  "_note": "What the chat assistant (Yatra) knows about the app itself. Keep it true to the screens: update this file when a screen changes.",
+  "about": {
+    "en": "Dishaara is a travel helper for Gwalior and Indore. It keeps one checked, dated record per place and builds a day plan that fits your time. Every fact shows how sure we are. Yatra is its assistant.",
+    "hi": "दिशारा ग्वालियर और इंदौर के लिए यात्रा सहायक है। हर जगह का एक जाँचा हुआ, तारीख वाला रिकॉर्ड रखता है और आपके समय में फिट दिन का प्लान बनाता है। हर जानकारी के साथ बताता है कि हम कितने पक्के हैं। यात्रा इसकी सहायक है।"
+  },
+  "features": [
+    {
+      "id": "plan",
+      "words": "plan day itinerary roadmap trip schedule hours time route प्लान दिन रोडमैप घूमना समय योजना",
+      "en": "Plan a day: on the Chat home tap \"Plan my day in a few taps\" (or ask me). Pick when and how long, where you start, who is coming and how you get around. Your roadmap opens with times, ticket totals and travel cost estimates.",
+      "hi": "दिन प्लान करें: चैट होम पर \"कुछ टैप में दिन प्लान करें\" दबाएँ (या मुझसे पूछें)। कब और कितनी देर, कहाँ से शुरू, कौन आ रहा है और कैसे घूमेंगे चुनें। रोडमैप समय, टिकट का कुल और सफ़र के अनुमानित खर्च के साथ खुलता है।"
+    },
+    {
+      "id": "roadmap",
+      "words": "roadmap reorder drag tick done late running late change order skip share रोडमैप देर क्रम बदलें",
+      "en": "Roadmap tab: drag stops to change the order, tick a stop when you finish it, and tap \"I'm running late\" to re-plan the rest of the day. Share it with your group.",
+      "hi": "रोडमैप टैब: क्रम बदलने के लिए स्टॉप खींचें, पूरा होने पर टिक करें, और देर हो तो \"मुझे देर हो रही है\" दबाएँ ताकि बाकी दिन फिर से बने। समूह के साथ शेयर करें।"
+    },
+    {
+      "id": "story",
+      "words": "place details card story info read about information जगह जानकारी कहानी कार्ड",
+      "en": "Tap any place to open its story cards: today's verdict, tickets, time needed, what we don't know and who checked it. \"See full details\" opens the full page.",
+      "hi": "किसी भी जगह पर टैप करें तो उसके कहानी कार्ड खुलते हैं: आज का फ़ैसला, टिकट, लगने वाला समय, क्या पता नहीं और किसने जाँचा। आख़िरी कार्ड से पूरा पेज खुलता है।"
+    },
+    {
+      "id": "trust",
+      "words": "confirmed sure label trust reliable verified not confirmed disagree source पक्का भरोसा स्रोत पुष्ट",
+      "en": "Every fact has a label: officially confirmed, checked on site, recently reported, an estimate, and so on, with its date and source. \"Not confirmed\" means sources disagree, so we never show a number for it.",
+      "hi": "हर जानकारी पर लेबल होता है: आधिकारिक रूप से पुष्ट, मौके पर जाँचा, हाल में बताया गया, अनुमान आदि, तारीख और स्रोत के साथ। \"पक्का नहीं\" का मतलब है स्रोत अलग-अलग कहते हैं, इसलिए हम उसकी कोई संख्या नहीं दिखाते।"
+    },
+    {
+      "id": "map",
+      "words": "map location pins near nearby directions where shops offline sketch नक्शा पास दिशा कहाँ",
+      "en": "Map tab: tap a pin to see the place, swipe the strip below to fly between places, and switch on shops. With location on you see where you are. There is also an offline sketch map for weak signal.",
+      "hi": "नक्शा टैब: जगह देखने के लिए पिन पर टैप करें, नीचे की पट्टी से जगहों के बीच जाएँ, और दुकानें भी दिखाएँ। लोकेशन चालू हो तो आप कहाँ हैं दिखता है। कमज़ोर सिग्नल के लिए ऑफ़लाइन स्केच नक्शा भी है।"
+    },
+    {
+      "id": "city",
+      "words": "city indore gwalior switch change शहर इंदौर ग्वालियर बदलें",
+      "en": "Switch city with the picker in the top bar. With location on, Dishaara opens in the city you are in.",
+      "hi": "ऊपर की पट्टी के चुनाव से शहर बदलें। लोकेशन चालू हो तो दिशारा उसी शहर में खुलता है जहाँ आप हैं।"
+    },
+    {
+      "id": "stamps",
+      "words": "stamp stamps collect passport check in visit proof रेयर स्टैम्प पासपोर्ट",
+      "en": "Stamps: at a place, open it and tap \"Collect stamp\". We check you are really there for about a minute, or you can use the counter code. Stamps fill your passport: bronze, silver and gold per city. Rare stamps come from lesser-known places. You need to sign in.",
+      "hi": "स्टैम्प: जगह पर पहुँचकर उसे खोलें और \"स्टैम्प लें\" दबाएँ। हम लगभग एक मिनट जाँचते हैं कि आप सच में वहाँ हैं, या काउंटर कोड से। स्टैम्प से पासपोर्ट भरता है: हर शहर के लिए ब्रॉन्ज़, सिल्वर, गोल्ड। कम मशहूर जगहों पर दुर्लभ स्टैम्प मिलते हैं। साइन इन ज़रूरी है।"
+    },
+    {
+      "id": "points",
+      "words": "points level badge badges quest quests reward rewards unlock theme avatar frame banner पॉइंट लेवल बैज इनाम थीम",
+      "en": "Stamps, feedback and quests give points. Points raise your level, and levels, badges and passport tiers unlock themes, avatars, frames and banners in Profile, Rewards and unlocks.",
+      "hi": "स्टैम्प, फ़ीडबैक और क्वेस्ट से पॉइंट मिलते हैं। पॉइंट से लेवल बढ़ता है, और लेवल, बैज और पासपोर्ट से प्रोफ़ाइल में थीम, अवतार, फ़्रेम और बैनर खुलते हैं।"
+    },
+    {
+      "id": "feedback",
+      "words": "wrong wrong info report error correct feedback update still true changed outdated गलत सुधार फ़ीडबैक",
+      "en": "Found something wrong? On the place page, tap \"Still true?\" or send feedback. A saarthi checks it and the record is updated. You get points when it helps.",
+      "hi": "कुछ गलत मिला? जगह के पेज पर \"क्या यह अभी भी सही है?\" में जवाब दें या फ़ीडबैक भेजें। सारथी जाँचता है और रिकॉर्ड अपडेट होता है। मदद होने पर पॉइंट मिलते हैं।"
+    },
+    {
+      "id": "saarthi",
+      "words": "saarthi guide local verified become join apply post सारथी गाइड बनें",
+      "en": "Saarthis are local people who check places on site and post updates. Anyone can apply in Profile, Settings, \"Become a saarthi\"; a moderator approves.",
+      "hi": "सारथी स्थानीय लोग हैं जो मौके पर जाकर जगहें जाँचते हैं और अपडेट डालते हैं। प्रोफ़ाइल, सेटिंग्स में \"सारथी बनें\" से कोई भी आवेदन कर सकता है; मॉडरेटर मंज़ूरी देता है।"
+    },
+    {
+      "id": "bazaar",
+      "words": "bazaar shop shops food eat buy souvenir craft local business posts feed बाज़ार दुकान खाना ख़रीद",
+      "en": "Bazaar tab: local shops near your route and posts from saarthis and shops. Like, save, comment and follow after signing in.",
+      "hi": "बाज़ार टैब: आपके रास्ते के पास की स्थानीय दुकानें और सारथियों व दुकानों की पोस्ट। साइन इन करके लाइक, सेव, टिप्पणी और फ़ॉलो करें।"
+    },
+    {
+      "id": "emergency",
+      "words": "emergency help sos danger unsafe police ambulance 112 आपात मदद",
+      "en": "Emergency: the red shield in the top bar (or the red button during a trip) calls 112 and alerts the Dishaara moderators with your location if you share it.",
+      "hi": "आपात स्थिति: ऊपर की लाल ढाल (या यात्रा के दौरान लाल बटन) 112 पर कॉल करती है और लोकेशन साझा करें तो दिशारा मॉडरेटर को सूचना जाती है।"
+    },
+    {
+      "id": "voice",
+      "words": "voice speak talk mic microphone listen hear read aloud hindi english language आवाज़ बोलें सुनें भाषा हिंदी",
+      "en": "Hold the mic to ask by voice, and tap the speaker on a reply to hear it. Switch Hindi or English with the हि / En button in the top bar.",
+      "hi": "आवाज़ से पूछने के लिए माइक दबाएँ, और जवाब सुनने के लिए स्पीकर दबाएँ। ऊपर हि / En बटन से हिंदी या अंग्रेज़ी चुनें।"
+    },
+    {
+      "id": "account",
+      "words": "sign in login account google guest profile settings personal preferences साइन लॉगिन अकाउंट प्रोफ़ाइल सेटिंग",
+      "en": "You can plan a trip as a guest. Sign in with Google to collect stamps, earn points, give feedback and post. Change your interests and travel style in Profile, My personalisation.",
+      "hi": "मेहमान के रूप में भी ट्रिप प्लान कर सकते हैं। स्टैम्प, पॉइंट, फ़ीडबैक और पोस्ट के लिए Google से साइन इन करें। रुचि और घूमने का तरीका प्रोफ़ाइल में बदलें।"
+    },
+    {
+      "id": "offline",
+      "words": "offline internet signal network data no connection ऑफ़लाइन नेटवर्क सिग्नल",
+      "en": "Once opened, Dishaara works offline: your plan, place records and visited map areas stay on your phone. You can install it from the browser menu.",
+      "hi": "एक बार खोलने के बाद दिशारा ऑफ़लाइन चलता है: प्लान, जगहों के रिकॉर्ड और देखे गए नक्शे फ़ोन में रहते हैं। ब्राउज़र मेनू से इसे इंस्टॉल कर सकते हैं।"
+    },
+    {
+      "id": "themes",
+      "words": "theme colour color look dark mode appearance diwali थीम रंग डार्क",
+      "en": "Tap the palette button in the top bar to change the theme or turn on dark mode. More themes unlock as you level up.",
+      "hi": "ऊपर पैलेट बटन से थीम बदलें या डार्क मोड चालू करें। लेवल बढ़ने पर और थीम खुलती हैं।"
+    },
+    {
+      "id": "leaderboard",
+      "words": "leaderboard rank ranking top streak compete friends score लीडरबोर्ड रैंक स्ट्रीक",
+      "en": "Profile, Leaderboard ranks raahis by points this week and all time. Earn points on more days in a row to grow your streak, shown next to your level.",
+      "hi": "प्रोफ़ाइल में लीडरबोर्ड इस हफ़्ते और अब तक के पॉइंट से राहियों की रैंक दिखाता है। लगातार दिनों तक पॉइंट कमाएँ तो लेवल के पास आपकी स्ट्रीक बढ़ती है।"
+    },
+    {
+      "id": "beyond",
+      "words": "mall shopping nature lake waterfall dam park garden modern adventure activity show trek picnic मॉल झरना बाँध पार्क बगीचा रोमांच शो",
+      "en": "Beyond heritage: pick Nature, Modern city or Adventure and activities in your interests. Malls, gardens, lakes, waterfalls and shows appear on the map and in search; add them to your day with Add to roadmap.",
+      "hi": "विरासत से आगे: अपनी रुचि में प्रकृति, आधुनिक शहर या रोमांच चुनें। मॉल, बगीचे, झील, झरने और शो नक्शे और खोज में दिखते हैं; रोडमैप में जोड़ें से दिन में डालें।"
+    }
+  ]
+}
