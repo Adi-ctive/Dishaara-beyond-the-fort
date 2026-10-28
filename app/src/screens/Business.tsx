@@ -1,15 +1,17 @@
 // B1-B4: business owner screens, all from the server. An owner applies, a moderator approves,
 // then the shop shows in the Bazaar and these screens show its real counts and comments.
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { api, lastError, mediaUrl, uploadShopPhoto, type ServerComment, type Shop } from '../api';
 import { shrink } from './Saarthi';
-import { MapPicker } from '../map/MapPicker';
 import { useNav } from '../nav';
 import { useStore } from '../store';
 import { useTheme } from '../theme/ThemeProvider';
 import { Icon } from '../ui/Icon';
 import { LayerPage, Section, Seg } from '../ui/Layer';
 import { useTr } from '../ui/tr';
+
+// The map library is large: it loads only when an owner opens a map.
+const MapPicker = lazy(() => import('../map/MapPicker').then((m) => ({ default: m.MapPicker })));
 
 const KIND_OPTS = (tr: (en: string, hi: string) => string) => [
   { v: 'food', label: tr('Food', 'खाना') },
@@ -72,7 +74,7 @@ export function ApplyBusiness() {
         </select>
       </label>
       <div className="field"><span>{tr('Where exactly (tap the map)', 'ठीक कहाँ (नक्शे पर टैप करें)')}</span>
-        <MapPicker center={data.city.center} value={pin} tokens={tokens} onPick={setPin} />
+        <Suspense fallback={<div className="map-picker" />}><MapPicker center={data.city.center} value={pin} tokens={tokens} onPick={setPin} /></Suspense>
       </div>
       <label className="field"><span>{tr('Hours, prices, what you offer', 'समय, कीमत, आप क्या देते हैं')}</span><textarea rows={4} maxLength={600} value={f.details} onChange={(e) => setF({ ...f, details: e.target.value })} /></label>
       <label className="field"><span>{tr('Phone for customers', 'ग्राहकों के लिए फ़ोन')}</span><input inputMode="tel" maxLength={20} value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></label>
@@ -165,7 +167,7 @@ export function BusinessEdit() {
         </select>
       </label>
       <div className="field"><span>{tr('Where exactly (tap the map)', 'ठीक कहाँ (नक्शे पर टैप करें)')}</span>
-        <MapPicker center={data.city.center} value={b.lat != null && b.lng != null ? [b.lat, b.lng] : null} tokens={tokens} onPick={(c) => setB({ ...b, lat: c[0], lng: c[1] })} />
+        <Suspense fallback={<div className="map-picker" />}><MapPicker center={data.city.center} value={b.lat != null && b.lng != null ? [b.lat, b.lng] : null} tokens={tokens} onPick={(c) => setB({ ...b, lat: c[0], lng: c[1] })} /></Suspense>
       </div>
       <label className="field"><span>{tr('Hours, prices, what you offer', 'समय, कीमत, आप क्या देते हैं')}</span><textarea rows={4} maxLength={600} value={b.details ?? ''} onChange={(e) => setB({ ...b, details: e.target.value })} /></label>
       <div className="field"><span>{tr('Photos of your shop (up to 6)', 'आपकी दुकान की फ़ोटो (6 तक)')}</span>

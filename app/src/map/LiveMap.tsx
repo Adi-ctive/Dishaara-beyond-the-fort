@@ -14,6 +14,17 @@ function hex(c: string): [number, number, number] {
   const h = c.replace('#', '');
   return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as [number, number, number];
 }
+// Names come from the database (shop names are typed by owners), so they go in as text, never as HTML.
+function pinBody(el: HTMLElement, dot: string, label: string) {
+  const d = document.createElement('span');
+  d.className = 'pin-dot';
+  d.textContent = dot;
+  const l = document.createElement('span');
+  l.className = 'pin-label';
+  l.textContent = label;
+  el.replaceChildren(d, l);
+}
+
 export function mix(a: string, b: string, t: number): string {
   const x = hex(a);
   const y = hex(b);
@@ -129,7 +140,7 @@ export function LiveMap({ data, plan, ids, stamps, tokens, lang, me, onPick, onR
       el.className = `pin${n >= 0 ? ' stop' : ''}${stamps[id] ? ' got' : ''}`;
       el.dataset.pin = id;
       el.setAttribute('aria-label', p.name[lang]);
-      el.innerHTML = `<span class="pin-dot">${n >= 0 ? n + 1 : ''}</span><span class="pin-label">${p.name[lang]}</span>`;
+      pinBody(el, n >= 0 ? String(n + 1) : '', p.name[lang]);
       el.addEventListener('click', (e) => {
         e.stopPropagation();
         onPick(id);
@@ -141,7 +152,7 @@ export function LiveMap({ data, plan, ids, stamps, tokens, lang, me, onPick, onR
       el.className = `pin shop ${sh.kind}`;
       el.dataset.pin = sh.id;
       el.setAttribute('aria-label', sh.name);
-      el.innerHTML = `<span class="pin-dot">₹</span><span class="pin-label">${sh.name.replace(/^Sample: |^नमूना: /, '')}</span>`;
+      pinBody(el, '₹', sh.name.replace(/^Sample: |^नमूना: /, ''));
       el.addEventListener('click', (e) => {
         e.stopPropagation();
         onPick(sh.id);
@@ -153,7 +164,7 @@ export function LiveMap({ data, plan, ids, stamps, tokens, lang, me, onPick, onR
       const c = startCoord(data, plan.input.startPoint);
       const el = document.createElement('div');
       el.className = 'pin start';
-      el.innerHTML = `<span class="pin-dot">◆</span><span class="pin-label">${startName(data, plan.input.startPoint)[lang].split(' (')[0]}</span>`;
+      pinBody(el, '◆', startName(data, plan.input.startPoint)[lang].split(' (')[0]);
       add(el, [c[1], c[0]], -12);
     }
   }, [ready, ids, shops, plan, stamps, lang, data, onPick]);

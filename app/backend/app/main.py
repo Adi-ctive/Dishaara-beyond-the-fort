@@ -20,7 +20,7 @@ from pathlib import Path
 
 import httpx
 from bson.binary import Binary
-from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Response, UploadFile
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -31,7 +31,9 @@ from .auth import current, limit, need
 from .db import get_db, now
 
 app = FastAPI(title="Dishaara backend")
-app.add_middleware(CORSMiddleware, allow_origins=os.getenv("CORS_ORIGINS", "*").split(","), allow_methods=["*"], allow_headers=["*"])
+# Only the app's own pages call the API from a browser (the phone app and Vercel share one origin).
+ORIGINS = os.getenv("CORS_ORIGINS", "https://dishaara.vercel.app,http://localhost:5174,http://localhost:5175,http://localhost:4174").split(",")
+app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=["GET", "POST", "PUT", "DELETE"], allow_headers=["Authorization", "Content-Type"])
 app.include_router(social.router)
 
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -104,6 +106,15 @@ def twists() -> dict:
     boot()
     t = get_db().twists.find_one({"_id": "twists"}) or {}
     return {k: t.get(k, v) for k, v in TWISTS.items()}
+
+
+EVERYONE = {"_id": "all"}  # app-wide caps on calls that cost money
+
+
+def by_ip(request: Request) -> dict:
+    """Guests have no account, so their rate limits go by network address (Vercel puts it in x-forwarded-for)."""
+    ip = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip() or (request.client.host if request.client else "?")
+    return {"_id": f"ip:{ip}"}
 
 
 def strip(doc: dict) -> dict:
@@ -1347,7 +1358,7 @@ WRITER = groq  # tests replace this
 
 
 @app.post("/chat")
-def chat(body: ChatIn, me: dict | None = Depends(current)):
+def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
     """Returns {ai: false} when there is no key or the reply fails the checks; the app then shows its rule answer."""
     if re.search(r"emergency|ambulance|police|hospital|injur|accident|आपात|एम्बुलेंस|पुलिस|अस्पताल", body.text, re.I):
         return {"ai": False, "emergency": True, "text": None}
@@ -1355,6 +1366,8 @@ def chat(body: ChatIn, me: dict | None = Depends(current)):
         return {"ai": False, "note": "no-key", "text": None}
     if me:
         limit(me, "chat", 60, 60)
+    else:
+        limit(by_ip(request), "chat", 20, 60)
     pack, allowed = retrieve(body)
     if me:
         past = [f"{r['updated']:%d %b}: {r.get('summary') or r['title']}" for r in get_db().chats.find({"user": me["_id"], "_id": {"$ne": body.chatId}}, {"msgs": 0}).sort("updated", -1).limit(CHAT_CONTEXT)]
@@ -1706,6 +1719,12 @@ def business_me(me: dict | None = Depends(current)):
 def business_put(body: dict, me: dict | None = Depends(current)):
     b = my_business(need(me, "business"))
     upd = {k: v for k, v in body.items() if k in ("name", "tags", "details", "near", "phone", "lat", "lng") and len(json.dumps(v)) < 2000}
+    for k in ("lat", "lng"):
+        if k in upd and not (isinstance(upd[k], (int, float)) and not isinstance(upd[k], bool) and -180 <= upd[k] <= 180):
+            raise HTTPException(422, f"{k} must be a number")
+    for k in ("name", "phone", "near"):
+        if k in upd and not isinstance(upd[k], str):
+            raise HTTPException(422, f"{k} must be text")
     get_db().business.update_one({"_id": b["_id"]}, {"$set": upd})
     return strip(get_db().business.find_one({"_id": b["_id"]}))
 
@@ -1991,7 +2010,7 @@ SPEAKER = eleven  # tests replace this
 
 
 @app.get("/tts")
-def tts(text: str, lang: str = "en"):
+def tts(request: Request, text: str = Query(max_length=2000), lang: str = "en"):
     """Read-aloud audio. Each text is made once and kept in the database (ElevenLabs bills per character).
     204 means no key or a failed call: the app uses the free browser voice instead."""
     if not os.getenv("ELEVENLABS_KEY") and SPEAKER is eleven:
@@ -2006,6 +2025,9 @@ def tts(text: str, lang: str = "en"):
     hit = db.tts.find_one({"_id": key})
     if hit:
         return Response(bytes(hit["audio"]), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=604800"})
+    # Only new clips cost ElevenLabs credits, so only they count: per visitor and for the whole app per day.
+    limit(by_ip(request), "tts", 40, 60)
+    limit(EVERYONE, "tts", 400, 24 * 60)
     if SPEAKER is eleven:
         # Stream: the first sound reaches the phone in about a second instead of after the whole clip.
         try:
@@ -2042,11 +2064,13 @@ LISTENER = whisper  # tests replace this
 
 
 @app.post("/stt")
-async def stt(audio: UploadFile = File(...), lang: str = Form("en")):
+async def stt(request: Request, audio: UploadFile = File(...), lang: str = Form("en")):
     """Voice input for browsers without speech recognition: Whisper on Groq."""
     if not os.getenv("GROQ_KEY") and LISTENER is whisper:
         raise HTTPException(503, "no speech key on the server")
-    raw = await audio.read()
+    limit(by_ip(request), "stt", 30, 60)
+    limit(EVERYONE, "stt", 300, 24 * 60)
+    raw = await audio.read(5_000_001)
     if not raw:
         raise HTTPException(422, "empty audio")
     if len(raw) > 5_000_000:

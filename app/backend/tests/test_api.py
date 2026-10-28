@@ -240,6 +240,8 @@ def test_business_apply_approve_then_bazaar():
     assert c.get("/bazaar?city=indore").json() == []
     assert c.put("/business/me", json={"details": "Open 9 to 9", "evil": 1}, headers=owner).json()["details"] == "Open 9 to 9"
     assert "evil" not in c.get("/business/me", headers=owner).json()
+    assert c.put("/business/me", json={"lat": {"$gt": 0}}, headers=owner).status_code == 422
+    assert c.put("/business/me", json={"name": ["<img src=x>"]}, headers=owner).status_code == 422
     other = signin("Someone Else")
     assert c.get("/business/me", headers=other).status_code == 404  # nobody edits a shared shop any more
 
@@ -795,3 +797,32 @@ def test_news_keeps_local_visitor_news_only():
     drop = ["Lula bucks the rightward tide in Latin America", "Pune techie travels to Indore firm, realises he lost Rs 2.17 crore in stock scam"]
     assert not any(main.junk_news(t, "The Indian Express", "indore") for t in keep)
     assert all(main.junk_news(t, "The Indian Express", "indore") for t in drop)
+
+
+# security pass, 28 Oct night (own scan before the ArgosX scans)
+def test_new_voice_clips_are_rate_limited_per_visitor_but_cached_ones_are_free():
+    main.SPEAKER = lambda t, lang: b"ID3fake"
+    h = {"x-forwarded-for": "203.0.113.9"}
+    for i in range(40):
+        assert c.get("/tts", params={"text": f"Clip number {i}."}, headers=h).status_code == 200
+    assert c.get("/tts", params={"text": "One more new clip."}, headers=h).status_code == 429
+    assert c.get("/tts", params={"text": "Clip number 3."}, headers=h).status_code == 200  # cached, costs nothing
+    assert c.get("/tts", params={"text": "Another network."}, headers={"x-forwarded-for": "198.51.100.4"}).status_code == 200
+
+
+def test_guest_chat_is_rate_limited_by_network():
+    os.environ["GROQ_KEY"] = "test"
+    main.WRITER = lambda *a, **k: "Gwalior Fort is open today."
+    try:
+        h = {"x-forwarded-for": "203.0.113.10"}
+        codes = [c.post("/chat", json={"text": "what is open today", "city": "gwalior"}, headers=h).status_code for _ in range(21)]
+        assert codes[:20] == [200] * 20 and codes[20] == 429
+    finally:
+        os.environ.pop("GROQ_KEY", None)
+
+
+def test_cors_only_allows_the_app():
+    ok = c.options("/chat", headers={"Origin": "https://dishaara.vercel.app", "Access-Control-Request-Method": "POST"})
+    bad = c.options("/chat", headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "POST"})
+    assert ok.headers.get("access-control-allow-origin") == "https://dishaara.vercel.app"
+    assert "access-control-allow-origin" not in bad.headers
