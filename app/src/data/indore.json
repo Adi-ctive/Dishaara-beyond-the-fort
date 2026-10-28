@@ -5,7 +5,7 @@
       "en": "Indore",
       "hi": "इंदौर"
     },
-    "dataVersion": "2026-10-28T04:51",
+    "dataVersion": "2026-10-28T20:27",
     "readAt": "2026-10-25",
     "tz": 5.5,
     "center": [
@@ -5807,13 +5807,13 @@
           "from": "guardrail"
         }
       ],
-      "official": [],
       "photo": {
         "img": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Phoenix_Citadel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
         "page": "https://commons.wikimedia.org/wiki/File:Phoenix_Citadel.jpg",
         "author": "01bhoomi",
         "license": "CC0"
-      }
+      },
+      "official": []
     },
     {
       "id": "treasure-island",
@@ -6118,13 +6118,13 @@
           "from": "guardrail"
         }
       ],
-      "official": [],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Treasure_islandindore.jpg/960px-Treasure_islandindore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Treasure_islandindore.jpg",
         "author": "Chang.zang",
         "license": "Public domain"
-      }
+      },
+      "official": []
     },
     {
       "id": "meghdoot-garden",
@@ -7972,18 +7972,18 @@
           "from": "guardrail"
         }
       ],
-      "official": [
-        {
-          "name": "Indore district: Choral Dam",
-          "url": "https://indore.nic.in/en/tourist-place/choral-dam/"
-        }
-      ],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/River_choral.jpg/960px-River_choral.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:River_choral.jpg",
         "author": "Gajendra",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": [
+        {
+          "name": "Indore district: Choral Dam",
+          "url": "https://indore.nic.in/en/tourist-place/choral-dam/"
+        }
+      ]
     },
     {
       "id": "indore-zoo",
@@ -8291,18 +8291,18 @@
           "from": "guardrail"
         }
       ],
-      "official": [
-        {
-          "name": "Indore Zoo ticket booking (official)",
-          "url": "https://knpsi.in/"
-        }
-      ],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Indore_zoo_gate.jpg/960px-Indore_zoo_gate.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Indore_zoo_gate.jpg",
         "author": "VikramSingh Valera",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": [
+        {
+          "name": "Indore Zoo ticket booking (official)",
+          "url": "https://knpsi.in/"
+        }
+      ]
     },
     {
       "id": "regional-park",
@@ -8593,13 +8593,13 @@
           "from": "guardrail"
         }
       ],
-      "official": [],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Lake_view_Regional_park%2C_Indore.jpg/960px-Lake_view_Regional_park%2C_Indore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Lake_view_Regional_park,_Indore.jpg",
         "author": "Sonika Dhakad",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": []
     },
     {
       "id": "gandhi-hall",
@@ -8897,13 +8897,13 @@
           "from": "guardrail"
         }
       ],
-      "official": [],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Image_0217_%28Indore%29.png/960px-Image_0217_%28Indore%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Image_0217_(Indore).png",
         "author": "Asif0717",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": []
     },
     {
       "id": "bhim-janmabhoomi",
@@ -9172,18 +9172,18 @@
           "from": "guardrail"
         }
       ],
-      "official": [
-        {
-          "name": "Indore district: Dr. Babasaheb Ambedkar birth place",
-          "url": "https://indore.nic.in/en/tourist-place/bhim-janmabhoomi-dr-babasaheb-ambedkar/"
-        }
-      ],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Bhim_Janmabhoomi_Memorial_in_Dr._Ambedkar_Nagar_%28Mhow%29.jpg/960px-Bhim_Janmabhoomi_Memorial_in_Dr._Ambedkar_Nagar_%28Mhow%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Bhim_Janmabhoomi_Memorial_in_Dr._Ambedkar_Nagar_(Mhow).jpg",
         "author": "Shraddha rahul waghmare",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": [
+        {
+          "name": "Indore district: Dr. Babasaheb Ambedkar birth place",
+          "url": "https://indore.nic.in/en/tourist-place/bhim-janmabhoomi-dr-babasaheb-ambedkar/"
+        }
+      ]
     },
     {
       "id": "bijasan-mata",
@@ -9740,13 +9740,13 @@
           "from": "guardrail"
         }
       ],
-      "official": [],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Pitreshwar_Hanuman_dham_of_Indore.jpg/960px-Pitreshwar_Hanuman_dham_of_Indore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Pitreshwar_Hanuman_dham_of_Indore.jpg",
         "author": "Annni07",
         "license": "CC BY-SA 3.0"
-      }
+      },
+      "official": []
     },
     {
       "id": "gommatgiri",
@@ -10353,18 +10353,18 @@
           "from": "guardrail"
         }
       ],
-      "official": [
-        {
-          "name": "Indore Municipal Corporation lake (Wikipedia on its Ramsar status)",
-          "url": "https://en.wikipedia.org/wiki/Sirpur_Lake"
-        }
-      ],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Great_Cormorant_at_Sirpur_Lake%2C_Indore%2C_Madhya_Pradesh.jpg/960px-Great_Cormorant_at_Sirpur_Lake%2C_Indore%2C_Madhya_Pradesh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Great_Cormorant_at_Sirpur_Lake,_Indore,_Madhya_Pradesh.jpg",
         "author": "Abhishek Bhopte",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": [
+        {
+          "name": "Indore Municipal Corporation lake (Wikipedia on its Ramsar status)",
+          "url": "https://en.wikipedia.org/wiki/Sirpur_Lake"
+        }
+      ]
     },
     {
       "id": "jam-gate",
@@ -10612,13 +10612,13 @@
           "from": "guardrail"
         }
       ],
-      "official": [],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Jamgate.jpg/960px-Jamgate.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Jamgate.jpg",
         "author": "Aamin",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": []
     }
   ],
   "directory": [

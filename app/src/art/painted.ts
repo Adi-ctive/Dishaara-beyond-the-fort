@@ -12,7 +12,7 @@ const PAINTED = {
     'abul-fazal-tomb', 'annapurna', 'assi-khamba-bawri', 'bateshwar', 'bhim-janmabhoomi', 'bijasan-mata', 'chaturbhuj-temple', 'choral-dam',
     'gandhi-hall', 'geoscience-museum', 'ghatigaon', 'gohad-fort', 'gommatgiri', 'gopachal', 'gwalior-zoo', 'indore-zoo', 'italian-garden',
     'jam-gate', 'maharaj-bada', 'mitaoli', 'moti-mahal', 'pitra-parvat', 'rani-samadhi', 'regional-park', 'sarafa-gwalior', 'scindia-chhatris',
-    'sirpur-lake', 'padavali', 'sarod-ghar',
+    'sirpur-lake', 'padavali', 'sarod-ghar', 'baija-taal',
   ],
   banners: ['dusk', 'marigold', 'monsoon', 'diwali', 'peacock', 'stars'],
   // No tabla: the model could not draw one correctly.

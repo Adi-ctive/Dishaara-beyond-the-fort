@@ -5,7 +5,7 @@
       "en": "Gwalior",
       "hi": "ग्वालियर"
     },
-    "dataVersion": "2026-10-28T04:51",
+    "dataVersion": "2026-10-28T20:27",
     "readAt": "2026-10-25",
     "tz": 5.5,
     "center": [
@@ -1556,6 +1556,18 @@
           "date": "2026-10-25"
         }
       ]
+    },
+    "field-28oct": {
+      "name": "Team Argus field visit, Gwalior (Aditya)",
+      "type": "field check",
+      "evidence": "On site 28 Oct 2026, 15:30-18:00: Gole ka Mandir, Baija Taal, Moti Mahal, Italian Garden; talks with a Rapido driver and two auto drivers",
+      "date": "2026-10-28"
+    },
+    "osm-baija": {
+      "name": "OpenStreetMap, Baija Taal",
+      "type": "official page",
+      "evidence": "Pond, OSM way 1082100658, read 28 Oct 2026",
+      "date": "2026-10-28"
     }
   },
   "landmarks": [
@@ -5828,18 +5840,18 @@
           "from": "guardrail"
         }
       ],
-      "official": [
-        {
-          "name": "MP Tourism: Gwalior Fort (show times and tickets)",
-          "url": "https://www.mptourism.com/gwalior-fort-madhya-pradesh-historical-place.html"
-        }
-      ],
       "photo": {
         "img": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Man_Mandir_Palace_Gwalior_Fort_at_Night_-_panoramio_-_Gyanendra_Singh_Chau%E2%80%A6_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
         "page": "https://commons.wikimedia.org/wiki/File:Man_Mandir_Palace_Gwalior_Fort_at_Night_-_panoramio_-_Gyanendra_Singh_Chau%E2%80%A6_(2).jpg",
         "author": "Gyanendra_Singh_Chau…",
         "license": "CC BY 3.0"
-      }
+      },
+      "official": [
+        {
+          "name": "MP Tourism: Gwalior Fort (show times and tickets)",
+          "url": "https://www.mptourism.com/gwalior-fort-madhya-pradesh-historical-place.html"
+        }
+      ]
     },
     {
       "id": "tighra-dam",
@@ -6160,18 +6172,18 @@
           "from": "guardrail"
         }
       ],
-      "official": [
-        {
-          "name": "Gwalior district: Tighra Dam",
-          "url": "https://gwalior.nic.in/en/tourist-place/tighra-dam/"
-        }
-      ],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Tighra_Dam_Gwalior.JPG/960px-Tighra_Dam_Gwalior.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Tighra_Dam_Gwalior.JPG",
         "author": "Ameybarve27",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": [
+        {
+          "name": "Gwalior district: Tighra Dam",
+          "url": "https://gwalior.nic.in/en/tourist-place/tighra-dam/"
+        }
+      ]
     },
     {
       "id": "db-city-mall",
@@ -7015,18 +7027,18 @@
           "from": "guardrail"
         }
       ],
-      "official": [
-        {
-          "name": "Gwalior district: Gwalior Zoo",
-          "url": "https://gwalior.nic.in/en/tourist-place/gwalior-zoo-gandhi-zoological-park/"
-        }
-      ],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Sambhar_at_Gwalior_zoo.JPG/960px-Sambhar_at_Gwalior_zoo.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Sambhar_at_Gwalior_zoo.JPG",
         "author": "Adityajoardar9",
         "license": "CC BY-SA 3.0"
-      }
+      },
+      "official": [
+        {
+          "name": "Gwalior district: Gwalior Zoo",
+          "url": "https://gwalior.nic.in/en/tourist-place/gwalior-zoo-gandhi-zoological-park/"
+        }
+      ]
     },
     {
       "id": "chaturbhuj-temple",
@@ -10544,13 +10556,13 @@
           "from": "guardrail"
         }
       ],
-      "official": [],
       "photo": {
         "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Gwalior_Chhatri.jpg/960px-Gwalior_Chhatri.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
         "page": "https://commons.wikimedia.org/wiki/File:Gwalior_Chhatri.jpg",
         "author": "Akrati123",
         "license": "CC BY-SA 4.0"
-      }
+      },
+      "official": []
     },
     {
       "id": "italian-garden",
@@ -11560,6 +11572,294 @@
           "a": {
             "en": "No. Unticketed place: add it to your day by hand. You can add it to your day yourself.",
             "hi": "नहीं। बिना टिकट की जगह: दिन में खुद जोड़ें। आप इसे खुद दिन में जोड़ सकते हैं।"
+          },
+          "from": "guardrail"
+        }
+      ],
+      "official": []
+    },
+    {
+      "id": "baija-taal",
+      "name": {
+        "en": "Baija Taal",
+        "hi": "बैजा ताल"
+      },
+      "type": {
+        "en": "Lake behind Moti Mahal, with boating",
+        "hi": "मोती महल के पीछे झील, नौका विहार के साथ"
+      },
+      "tags": [
+        "nature",
+        "activities"
+      ],
+      "lesserKnown": true,
+      "insideFort": false,
+      "extra": true,
+      "guardrail": {
+        "status": "notEligible",
+        "dailyLimit": null,
+        "reason": {
+          "en": "No custodian publication of hours and fees found",
+          "hi": "संरक्षक का समय और शुल्क प्रकाशन नहीं मिला"
+        }
+      },
+      "summary": {
+        "t": {
+          "en": "A lake right behind Moti Mahal, with boating.",
+          "hi": "मोती महल के ठीक पीछे एक झील, नौका विहार के साथ।"
+        },
+        "s": "locally verified",
+        "src": "field-28oct",
+        "ver": "2026-10-28",
+        "cls": "history"
+      },
+      "contact": {
+        "v": null,
+        "cls": "rules",
+        "why": {
+          "en": "Contact not found",
+          "hi": "संपर्क नहीं मिला"
+        }
+      },
+      "accessibility": {
+        "v": null,
+        "cls": "rules",
+        "why": {
+          "en": "No sourced accessibility information",
+          "hi": "पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं"
+        }
+      },
+      "facilities": {
+        "v": null,
+        "cls": "hours",
+        "why": {
+          "en": "No official source found",
+          "hi": "कोई आधिकारिक स्रोत नहीं मिला"
+        }
+      },
+      "rules": [],
+      "notes": [
+        {
+          "t": {
+            "en": "Almost empty on a Wednesday afternoon (28 Oct).",
+            "hi": "बुधवार दोपहर (28 अक्टूबर) लगभग ख़ाली था।"
+          },
+          "s": "locally verified",
+          "src": "field-28oct",
+          "ver": "2026-10-28",
+          "cls": "status"
+        },
+        {
+          "t": {
+            "en": "Lit up at night, say locals. Not seen by the team yet.",
+            "hi": "स्थानीय लोगों के अनुसार रात में रोशनी होती है। टीम ने अभी देखा नहीं।"
+          },
+          "s": "recently reported",
+          "src": "field-28oct",
+          "ver": "2026-10-28",
+          "cls": "status"
+        }
+      ],
+      "units": [
+        {
+          "id": "baija-taal",
+          "name": {
+            "en": "Baija Taal",
+            "hi": "बैजा ताल"
+          },
+          "custodian": {
+            "v": null,
+            "cls": "rules",
+            "why": {
+              "en": "Owner or custodian not confirmed",
+              "hi": "मालिक या संरक्षक पुष्ट नहीं"
+            }
+          },
+          "coord": [
+            26.20802,
+            78.17128
+          ],
+          "hours": {
+            "v": null,
+            "cls": "hours",
+            "why": {
+              "en": "No official opening hours found",
+              "hi": "आधिकारिक समय नहीं मिला"
+            }
+          },
+          "weeklyClosed": {
+            "v": null,
+            "cls": "hours",
+            "why": {
+              "en": "No weekly closing found",
+              "hi": "साप्ताहिक बंदी नहीं मिली"
+            }
+          },
+          "lastEntry": {
+            "v": null,
+            "cls": "hours",
+            "why": {
+              "en": "Not published",
+              "hi": "प्रकाशित नहीं"
+            }
+          },
+          "ticket": "baija-taal",
+          "fees": {
+            "v": null,
+            "cls": "fees",
+            "why": {
+              "en": "No official price found",
+              "hi": "आधिकारिक कीमत नहीं मिली"
+            }
+          },
+          "payment": {
+            "v": null,
+            "cls": "fees",
+            "why": {
+              "en": "Payment modes not stated",
+              "hi": "भुगतान के तरीके नहीं बताए गए"
+            }
+          },
+          "minVisit": {
+            "v": 30,
+            "rec": 60,
+            "s": "estimated",
+            "src": "team-estimate",
+            "ver": "2026-10-23",
+            "cls": "hours"
+          }
+        }
+      ],
+      "activities": [
+        {
+          "id": "baija-boating",
+          "name": {
+            "en": "Boating",
+            "hi": "नौका विहार"
+          },
+          "kind": "boating",
+          "price": null,
+          "t": {
+            "en": "Boating on the lake. Price not noted yet.",
+            "hi": "झील में नौका विहार। कीमत अभी दर्ज नहीं।"
+          },
+          "s": "locally verified",
+          "src": "field-28oct",
+          "ver": "2026-10-28",
+          "cls": "status"
+        }
+      ],
+      "faqs": [
+        {
+          "q": {
+            "en": "When is Baija Taal open?",
+            "hi": "बैजा ताल कब खुलता है?"
+          },
+          "a": {
+            "en": "Not known yet. No official opening hours found.",
+            "hi": "अभी पता नहीं। आधिकारिक समय नहीं मिला."
+          },
+          "from": "hours"
+        },
+        {
+          "q": {
+            "en": "Which day is Baija Taal closed?",
+            "hi": "बैजा ताल किस दिन बंद रहता है?"
+          },
+          "a": {
+            "en": "Not known yet. No weekly closing found.",
+            "hi": "अभी पता नहीं। साप्ताहिक बंदी नहीं मिली."
+          },
+          "from": "weeklyClosed"
+        },
+        {
+          "q": {
+            "en": "What is the entry fee at Baija Taal?",
+            "hi": "बैजा ताल का प्रवेश शुल्क क्या है?"
+          },
+          "a": {
+            "en": "Not known yet. No official price found.",
+            "hi": "अभी पता नहीं। आधिकारिक कीमत नहीं मिली."
+          },
+          "from": "fees"
+        },
+        {
+          "q": {
+            "en": "What is the last entry time at Baija Taal?",
+            "hi": "बैजा ताल में आख़िरी प्रवेश कब तक?"
+          },
+          "a": {
+            "en": "Not known yet. Not published.",
+            "hi": "अभी पता नहीं। प्रकाशित नहीं."
+          },
+          "from": "lastEntry"
+        },
+        {
+          "q": {
+            "en": "Can I pay by UPI or card at Baija Taal?",
+            "hi": "क्या बैजा ताल में UPI या कार्ड से भुगतान हो सकता है?"
+          },
+          "a": {
+            "en": "Not known yet. Payment modes not stated.",
+            "hi": "अभी पता नहीं। भुगतान के तरीके नहीं बताए गए."
+          },
+          "from": "payment"
+        },
+        {
+          "q": {
+            "en": "Is Baija Taal wheelchair accessible?",
+            "hi": "क्या बैजा ताल व्हीलचेयर से जा सकते हैं?"
+          },
+          "a": {
+            "en": "Not known yet. No sourced accessibility information.",
+            "hi": "अभी पता नहीं। पहुँच-योग्यता की कोई स्रोतित जानकारी नहीं."
+          },
+          "from": "accessibility"
+        },
+        {
+          "q": {
+            "en": "Are there toilets and parking at Baija Taal?",
+            "hi": "क्या बैजा ताल में शौचालय और पार्किंग है?"
+          },
+          "a": {
+            "en": "Not known yet. No official source found.",
+            "hi": "अभी पता नहीं। कोई आधिकारिक स्रोत नहीं मिला."
+          },
+          "from": "facilities"
+        },
+        {
+          "q": {
+            "en": "How do I contact Baija Taal?",
+            "hi": "बैजा ताल से संपर्क कैसे करें?"
+          },
+          "a": {
+            "en": "Not known yet. Contact not found.",
+            "hi": "अभी पता नहीं। संपर्क नहीं मिला."
+          },
+          "from": "contact"
+        },
+        {
+          "q": {
+            "en": "What can I do at Baija Taal?",
+            "hi": "बैजा ताल में क्या कर सकते हैं?"
+          },
+          "a": {
+            "en": "Boating: Boating on the lake. Price not noted yet. (checked on site, 2026-10-28)",
+            "hi": "नौका विहार: झील में नौका विहार। कीमत अभी दर्ज नहीं।. (मौके पर जाँचा, 2026-10-28)"
+          },
+          "from": "activities",
+          "s": "locally verified",
+          "src": "field-28oct",
+          "ver": "2026-10-28"
+        },
+        {
+          "q": {
+            "en": "Will Dishaara put Baija Taal in my day plan by itself?",
+            "hi": "क्या दिशारा बैजा ताल को अपने आप मेरी योजना में डालेगा?"
+          },
+          "a": {
+            "en": "No. No custodian publication of hours and fees found. You can add it to your day yourself.",
+            "hi": "नहीं। संरक्षक का समय और शुल्क प्रकाशन नहीं मिला। आप इसे खुद दिन में जोड़ सकते हैं।"
           },
           "from": "guardrail"
         }
@@ -15014,5 +15314,73 @@
       "en": "News and media",
       "hi": "समाचार और मीडिया"
     }
-  }
+  },
+  "tips": [
+    {
+      "topic": "transport",
+      "t": {
+        "en": "Green CNG shared autos run fixed routes (for example Gole ka Mandir to Baija Taal) for about ₹20–25 a person, cash only. Cheaper but slower than a private auto.",
+        "hi": "हरे CNG शेयर ऑटो तय रूट पर चलते हैं (जैसे गोले का मंदिर से बैजा ताल), लगभग ₹20–25 प्रति व्यक्ति, सिर्फ़ नकद। निजी ऑटो से सस्ते पर धीमे।"
+      },
+      "s": "locally verified",
+      "src": "field-28oct",
+      "ver": "2026-10-28",
+      "cls": "fare"
+    },
+    {
+      "topic": "transport",
+      "t": {
+        "en": "Electric rickshaw: asked ₹50, agreed ₹40 for two people from Gole ka Mandir. Bargaining works.",
+        "hi": "ई-रिक्शा: ₹50 माँगे, गोले का मंदिर से दो लोगों के ₹40 तय हुए। मोलभाव चलता है।"
+      },
+      "s": "locally verified",
+      "src": "field-28oct",
+      "ver": "2026-10-28",
+      "cls": "fare"
+    },
+    {
+      "topic": "transport",
+      "t": {
+        "en": "CNG shared autos, e-rickshaws and private autos are all found at Gole ka Mandir chauraha.",
+        "hi": "गोले का मंदिर चौराहे पर CNG शेयर ऑटो, ई-रिक्शा और निजी ऑटो, तीनों मिलते हैं।"
+      },
+      "s": "locally verified",
+      "src": "field-28oct",
+      "ver": "2026-10-28",
+      "cls": "status"
+    },
+    {
+      "topic": "transport",
+      "t": {
+        "en": "Private autos hired on the street, daytime quotes: about ₹150 for 5 km, ₹250 for 9 km, ₹300 for 15–16 km. More at night.",
+        "hi": "सड़क पर निजी ऑटो, दिन के दाम: 5 किमी के लगभग ₹150, 9 किमी के ₹250, 15–16 किमी के ₹300। रात में ज़्यादा।"
+      },
+      "s": "recently reported",
+      "src": "field-28oct",
+      "ver": "2026-10-28",
+      "cls": "fare"
+    },
+    {
+      "topic": "transport",
+      "t": {
+        "en": "On Rapido, a 9–10 km ride is about ₹150, less than a street auto.",
+        "hi": "रैपिडो पर 9–10 किमी की सवारी लगभग ₹150, सड़क के ऑटो से कम।"
+      },
+      "s": "recently reported",
+      "src": "field-28oct",
+      "ver": "2026-10-28",
+      "cls": "fare"
+    },
+    {
+      "topic": "station",
+      "t": {
+        "en": "Gwalior railway station is under construction for its upgrade (seen 28 Oct). Allow extra time getting in and out.",
+        "hi": "ग्वालियर रेलवे स्टेशन पर उन्नयन का निर्माण चल रहा है (28 अक्टूबर को देखा)। आने-जाने में ज़्यादा समय रखें।"
+      },
+      "s": "locally verified",
+      "src": "field-28oct",
+      "ver": "2026-10-28",
+      "cls": "status"
+    }
+  ]
 }

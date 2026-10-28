@@ -473,5 +473,9 @@
  "indore:gommatgiri": {
   "qid": null,
   "tried": "commons-geo"
+ },
+ "gwalior:baija-taal": {
+  "qid": null,
+  "tried": "commons-geo"
  }
 }

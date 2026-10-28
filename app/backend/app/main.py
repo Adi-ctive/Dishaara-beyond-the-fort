@@ -1008,6 +1008,8 @@ def place_pack(d: dict, p: dict, lang: str, day: str, origin: dict | None = None
 
 ASSISTANT = {"en": "Yatra", "hi": "यात्रा"}
 FOLLOW_Q = re.compile(r"\b(this|that|it|there|here|these|those|listed|where is|how far|how long|get there|reach)\b|यह|वह|वहाँ|कहाँ", re.I)
+TIP_TOPIC = {"transport": r"auto|rickshaw|rikshaw|cab|taxi|rapido|ola|uber|fare|ride|travel|get around|getting around|transport|cheap|budget|cost|ऑटो|रिक्शा|किराया|सवारी|कैब",
+             "station": r"station|railway|train|arriv|reach|स्टेशन|रेलवे|ट्रेन"}
 RECO_Q = re.compile(r"where (should|can|do) (i|we) go|what should (i|we) (see|visit|do)|where to go|suggest|recommend|what to (see|visit)|best place|must see|kaha(n)? ja(u|un|yen)|कहाँ जाएँ|कहाँ जाऊँ|क्या देखें|सुझाव", re.I)
 HOW_KNOW_Q = re.compile(r"source|verif|how do you know|where .*(info|data|information)|trust|accurate|reliable|kaha se|kahan se|स्रोत|सत्यापि|कहाँ से|भरोसा", re.I)
 NEAR_Q = re.compile(r"\bnear|nearby|close to|around\b|पास", re.I)
@@ -1133,6 +1135,10 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
         pack["openToday"] = open_today(d, lang, day, tw)
         pack["places"] = []  # the compact list answers it; full records would overflow the free tier's per-minute limit
         ids += [p["id"] for p in d["places"] if p["name"][lang] in {o["name"] for o in pack["openToday"]} and p["id"] not in ids]
+    # Getting-around tips and city notes from team field visits (fares, shared autos, the station works).
+    tips = [t for t in d.get("tips", []) if re.search(TIP_TOPIC[t["topic"]], body.text, re.I)]
+    if tips:
+        pack["localTips"] = [{"tip": t["t"][lang], "howSure": LABEL_WORDS[lang].get(t["s"], t["s"]), "checked": t["ver"]} for t in tips[:5]]
     nums = directory_for(d, body.text, lang)
     if nums:
         pack["cityNumbers"] = nums
@@ -1292,6 +1298,7 @@ def system_prompt(body: ChatIn, city: str) -> str:
         "6k. Write Getting there only from fromYou. If a place has no fromYou, leave Getting there out: never give a travel time, distance or fare for it.",
         "6g. If a place has fromYou, give the time from the raahi's start (by auto, and on foot when given) and the autoFare, and call it an estimate.",
         "6h. If FACTS has howWeKnow, explain in plain words how the app knows and checks facts, using it.",
+        "6n. If FACTS has localTips, give the ones that answer the question as bullets, each with its howSure and date, and say they come from the team's own visit.",
         "6l. If FACTS has suggestedBecause, reply with a bold first line, then one bullet per place \"- **Name**: hours, today's verdict\", then one line with suggestedBecause in your own words, then offer Plan my day to fit them into their time. Never say there are no places.",
         "6m. If FACTS has no places, no openToday and no cityNumbers, do not use the labelled bullets: answer in one or two plain lines and ask what they want to see.",
         "6j. If FACTS has weatherToday and it has a tip (heat, rain, strong sun), you may give that tip as Good to know.",

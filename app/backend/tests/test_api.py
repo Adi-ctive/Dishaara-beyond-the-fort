@@ -761,3 +761,15 @@ def test_short_new_question_is_not_a_follow_up():
     body = main.ChatIn(text="tell me something nice", history=[], lang="en", prompt=[], city="gwalior", lastPlaces=[])
     pack, _ = main.retrieve(body)
     assert "suggestedBecause" not in pack
+
+
+def test_field_tips_reach_yatra_for_transport_questions():
+    body = main.ChatIn(text="cheapest way to get around by auto", history=[], lang="en", prompt=[], city="gwalior")
+    pack, _ = main.retrieve(body)
+    assert any("CNG shared autos" in t["tip"] for t in pack["localTips"])
+    assert main.data("gwalior")["sources"]["field-28oct"]["type"] == "field check"
+
+
+def test_baija_taal_is_a_record_but_never_suggested():
+    p = main.rules.get_place(main.data("gwalior"), "baija-taal")
+    assert p and p["summary"]["s"] == "locally verified" and not main.guard_ok(p)
