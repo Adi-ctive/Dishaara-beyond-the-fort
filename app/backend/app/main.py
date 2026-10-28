@@ -1454,7 +1454,8 @@ def saarthi_me(me: dict | None = Depends(current)):
 
 
 class FactIn(BaseModel):
-    placeId: str
+    placeId: str  # a place id, or "city" for an entry about the whole city (with city set)
+    city: str | None = None
     unitId: str | None = None  # the part of a place (Gwalior Fort has four); empty = the whole place
     field: str = Field(max_length=60)
     value: str = Field(min_length=1, max_length=500)
@@ -1469,7 +1470,12 @@ HIGH_RISK = {"Ticket prices", "Weekly closing", "Opening hours", "Last entry", "
 def add_fact(body: FactIn, me: dict | None = Depends(current)):
     """Saarthi entries never go live directly. High-risk fields need a second saarthi or an official source."""
     me = need(me, "saarthi")
-    city, _ = place(body.placeId)
+    if body.placeId == "city":
+        if body.city not in cities.CITY_IDS or body.field not in cities.CITY_FIELDS:
+            raise HTTPException(422, "a city entry needs a covered city and the field Getting around or City notice")
+        city = body.city
+    else:
+        city, _ = place(body.placeId)
     if body.label not in rules.STRONG | {"recently reported", "estimated", "historical pattern", "unverified", "conflicting", "potentially outdated"}:
         raise HTTPException(422, "unknown label")
     limit(me, "fact", 50, 24 * 60)
@@ -1481,7 +1487,7 @@ def add_fact(body: FactIn, me: dict | None = Depends(current)):
          "status": "review" if new else "pending", "date": today(), "label": body.label, "proof": proofs, "at": now()}
     db.verify.insert_one(e)
     if new:
-        _, pl = place(body.placeId)
+        pl = place(body.placeId)[1] if body.placeId != "city" else {"name": {"en": f"Whole city ({city.title()})"}, "units": []}
         db.queue.insert_one({"_id": f"m-fact-{e['_id']}", "kind": "fact", "entry": e["_id"], "user": me["_id"],
                              "title": f"New saarthi entry: {pl['name']['en']}{' / ' + next((u['name']['en'] for u in pl['units'] if u['id'] == body.unitId), '') if body.unitId else ''}, {body.field}", "detail": f"{body.value} ({body.label}) by {e['by']}",
                              "proof": proofs, "status": "pending", "at": now()})

@@ -5,7 +5,7 @@
       "en": "Gwalior",
       "hi": "ग्वालियर"
     },
-    "dataVersion": "2026-10-28T20:27",
+    "dataVersion": "2026-10-28T20:35",
     "readAt": "2026-10-25",
     "tz": 5.5,
     "center": [
@@ -1556,12 +1556,6 @@
           "date": "2026-10-25"
         }
       ]
-    },
-    "field-28oct": {
-      "name": "Team Argus field visit, Gwalior (Aditya)",
-      "type": "field check",
-      "evidence": "On site 28 Oct 2026, 15:30-18:00: Gole ka Mandir, Baija Taal, Moti Mahal, Italian Garden; talks with a Rapido driver and two auto drivers",
-      "date": "2026-10-28"
     },
     "osm-baija": {
       "name": "OpenStreetMap, Baija Taal",
@@ -11585,12 +11579,11 @@
         "hi": "बैजा ताल"
       },
       "type": {
-        "en": "Lake behind Moti Mahal, with boating",
-        "hi": "मोती महल के पीछे झील, नौका विहार के साथ"
+        "en": "Lake next to Moti Mahal",
+        "hi": "मोती महल के पास झील"
       },
       "tags": [
-        "nature",
-        "activities"
+        "nature"
       ],
       "lesserKnown": true,
       "insideFort": false,
@@ -11605,12 +11598,12 @@
       },
       "summary": {
         "t": {
-          "en": "A lake right behind Moti Mahal, with boating.",
-          "hi": "मोती महल के ठीक पीछे एक झील, नौका विहार के साथ।"
+          "en": "A lake marked on OpenStreetMap, about 200 m west of Moti Mahal.",
+          "hi": "OpenStreetMap पर दर्ज झील, मोती महल से लगभग 200 मीटर पश्चिम।"
         },
-        "s": "locally verified",
-        "src": "field-28oct",
-        "ver": "2026-10-28",
+        "s": "recently reported",
+        "src": "osm-baija",
+        "ver": "2026-10-23",
         "cls": "history"
       },
       "contact": {
@@ -11638,28 +11631,7 @@
         }
       },
       "rules": [],
-      "notes": [
-        {
-          "t": {
-            "en": "Almost empty on a Wednesday afternoon (28 Oct).",
-            "hi": "बुधवार दोपहर (28 अक्टूबर) लगभग ख़ाली था।"
-          },
-          "s": "locally verified",
-          "src": "field-28oct",
-          "ver": "2026-10-28",
-          "cls": "status"
-        },
-        {
-          "t": {
-            "en": "Lit up at night, say locals. Not seen by the team yet.",
-            "hi": "स्थानीय लोगों के अनुसार रात में रोशनी होती है। टीम ने अभी देखा नहीं।"
-          },
-          "s": "recently reported",
-          "src": "field-28oct",
-          "ver": "2026-10-28",
-          "cls": "status"
-        }
-      ],
+      "notes": [],
       "units": [
         {
           "id": "baija-taal",
@@ -11728,25 +11700,6 @@
             "ver": "2026-10-23",
             "cls": "hours"
           }
-        }
-      ],
-      "activities": [
-        {
-          "id": "baija-boating",
-          "name": {
-            "en": "Boating",
-            "hi": "नौका विहार"
-          },
-          "kind": "boating",
-          "price": null,
-          "t": {
-            "en": "Boating on the lake. Price not noted yet.",
-            "hi": "झील में नौका विहार। कीमत अभी दर्ज नहीं।"
-          },
-          "s": "locally verified",
-          "src": "field-28oct",
-          "ver": "2026-10-28",
-          "cls": "status"
         }
       ],
       "faqs": [
@@ -11837,20 +11790,6 @@
             "hi": "अभी पता नहीं। संपर्क नहीं मिला."
           },
           "from": "contact"
-        },
-        {
-          "q": {
-            "en": "What can I do at Baija Taal?",
-            "hi": "बैजा ताल में क्या कर सकते हैं?"
-          },
-          "a": {
-            "en": "Boating: Boating on the lake. Price not noted yet. (checked on site, 2026-10-28)",
-            "hi": "नौका विहार: झील में नौका विहार। कीमत अभी दर्ज नहीं।. (मौके पर जाँचा, 2026-10-28)"
-          },
-          "from": "activities",
-          "s": "locally verified",
-          "src": "field-28oct",
-          "ver": "2026-10-28"
         },
         {
           "q": {
@@ -15314,73 +15253,5 @@
       "en": "News and media",
       "hi": "समाचार और मीडिया"
     }
-  },
-  "tips": [
-    {
-      "topic": "transport",
-      "t": {
-        "en": "Green CNG shared autos run fixed routes (for example Gole ka Mandir to Baija Taal) for about ₹20–25 a person, cash only. Cheaper but slower than a private auto.",
-        "hi": "हरे CNG शेयर ऑटो तय रूट पर चलते हैं (जैसे गोले का मंदिर से बैजा ताल), लगभग ₹20–25 प्रति व्यक्ति, सिर्फ़ नकद। निजी ऑटो से सस्ते पर धीमे।"
-      },
-      "s": "locally verified",
-      "src": "field-28oct",
-      "ver": "2026-10-28",
-      "cls": "fare"
-    },
-    {
-      "topic": "transport",
-      "t": {
-        "en": "Electric rickshaw: asked ₹50, agreed ₹40 for two people from Gole ka Mandir. Bargaining works.",
-        "hi": "ई-रिक्शा: ₹50 माँगे, गोले का मंदिर से दो लोगों के ₹40 तय हुए। मोलभाव चलता है।"
-      },
-      "s": "locally verified",
-      "src": "field-28oct",
-      "ver": "2026-10-28",
-      "cls": "fare"
-    },
-    {
-      "topic": "transport",
-      "t": {
-        "en": "CNG shared autos, e-rickshaws and private autos are all found at Gole ka Mandir chauraha.",
-        "hi": "गोले का मंदिर चौराहे पर CNG शेयर ऑटो, ई-रिक्शा और निजी ऑटो, तीनों मिलते हैं।"
-      },
-      "s": "locally verified",
-      "src": "field-28oct",
-      "ver": "2026-10-28",
-      "cls": "status"
-    },
-    {
-      "topic": "transport",
-      "t": {
-        "en": "Private autos hired on the street, daytime quotes: about ₹150 for 5 km, ₹250 for 9 km, ₹300 for 15–16 km. More at night.",
-        "hi": "सड़क पर निजी ऑटो, दिन के दाम: 5 किमी के लगभग ₹150, 9 किमी के ₹250, 15–16 किमी के ₹300। रात में ज़्यादा।"
-      },
-      "s": "recently reported",
-      "src": "field-28oct",
-      "ver": "2026-10-28",
-      "cls": "fare"
-    },
-    {
-      "topic": "transport",
-      "t": {
-        "en": "On Rapido, a 9–10 km ride is about ₹150, less than a street auto.",
-        "hi": "रैपिडो पर 9–10 किमी की सवारी लगभग ₹150, सड़क के ऑटो से कम।"
-      },
-      "s": "recently reported",
-      "src": "field-28oct",
-      "ver": "2026-10-28",
-      "cls": "fare"
-    },
-    {
-      "topic": "station",
-      "t": {
-        "en": "Gwalior railway station is under construction for its upgrade (seen 28 Oct). Allow extra time getting in and out.",
-        "hi": "ग्वालियर रेलवे स्टेशन पर उन्नयन का निर्माण चल रहा है (28 अक्टूबर को देखा)। आने-जाने में ज़्यादा समय रखें।"
-      },
-      "s": "locally verified",
-      "src": "field-28oct",
-      "ver": "2026-10-28",
-      "cls": "status"
-    }
-  ]
+  }
 }

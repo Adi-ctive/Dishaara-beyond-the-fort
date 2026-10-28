@@ -90,6 +90,13 @@ const FIELDS: [string, string][] = [
   ['Facilities', 'सुविधाएँ'],
   ["Do and don't", 'क्या करें, क्या नहीं'],
   ['Safety note', 'सुरक्षा नोट'],
+  ['Good to know', 'जानने लायक'],
+  ['Things to do', 'क्या करें'],
+];
+// Entries about the whole city (place "city"): how to get around, and notices that affect many places.
+const CITY_FIELDS: [string, string][] = [
+  ['Getting around', 'आना-जाना'],
+  ['City notice', 'शहर की सूचना'],
 ];
 
 /** Shrinks a phone photo to at most 1600 px on the long side, as JPEG, so it stays under the 2 MB limit. */
@@ -162,7 +169,7 @@ export function SaarthiForm() {
   };
   const send = async () => {
     if (!value.trim()) return setSent(tr('Write what you saw first.', 'पहले लिखें आपने क्या देखा।'));
-    const r = await api.addFact({ placeId: place, unitId: unit, field, value: value.trim(), label, proof: proofs.map((p) => p.id) });
+    const r = await api.addFact({ placeId: place, city: place === 'city' ? s.city : undefined, unitId: unit, field, value: value.trim(), label, proof: proofs.map((p) => p.id) });
     if (!r) return setSent(lastError || tr('Could not send. Try again.', 'नहीं भेजा जा सका। फिर कोशिश करें।'));
     setValue('');
     setProofs([]);
@@ -194,7 +201,8 @@ export function SaarthiForm() {
       </Section>
       <div id="saarthi-form" />
       <label className="field"><span>{tr('Place', 'जगह')}</span>
-        <select value={place} onChange={(e) => { setPlace(e.target.value); setUnit(null); }}>
+        <select value={place} onChange={(e) => { setPlace(e.target.value); setUnit(null); setField(e.target.value === 'city' ? CITY_FIELDS[0][0] : FIELDS[0][0]); }}>
+          <option value="city">{tr('Whole city: getting around, notices', 'पूरा शहर: आना-जाना, सूचनाएँ')}</option>
           {data.places.map((p) => <option key={p.id} value={p.id}>{p.name[lang]}</option>)}
         </select>
       </label>
@@ -208,7 +216,7 @@ export function SaarthiForm() {
       )}
       <label className="field"><span>{tr('Template field', 'टेम्पलेट का हिस्सा')}</span>
         <select value={field} onChange={(e) => setField(e.target.value)}>
-          {FIELDS.map(([en, hi]) => <option key={en} value={en}>{tr(en, hi)}</option>)}
+          {(place === 'city' ? CITY_FIELDS : FIELDS).map(([en, hi]) => <option key={en} value={en}>{tr(en, hi)}</option>)}
         </select>
       </label>
       <label className="field"><span>{tr('What you saw', 'आपने क्या देखा')}</span><textarea rows={3} value={value} maxLength={500} onChange={(e) => setValue(e.target.value)} placeholder={tr('Write exactly what the board or the counter says, for example "9 am to 5 pm, closed Monday"', 'बोर्ड या काउंटर पर जो लिखा है वही लिखें, जैसे "सुबह 9 से शाम 5, सोमवार बंद"')} /></label>
@@ -260,7 +268,7 @@ export function SaarthiVerify() {
       {queue?.length === 0 && <p className="muted">{tr('Nothing to verify right now.', 'अभी जाँचने को कुछ नहीं।')}</p>}
       {queue?.map((v) => (
         <div key={v.id} className={`card col${done[v.id] ? ' dim' : ''}`}>
-          <div className="biz-top"><b>{data.places.find((p) => p.id === v.place)?.name[lang]} · {tr(v.field, FIELDS.find((f) => f[0] === v.field)?.[1] ?? v.field)}</b><span className={`risk ${v.risk}`}>{tr(...(RISK[v.risk] ?? [v.risk, v.risk]))}</span></div>
+          <div className="biz-top"><b>{v.place === 'city' ? tr('Whole city', 'पूरा शहर') : data.places.find((p) => p.id === v.place)?.name[lang]} · {tr(v.field, [...FIELDS, ...CITY_FIELDS].find((f) => f[0] === v.field)?.[1] ?? v.field)}</b><span className={`risk ${v.risk}`}>{tr(...(RISK[v.risk] ?? [v.risk, v.risk]))}</span></div>
           <p>{v.value}</p>
           <small className="muted">{tr('by', 'द्वारा')} {v.by}</small>
           {done[v.id] ? (

@@ -172,7 +172,7 @@ export const api = {
   saarthiMe: () => call<{ id: string; name: string; region: string; checks: number; approved: number; toVerify: number; openTickets: number; followers: number }>('GET', '/saarthi/me'),
   verifyQueue: () => call<{ id: string; place: string; field: string; value: string; by: string; risk: string }[]>('GET', '/verify-queue'),
   verify: (id: string, ok: boolean) => call('POST', `/verify/${id}`, { ok }),
-  addFact: (b: { placeId: string; unitId?: string | null; field: string; value: string; label: string; proof?: string[] }) => call<{ id: string; risk: string; route: 'moderator' | 'saarthi' }>('POST', '/facts', b),
+  addFact: (b: { placeId: string; city?: string; unitId?: string | null; field: string; value: string; label: string; proof?: string[] }) => call<{ id: string; risk: string; route: 'moderator' | 'saarthi' }>('POST', '/facts', b),
   saarthiTodo: (city: string) => call<{ place: string; name: string; items: { field: string; unit: string | null; unitName: string | null; state: string; now?: string; waiting: boolean }[] }[]>('GET', `/saarthi/todo?city=${city}`),
   // moderator
   getTwists: () => call<Twists>('GET', '/mod/twists', undefined, 3000),

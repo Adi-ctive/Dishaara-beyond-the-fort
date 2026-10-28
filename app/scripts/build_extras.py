@@ -222,42 +222,13 @@ for p in INDORE:
 
 GWALIOR += GWALIOR_MORE
 
-# Field visit, 28 Oct 2026 (Aditya, 15:30 to 18:00, with a resident he interviewed in Round 1). What he saw or paid himself is
-# "locally verified"; what drivers told him is "recently reported". Photos of boards and tickets are added once read.
-FIELD = "2026-10-28"
-SOURCES["gwalior"]["field-28oct"] = {"name": "Team Argus field visit, Gwalior (Aditya)", "type": "field check",
-                                     "evidence": "On site 28 Oct 2026, 15:30-18:00: Gole ka Mandir, Baija Taal, Moti Mahal, Italian Garden; talks with a Rapido driver and two auto drivers", "date": FIELD}
-SOURCES["gwalior"]["osm-baija"] = {"name": "OpenStreetMap, Baija Taal", "type": "official page", "evidence": "Pond, OSM way 1082100658, read 28 Oct 2026", "date": FIELD}
-
-
-def seen(en, hi, cls="status", s="locally verified"):
-    return {"t": L(en, hi), "s": s, "src": "field-28oct", "ver": FIELD, "cls": cls}
-
-
-baija = place("baija-taal", L("Baija Taal", "बैजा ताल"), L("Lake behind Moti Mahal, with boating", "मोती महल के पीछे झील, नौका विहार के साथ"), ["nature", "activities"],
-              [26.20802, 78.17128], L("A lake right behind Moti Mahal, with boating.", "मोती महल के ठीक पीछे एक झील, नौका विहार के साथ।"), "field-28oct", visit=(30, 60), lesser=True, guard=NOT_PUB)
-baija["summary"] = seen("A lake right behind Moti Mahal, with boating.", "मोती महल के ठीक पीछे एक झील, नौका विहार के साथ।", "history")
-baija["notes"] = [seen("Almost empty on a Wednesday afternoon (28 Oct).", "बुधवार दोपहर (28 अक्टूबर) लगभग ख़ाली था।"),
-                  seen("Lit up at night, say locals. Not seen by the team yet.", "स्थानीय लोगों के अनुसार रात में रोशनी होती है। टीम ने अभी देखा नहीं।", s="recently reported")]
-baija["activities"] = [{"id": "baija-boating", "name": L("Boating", "नौका विहार"), "kind": "boating", "price": None,
-                        **seen("Boating on the lake. Price not noted yet.", "झील में नौका विहार। कीमत अभी दर्ज नहीं।")}]
-GWALIOR.append(baija)
-
-# Getting around and city notes from the same visit, for Yatra and the city directory.
-TIPS = {"gwalior": [
-    {"topic": "transport", **seen("Green CNG shared autos run fixed routes (for example Gole ka Mandir to Baija Taal) for about ₹20–25 a person, cash only. Cheaper but slower than a private auto.",
-                                  "हरे CNG शेयर ऑटो तय रूट पर चलते हैं (जैसे गोले का मंदिर से बैजा ताल), लगभग ₹20–25 प्रति व्यक्ति, सिर्फ़ नकद। निजी ऑटो से सस्ते पर धीमे।", "fare")},
-    {"topic": "transport", **seen("Electric rickshaw: asked ₹50, agreed ₹40 for two people from Gole ka Mandir. Bargaining works.",
-                                  "ई-रिक्शा: ₹50 माँगे, गोले का मंदिर से दो लोगों के ₹40 तय हुए। मोलभाव चलता है।", "fare")},
-    {"topic": "transport", **seen("CNG shared autos, e-rickshaws and private autos are all found at Gole ka Mandir chauraha.",
-                                  "गोले का मंदिर चौराहे पर CNG शेयर ऑटो, ई-रिक्शा और निजी ऑटो, तीनों मिलते हैं।")},
-    {"topic": "transport", **seen("Private autos hired on the street, daytime quotes: about ₹150 for 5 km, ₹250 for 9 km, ₹300 for 15–16 km. More at night.",
-                                  "सड़क पर निजी ऑटो, दिन के दाम: 5 किमी के लगभग ₹150, 9 किमी के ₹250, 15–16 किमी के ₹300। रात में ज़्यादा।", "fare", "recently reported")},
-    {"topic": "transport", **seen("On Rapido, a 9–10 km ride is about ₹150, less than a street auto.",
-                                  "रैपिडो पर 9–10 किमी की सवारी लगभग ₹150, सड़क के ऑटो से कम।", "fare", "recently reported")},
-    {"topic": "station", **seen("Gwalior railway station is under construction for its upgrade (seen 28 Oct). Allow extra time getting in and out.",
-                                "ग्वालियर रेलवे स्टेशन पर उन्नयन का निर्माण चल रहा है (28 अक्टूबर को देखा)। आने-जाने में ज़्यादा समय रखें।")},
-]}
+# Baija Taal, 28 Oct 2026: named by the Gwalior resident Aditya interviewed in Round 1, who took him there (Decision 28
+# record rule). Only its position is filled here. What Aditya saw on his visit goes in as his saarthi entries, so a second
+# person reviews it before it changes the record.
+SOURCES["gwalior"]["osm-baija"] = {"name": "OpenStreetMap, Baija Taal", "type": "official page", "evidence": "Pond, OSM way 1082100658, read 28 Oct 2026", "date": "2026-10-28"}
+GWALIOR.append(place("baija-taal", L("Baija Taal", "बैजा ताल"), L("Lake next to Moti Mahal", "मोती महल के पास झील"), ["nature"],
+                     [26.20802, 78.17128], L("A lake marked on OpenStreetMap, about 200 m west of Moti Mahal.", "OpenStreetMap पर दर्ज झील, मोती महल से लगभग 200 मीटर पश्चिम।"), "osm-baija",
+                     visit=(30, 60), lesser=True, guard=NOT_PUB))
 
 # Indore had no fare data. The only published rate found (28 Oct 2026) is the 2019 meter chart: Rs 14 for the first km,
 # Rs 12 per km after. Bands below are that rate worked out by distance, labelled potentially outdated: meters are rarely used.
@@ -281,8 +252,8 @@ for city, extras in (("gwalior", GWALIOR), ("indore", INDORE)):
     ids = {p["id"] for p in extras}
     d["places"] = [p for p in d["places"] if p["id"] not in ids] + extras
     d["sources"].update(SOURCES[city])
-    if TIPS.get(city):
-        d["tips"] = TIPS[city]
+    d.pop("tips", None)  # city tips come only from approved saarthi entries (server side)
+    d["sources"].pop("field-28oct", None)  # dropped 28 Oct: field facts go in as saarthi entries instead
     if city == "indore" and not [f for f in d.get("fares", []) if f.get("src") != "fpj-auto-2019"]:
         d["fares"] = INDORE_FARES
     path.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")

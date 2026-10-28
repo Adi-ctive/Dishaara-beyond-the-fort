@@ -763,13 +763,18 @@ def test_short_new_question_is_not_a_follow_up():
     assert "suggestedBecause" not in pack
 
 
-def test_field_tips_reach_yatra_for_transport_questions():
-    body = main.ChatIn(text="cheapest way to get around by auto", history=[], lang="en", prompt=[], city="gwalior")
-    pack, _ = main.retrieve(body)
-    assert any("CNG shared autos" in t["tip"] for t in pack["localTips"])
-    assert main.data("gwalior")["sources"]["field-28oct"]["type"] == "field check"
-
-
-def test_baija_taal_is_a_record_but_never_suggested():
-    p = main.rules.get_place(main.data("gwalior"), "baija-taal")
-    assert p and p["summary"]["s"] == "locally verified" and not main.guard_ok(p)
+def test_city_tip_and_place_note_go_through_review():
+    a, b = staff("aditya", "Aditya"), staff("priyangi", "Priyangi")
+    veteran("aditya", "priyangi")
+    assert c.post("/facts", json={"placeId": "city", "city": "gwalior", "field": "Opening hours", "value": "x", "label": "locally verified"}, headers=a).status_code == 422
+    c.post("/facts", json={"placeId": "city", "city": "gwalior", "field": "Getting around", "value": "Green CNG shared autos cost about ₹20-25 a person, cash only.", "label": "locally verified"}, headers=a)
+    c.post("/facts", json={"placeId": "baija-taal", "field": "Things to do", "value": "Boating on the lake.", "label": "locally verified"}, headers=a)
+    body = main.ChatIn(text="cheapest auto", history=[], lang="en", prompt=[], city="gwalior")
+    assert "localTips" not in main.retrieve(body)[0]  # nothing live before review
+    for v in c.get("/verify-queue", headers=b).json():
+        c.post(f"/verify/{v['id']}", json={"ok": True}, headers=b)
+    assert "CNG shared autos" in main.retrieve(body)[0]["localTips"][0]["tip"]
+    bt = next(p for p in c.get("/cities/gwalior/data").json()["places"] if p["id"] == "baija-taal")
+    assert bt["activities"][0]["s"] == "locally verified" and not main.guard_ok(bt)
+    cities.import_city("gwalior")  # a redeploy keeps approved city tips
+    assert "localTips" in main.retrieve(body)[0]

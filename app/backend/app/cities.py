@@ -52,7 +52,10 @@ ENTRY_FIELDS = {
     "Ticket prices": ("unit", "fees", "fees"), "Last entry": ("unit", "lastEntry", "hours"), "Payment": ("unit", "payment", "fees"),
     "Accessibility": ("place", "accessibility", "rules"), "Facilities": ("place", "facilities", "hours"),
     "Dress rules": ("dress", "dress", "rules"), "Do and don't": ("rule", "courtesy", "rules"), "Safety note": ("rule", "safety", "rules"),
+    "Good to know": ("note", "notes", "status"), "Things to do": ("activity", "activities", "status"),
 }
+# Entries about the whole city, filed under the place id "city": getting around, notices that affect many places.
+CITY_FIELDS = {"Getting around": ("transport", "fare"), "City notice": ("station", "status")}
 DAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
 
 
@@ -81,8 +84,17 @@ def _value(field: str, text: str):
 
 def apply_entry(v: dict, rebuild: bool = True) -> bool:
     """Writes an approved saarthi entry into the place record: dated, labelled, credited to the saarthi."""
-    where = ENTRY_FIELDS.get(v.get("field"))
     db = get_db()
+    if v.get("place") == "city":
+        topic = CITY_FIELDS.get(v.get("field"))
+        if not topic:
+            return False
+        tip = {"topic": topic[0], "t": {"en": v["value"], "hi": v["value"]}, "s": v["label"], "src": "saarthi", "by": v.get("by", "Saarthi"), "ver": v.get("date"), "cls": topic[1], "entry": v.get("_id")}
+        db.cities.update_one({"_id": v["city"]}, {"$pull": {"tips": {"entry": v.get("_id")}}})
+        db.cities.update_one({"_id": v["city"]}, {"$push": {"tips": tip}})
+        _cache.pop(v["city"], None)
+        return True
+    where = ENTRY_FIELDS.get(v.get("field"))
     doc = db.places.find_one({"_id": f"{v['city']}:{v['place']}"})
     if not where or not doc:
         return False
@@ -100,6 +112,11 @@ def apply_entry(v: dict, rebuild: bool = True) -> bool:
         if not doc.get("sensitive"):
             return False
         doc["sensitive"]["dress"] = {**fact, "v": True}
+    elif kind == "note":
+        doc["notes"] = [n for n in doc.get("notes", []) if (n.get("t") or {}).get("en") != v["value"]] + [{**fact, "v": True}]
+    elif kind == "activity":
+        acts = [a for a in doc.get("activities", []) if (a.get("t") or {}).get("en") != v["value"]]
+        doc["activities"] = acts + [{**fact, "v": True, "id": f"s-{v.get('_id', len(acts))}", "name": {"en": v["value"].split(".")[0][:40], "hi": v["value"].split(".")[0][:40]}, "kind": "other", "price": None}]
     else:
         doc["rules"] = [r for r in doc.get("rules", []) if (r.get("t") or {}).get("en") != v["value"]] + [{**fact, "v": True, "kind": key}]
     db.places.replace_one({"_id": doc["_id"]}, doc)
