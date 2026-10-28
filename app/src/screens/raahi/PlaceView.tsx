@@ -91,7 +91,7 @@ export function PlaceView({ id }: { id: string }) {
 
       {p.photo && (
         <p className="photo-credit small muted">
-          {hi ? 'फ़ोटो' : 'Photo'}: <a href={p.photo.page} target="_blank" rel="noreferrer">{p.photo.author}</a>, {p.photo.license}, Wikimedia Commons
+          {hi ? 'फ़ोटो' : 'Photo'}: {p.photo.page ? <a href={p.photo.page} target="_blank" rel="noreferrer">{p.photo.author}</a> : p.photo.author}, {p.photo.license}{p.photo.page.includes('wikimedia') ? ', Wikimedia Commons' : ''}
         </p>
       )}
       {!isUnavailable(p.summary) && <p className="place-lede">{tx(p.summary, lang)}</p>}

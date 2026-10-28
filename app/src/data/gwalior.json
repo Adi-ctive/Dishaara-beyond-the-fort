@@ -5,7 +5,7 @@
       "en": "Gwalior",
       "hi": "ग्वालियर"
     },
-    "dataVersion": "2026-10-28T20:35",
+    "dataVersion": "2026-10-28T22:18",
     "readAt": "2026-10-25",
     "tz": 5.5,
     "center": [
@@ -1561,6 +1561,12 @@
       "name": "OpenStreetMap, Baija Taal",
       "type": "official page",
       "evidence": "Pond, OSM way 1082100658, read 28 Oct 2026",
+      "date": "2026-10-28"
+    },
+    "mpaam-moti-board": {
+      "name": "MP Archaeology, Archives and Museums, board at the Moti Mahal gate",
+      "type": "official page",
+      "evidence": "State Protected Monument board, photographed by Team Argus on 28 Oct 2026: Indian Rs 20, foreigner Rs 400, timing sunrise to sunset",
       "date": "2026-10-28"
     }
   },
@@ -7874,11 +7880,17 @@
       "insideFort": false,
       "extra": true,
       "guardrail": {
-        "status": "notEligible",
+        "status": "level1",
         "dailyLimit": null,
-        "reason": {
-          "en": "No custodian publication of hours and fees found",
-          "hi": "संरक्षक का समय और शुल्क प्रकाशन नहीं मिला"
+        "publication": {
+          "t": {
+            "en": "State Protected Monument board at the gate (MP Archaeology): open sunrise to sunset, ticketed",
+            "hi": "राज्य संरक्षित स्मारक बोर्ड (म.प्र. पुरातत्व): सूर्योदय से सूर्यास्त, टिकट सहित"
+          },
+          "s": "officially confirmed",
+          "src": "mpaam-moti-board",
+          "ver": "2026-10-28",
+          "cls": "fees"
         }
       },
       "summary": {
@@ -8108,18 +8120,17 @@
             "hi": "क्या दिशारा मोती महल को अपने आप मेरी योजना में डालेगा?"
           },
           "a": {
-            "en": "No. No custodian publication of hours and fees found. You can add it to your day yourself.",
-            "hi": "नहीं। संरक्षक का समय और शुल्क प्रकाशन नहीं मिला। आप इसे खुद दिन में जोड़ सकते हैं।"
+            "en": "Yes, when it fits your time: its custodian publishes it as open and ticketed.",
+            "hi": "हाँ, अगर आपके समय में फिट हो: इसका संरक्षक इसे खुला और टिकट वाला प्रकाशित करता है।"
           },
           "from": "guardrail"
         }
       ],
       "photo": {
-        "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Moti_Mahal.JPG/960px-Moti_Mahal.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-        "page": "https://commons.wikimedia.org/wiki/File:Moti_Mahal.JPG",
-        "author": "VidhuKhare",
-        "license": "CC BY-SA 3.0",
-        "wikidata": "Q98927541"
+        "img": "/art/photos/moti-mahal.webp",
+        "page": "",
+        "author": "Aditya, Team Argus",
+        "license": "field visit photo, 28 Oct 2026"
       },
       "official": [
         {
@@ -11803,6 +11814,12 @@
           "from": "guardrail"
         }
       ],
+      "photo": {
+        "img": "/art/photos/baija-taal.webp",
+        "page": "",
+        "author": "Aditya, Team Argus",
+        "license": "field visit photo, 28 Oct 2026"
+      },
       "official": []
     }
   ],

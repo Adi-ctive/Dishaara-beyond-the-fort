@@ -115,6 +115,18 @@ for p in GWALIOR_MORE:
     if p["id"] == "gopachal":
         p["sensitive"] = DRESS_UNKNOWN
 
+# Moti Mahal, 28 Oct 2026: the custodian's own board at the gate (Commissioner, Archaeology, Archives and Museums, MP,
+# photographed on Aditya's field visit) shows it a State Protected Monument, open sunrise to sunset and ticketed
+# (Indian Rs 20). That is a custodian publication, so Level 1 (Decision 25), decided by Aditya on 28 Oct. Hours and
+# prices themselves change only through the saarthi entries filed with the same photos.
+SOURCES["gwalior"]["mpaam-moti-board"] = {"name": "MP Archaeology, Archives and Museums, board at the Moti Mahal gate", "type": "official page",
+                                          "evidence": "State Protected Monument board, photographed by Team Argus on 28 Oct 2026: Indian Rs 20, foreigner Rs 400, timing sunrise to sunset", "date": "2026-10-28"}
+for p in GWALIOR_MORE:
+    if p["id"] == "moti-mahal":
+        p["guardrail"] = {"status": "level1", "dailyLimit": None, "publication": {
+            "t": L("State Protected Monument board at the gate (MP Archaeology): open sunrise to sunset, ticketed", "राज्य संरक्षित स्मारक बोर्ड (म.प्र. पुरातत्व): सूर्योदय से सूर्यास्त, टिकट सहित"),
+            "s": "officially confirmed", "src": "mpaam-moti-board", "ver": "2026-10-28", "cls": "fees"}}
+
 def H(o, c, src, en, hi, s, brk=None, ver=READ):
     v = {"kind": "fixed", "open": o, "close": c}
     if brk:

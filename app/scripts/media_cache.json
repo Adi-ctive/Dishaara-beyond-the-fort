@@ -334,13 +334,13 @@
   "license": "CC BY-SA 4.0"
  },
  "gwalior:moti-mahal": {
-  "qid": "Q98927541",
-  "file": "Moti Mahal.JPG",
-  "km": 0.03,
-  "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Moti_Mahal.JPG/960px-Moti_Mahal.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-  "page": "https://commons.wikimedia.org/wiki/File:Moti_Mahal.JPG",
-  "author": "VidhuKhare",
-  "license": "CC BY-SA 3.0"
+  "qid": null,
+  "file": "IMG_20261028_164238.jpg",
+  "via": "Team Argus field visit, 28 Oct 2026 (Aditya)",
+  "img": "/art/photos/moti-mahal.webp",
+  "page": "",
+  "author": "Aditya, Team Argus",
+  "license": "field visit photo, 28 Oct 2026"
  },
  "gwalior:maharaj-bada": {
   "qid": null,
@@ -476,6 +476,11 @@
  },
  "gwalior:baija-taal": {
   "qid": null,
-  "tried": "commons-geo"
+  "file": "IMG_20261028_163606.jpg",
+  "via": "Team Argus field visit, 28 Oct 2026 (Aditya)",
+  "img": "/art/photos/baija-taal.webp",
+  "page": "",
+  "author": "Aditya, Team Argus",
+  "license": "field visit photo, 28 Oct 2026"
  }
 }
