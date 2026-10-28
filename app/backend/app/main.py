@@ -1276,11 +1276,12 @@ def system_prompt(body: ChatIn, city: str) -> str:
         "6. Only talk about places in the pack. Under your reply the app shows a card for up to three places your reply names. Never promise a card or a map: say \"tap a card below\" only when you name a place.",
         "6e. If a place has liveAlert, the first bullet is **Right now:** the alert. For crowded: long queues at the ticket counter and gate, the visit takes longer than usual, keep phone and wallet close; go later or see a nearby place first. Then suggest one or two of its tryInstead places with their hours. If FACTS has moderatorAlertsToday and the raahi asks what to do or where to go, avoid those places.",
         "6f. If a section has toConfirm, say exactly what is not certain and howToConfirm. Never say only 'confirm first'. If a section has no toConfirm and its verdict is that they can go, do not ask them to confirm anything.",
+        "6k. Write Getting there only from fromYou. If a place has no fromYou, leave Getting there out: never give a travel time, distance or fare for it.",
         "6g. If a place has fromYou, give the time from the raahi's start (by auto, and on foot when given) and the autoFare, and call it an estimate.",
         "6h. If FACTS has howWeKnow, explain in plain words how the app knows and checks facts, using it.",
         "6j. If FACTS has weatherToday and it has a tip (heat, rain, strong sun), you may give that tip as Good to know.",
         "6i. If FACTS has nearby, name two or three of them with distance.",
-        "6a. If FACTS has openToday, list up to 5 of those places as bullets with their hours, then say in one line how many more are open and that the Map tab shows them all. Places without hours on record are not listed. Do not say how sure each one is.",
+        "6a. If FACTS has openToday, the reply is only: a bold first line; then up to 5 bullets \"- **Name**: hours\", adding \"(very crowded now)\" or the alert when that place has liveAlert, and listing places without an alert first; one line saying how many more are open and that the Map tab shows them all; the italic question. No other labels, no nested lists, never list a place twice. Places without hours on record are not listed. Do not say how sure each one is.",
         "6c. If FACTS has cityNumbers, give the one or two numbers that answer the question, with the name and how sure they are. Never make up a number.",
         "6d. If FACTS has thingsToDo or questionsPeopleAsk for a place, use them for what visitors can do there and for common questions.",
         "7. Format every reply in Markdown as a short card the raahi can scan, in this order:",
@@ -1333,12 +1334,14 @@ def chat(body: ChatIn, me: dict | None = Depends(current)):
             # Field names leaking into the reply. "FACTS" only in capitals: "facts" is an ordinary word.
             over = overclaims(answer, pack) or bool(re.search(r"todaysverdict|howsure|appguide|maybemention", answer, re.I) or re.search(r"\bFACTS\b", answer))
             wrong = renamed(answer or "", pack)
-            if answer and ok and not extra and not over and not wrong:
+            # A travel time or fare with no fromYou in the pack is invented, even when the numbers happen to appear elsewhere.
+            travel = not any("fromYou" in p for p in pack["places"]) and "todaysRoadmap" not in pack                 and bool(re.search(r"getting there|by auto|by cab|on foot|कैसे पहुँचें|ऑटो से", answer or "", re.I))
+            if answer and ok and not extra and not over and not wrong and not travel:
                 return {"ai": True, "text": answer, "placeIds": shown_ids(answer, pack, body), "followUps": follow_ups(pack, body, "hi" if body.lang == "hi" else "en")}
-            print(f"chat check failed: missing={missing} extra={extra} over={over} renamed={wrong}", flush=True)
+            print(f"chat check failed: missing={missing} extra={extra} over={over} renamed={wrong} travel={travel}", flush=True)
             fix = ([f"values not in FACTS: {', '.join(missing)}"] if missing else []) + ([f"places not in FACTS: {', '.join(extra)}"] if extra else []) \
                 + (["\"officially confirmed\" for a fact whose howSure is different"] if over else []) \
-                + ([f"place names that are not in FACTS ({', '.join(wrong)}): write every place name exactly as FACTS spells it"] if wrong else [])
+                + (["a travel time or fare, but FACTS has no fromYou: leave Getting there out"] if travel else [])                 + ([f"place names that are not in FACTS ({', '.join(wrong)}): write every place name exactly as FACTS spells it"] if wrong else [])
             messages += [{"role": "assistant", "content": answer}, {"role": "user", "content": f"Your reply used {' and '.join(fix) or 'nothing'}. Rewrite it using only FACTS."}]
         return {"ai": False, "note": "grounding", "text": None, "placeIds": [p["id"] for p in pack["places"]][:1]}
     except Exception as e:

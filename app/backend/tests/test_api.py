@@ -737,3 +737,11 @@ def test_daily_cron_pulls_news_for_every_city(monkeypatch):
     monkeypatch.setenv("CRON_SECRET", "s3cret")
     assert c.get("/cron/news").status_code == 401
     assert c.get("/cron/news", headers={"Authorization": "Bearer s3cret"}).status_code == 200
+
+
+def test_chat_travel_without_a_start_is_rejected(monkeypatch):
+    monkeypatch.setenv("GROQ_KEY", "test")
+    replies = iter(["**Teli ka Mandir is open.**\n- **Getting there:** 15 min by auto, about ₹30", "**Teli ka Mandir is open today.**"])
+    main.WRITER = lambda m: next(replies)
+    r = c.post("/chat", json={"text": "Tell me about Teli ka Mandir", "history": [], "lang": "en", "prompt": [], "city": "gwalior"}).json()
+    assert r["ai"] and "by auto" not in r["text"]
