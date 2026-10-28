@@ -5471,7 +5471,13 @@
           "name": "Gwalior district: Sun Temple",
           "url": "https://gwalior.nic.in/en/tourist-place/sun-temple/"
         }
-      ]
+      ],
+      "photo": {
+        "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Surya_mandir_Birla_Sun_temple_Gwalior.jpg/960px-Surya_mandir_Birla_Sun_temple_Gwalior.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "page": "https://commons.wikimedia.org/wiki/File:Surya_mandir_Birla_Sun_temple_Gwalior.jpg",
+        "author": "Nagarjun Kandukuru",
+        "license": "CC BY 2.0"
+      }
     },
     {
       "id": "light-sound-show",
@@ -5827,7 +5833,13 @@
           "name": "MP Tourism: Gwalior Fort (show times and tickets)",
           "url": "https://www.mptourism.com/gwalior-fort-madhya-pradesh-historical-place.html"
         }
-      ]
+      ],
+      "photo": {
+        "img": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Man_Mandir_Palace_Gwalior_Fort_at_Night_-_panoramio_-_Gyanendra_Singh_Chau%E2%80%A6_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+        "page": "https://commons.wikimedia.org/wiki/File:Man_Mandir_Palace_Gwalior_Fort_at_Night_-_panoramio_-_Gyanendra_Singh_Chau%E2%80%A6_(2).jpg",
+        "author": "Gyanendra_Singh_Chau…",
+        "license": "CC BY 3.0"
+      }
     },
     {
       "id": "tighra-dam",
@@ -6153,7 +6165,13 @@
           "name": "Gwalior district: Tighra Dam",
           "url": "https://gwalior.nic.in/en/tourist-place/tighra-dam/"
         }
-      ]
+      ],
+      "photo": {
+        "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Tighra_Dam_Gwalior.JPG/960px-Tighra_Dam_Gwalior.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "page": "https://commons.wikimedia.org/wiki/File:Tighra_Dam_Gwalior.JPG",
+        "author": "Ameybarve27",
+        "license": "CC BY-SA 4.0"
+      }
     },
     {
       "id": "db-city-mall",
@@ -7002,7 +7020,13 @@
           "name": "Gwalior district: Gwalior Zoo",
           "url": "https://gwalior.nic.in/en/tourist-place/gwalior-zoo-gandhi-zoological-park/"
         }
-      ]
+      ],
+      "photo": {
+        "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Sambhar_at_Gwalior_zoo.JPG/960px-Sambhar_at_Gwalior_zoo.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "page": "https://commons.wikimedia.org/wiki/File:Sambhar_at_Gwalior_zoo.JPG",
+        "author": "Adityajoardar9",
+        "license": "CC BY-SA 3.0"
+      }
     },
     {
       "id": "chaturbhuj-temple",
@@ -10520,7 +10544,13 @@
           "from": "guardrail"
         }
       ],
-      "official": []
+      "official": [],
+      "photo": {
+        "img": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Gwalior_Chhatri.jpg/960px-Gwalior_Chhatri.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "page": "https://commons.wikimedia.org/wiki/File:Gwalior_Chhatri.jpg",
+        "author": "Akrati123",
+        "license": "CC BY-SA 4.0"
+      }
     },
     {
       "id": "italian-garden",

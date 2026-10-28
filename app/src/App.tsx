@@ -139,7 +139,7 @@ export function App() {
           </button>
           <div className="topbar-actions">
             {entered && s.role === 'raahi' && <CityPick />}
-            {entered && s.role === 'raahi' && !tripLive && <Emergency variant="top" />}
+            {entered && s.role === 'raahi' && <Emergency variant="top" />}
             {entered && s.role !== 'raahi' && (
               <button className="icon-btn" onClick={() => open({ kind: 'settings' })} aria-label={lang === 'hi' ? 'सेटिंग्स' : 'Settings'} title={lang === 'hi' ? 'सेटिंग्स' : 'Settings'}>
                 <Icon name="settings" size={19} />
@@ -177,7 +177,6 @@ export function App() {
               </Boundary>
             </motion.main>
           </AnimatePresence>
-          {s.role === 'raahi' && tripLive && <Emergency />}
           <nav className="tabbar" aria-label="Main" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
             {tabs.map((x) => (
               <button key={x.id} className={`tab${shown === x.id ? ' on' : ''}`} onClick={() => go(x.id)} aria-current={shown === x.id ? 'page' : undefined}>

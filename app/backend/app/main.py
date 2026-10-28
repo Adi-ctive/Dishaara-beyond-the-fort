@@ -817,6 +817,8 @@ class ChatIn(BaseModel):
     city: str = "gwalior"
     origin: dict | None = None  # {"name", "lat", "lng"}: the raahi's roadmap start or shared location
     lastPlaces: list[str] = []  # places the previous reply showed: "where is this listed?" follows on from them
+    earlier: str = Field(default="", max_length=900)  # a short summary of this chat's older messages, made on the device
+    chatId: str = Field(default="", max_length=40)
 
 
 LABEL_WORDS = {
@@ -1084,12 +1086,22 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
     if HOW_KNOW_Q.search(body.text):
         pack["howWeKnow"] = HOW_WE_KNOW[lang]
     if ids and NEAR_Q.search(body.text):
+        # Decision 28: Yatra never names an unflagged place the raahi did not name, so "nearby" holds Level 2 places only.
         base = rules.get_place(d, ids[0])
+        flagged = [q for q in d["places"] if q["id"] != base["id"] and (q.get("guardrail") or {}).get("status") == "level2"]
         pack["nearby"] = [{"name": q["name"][lang], "kmAway": round(km(base["units"][0]["coord"], q["units"][0]["coord"]) * ROAD_FACTOR, 1),
                            "hours": fact(q["units"][0]["hours"], lang, d).get("value")}
-                          for q in sorted(d["places"], key=lambda q: km(base["units"][0]["coord"], q["units"][0]["coord"]))[1:5]]
+                          for q in sorted(flagged, key=lambda q: km(base["units"][0]["coord"], q["units"][0]["coord"]))[:3]]
+        pack["nearbyNote"] = "Only places whose custodians asked for more visitors are suggested nearby." if lang == "en" else "पास में सिर्फ़ वे जगहें सुझाई जाती हैं जिनके संरक्षकों ने ज़्यादा आगंतुक चाहे हैं।"
     if body.roadmap:
         pack["todaysRoadmap"] = body.roadmap
+    if body.earlier:
+        pack["earlierInThisChat"] = body.earlier
+    # Today's weather tips, only from the cached reading (the chat never waits on the weather service).
+    if pack["places"] and get_db().weather.find_one({"_id": city}):
+        w = weather_alert(city)
+        if w:
+            pack["weatherToday"] = w[lang]
     if re.search(r"open|open (today|now)|what.*open|खुल", body.text, re.I):
         pack["openToday"] = open_today(d, lang, day, tw)
         pack["places"] = []  # the compact list answers it; full records would overflow the free tier's per-minute limit
@@ -1222,6 +1234,19 @@ def mention_extra(answer: str, allowed: set[str], city: str = "gwalior") -> list
     return out
 
 
+def shown_ids(answer: str, pack: dict, body: ChatIn, k: int = 3) -> list[str]:
+    """The cards under a reply: the places it actually talks about, at most three. A list answer
+    (open today, nearby) shows cards only for the places it names, never every match."""
+    lang = "hi" if body.lang == "hi" else "en"
+    ids = [p["id"] for p in pack["places"] if named_in(p["name"], answer)]
+    d = data(body.city if body.city in cities.available() else "gwalior")
+    low = answer.lower()
+    ids += [p["id"] for p in d["places"] if p["id"] not in ids and (p["name"][lang].lower() in low)]
+    if not ids and pack["places"]:
+        ids = [pack["places"][0]["id"]]
+    return ids[:k]
+
+
 def system_prompt(body: ChatIn, city: str) -> str:
     return "\n".join([
         f"You are {ASSISTANT['hi' if body.lang == 'hi' else 'en']}, the assistant inside the Dishaara app: a warm, simple travel helper for {city}, India. Today is {today()}.",
@@ -1234,16 +1259,25 @@ def system_prompt(body: ChatIn, city: str) -> str:
         "4. If a value is \"not confirmed\", say so and pass on the advisory. Never give a price or time for it.",
         "5. Say how sure a key fact is with its howSure words and date, for example: officially confirmed on 13 Oct. Each fact has its own howSure: never give one fact's howSure to another (hours, fees and summary are separate). If unsure which applies, leave the howSure out.",
         "6b. If something is unavailable, name what we do not know, in one short sentence.",
-        "6. Only talk about places in the pack. The app shows a card for each place in FACTS under your reply, with its map, hours, ticket and travel time. Never mention a card when FACTS has no places.",
-        "6e. If a place has liveAlert, say that first, then suggest one or two of its tryInstead places with their hours. If FACTS has moderatorAlertsToday and the raahi asks what to do or where to go, avoid those places.",
+        "6. Only talk about places in the pack. Under your reply the app shows a card for up to three places your reply names. Never promise a card or a map: say \"tap a card below\" only when you name a place.",
+        "6e. If a place has liveAlert, the first bullet is **Right now:** the alert. For crowded: long queues at the ticket counter and gate, the visit takes longer than usual, keep phone and wallet close; go later or see a nearby place first. Then suggest one or two of its tryInstead places with their hours. If FACTS has moderatorAlertsToday and the raahi asks what to do or where to go, avoid those places.",
         "6f. If a section has toConfirm, say exactly what is not certain and howToConfirm. Never say only 'confirm first'. If a section has no toConfirm and its verdict is that they can go, do not ask them to confirm anything.",
         "6g. If a place has fromYou, give the time from the raahi's start (by auto, and on foot when given) and the autoFare, and call it an estimate.",
         "6h. If FACTS has howWeKnow, explain in plain words how the app knows and checks facts, using it.",
+        "6j. If FACTS has weatherToday and it has a tip (heat, rain, strong sun), you may give that tip as Good to know.",
         "6i. If FACTS has nearby, name two or three of them with distance.",
-        "6a. If FACTS has openToday, name a few of those places with their hours, then say the cards below list all of them and that places without hours on record are not listed. Do not say how sure each one is.",
+        "6a. If FACTS has openToday, list up to 5 of those places as bullets with their hours, then say in one line how many more are open and that the Map tab shows them all. Places without hours on record are not listed. Do not say how sure each one is.",
         "6c. If FACTS has cityNumbers, give the one or two numbers that answer the question, with the name and how sure they are. Never make up a number.",
         "6d. If FACTS has thingsToDo or questionsPeopleAsk for a place, use them for what visitors can do there and for common questions.",
-        "7. Answer in one go, like a local guide who knows the record: first the direct answer, then what the raahi needs to act on it (today's verdict, hours, ticket, how sure, travel time). At most 4 short sentences, under 80 words, no lists. End with one short question that helps plan their day (for example whether to add it to the roadmap, or what they enjoy).",
+        "7. Format every reply in Markdown as a short card the raahi can scan, in this order:",
+        "   - Line 1: the direct answer in **bold**, one sentence.",
+        "   - Then bullet lines (\"- \"), each starting with a bold label, only the ones that apply: " + ("**आज:** फ़ैसला; **समय:** घंटे (कितना पक्का, तारीख); **टिकट:** कीमत; **कैसे पहुँचें:** समय और किराया (अनुमान); **पहले जाँचें:** क्या पक्का नहीं और कैसे जाँचें; **जानने लायक:** जाने से पहले एक काम की बात" if body.lang == "hi" else "**Today:** the verdict; **Hours:** the hours (how sure, date); **Ticket:** the price; **Getting there:** time and fare from their start (estimate); **Check first:** what is not certain and how to check it; **Good to know:** one practical thing to know before going") + ".",
+        "   - Good to know comes from the place's rules, notes, facilities, access or a closed part: dress or shoe rules, photography, cash only, steep climb, a section that is shut. Pick what saves the raahi trouble on the day. Leave it out if FACTS has nothing.",
+        "   - Several places (open today, nearby, try instead): one bullet per place, \"- **Name**: hours\", at most 5.",
+        "   - Last line: one short question in *italics* that helps plan their day.",
+        "   At most 6 bullets and 110 words. No headings, tables or emojis. Never write field names.",
+        "9. You see the last few messages of this chat. earlierInThisChat is a short summary of this chat's older messages, and earlierChats lists the raahi's earlier chats (signed-in raahis only). Use them as context. You have only these summaries, not the full old messages: if asked what you remember, say exactly that. Without them, say you remember only this chat. Never claim to remember more.",
+        "10. If the raahi asks about their plan, roadmap, timings, schedule, costs or budget and FACTS has todaysRoadmap, answer with a Markdown table instead of bullets: columns Time | Place | Ride there | Ticket each, one row per stop, a last row for the ride back, then one bold line with the totals (tickets, rides, total, for how many people). Copy every time and price exactly from todaysRoadmap. If FACTS has no todaysRoadmap, say they can make one with Plan my day.",
         f"8. Reply in {'Hindi (Devanagari)' if body.lang == 'hi' else 'English'}.",
         f"About this raahi: {'; '.join(body.prompt[:10])}." if body.prompt else "No personal preferences set.",
     ])
@@ -1251,7 +1285,7 @@ def system_prompt(body: ChatIn, city: str) -> str:
 
 def groq(messages: list[dict]) -> str:
     key = os.environ["GROQ_KEY"]
-    r = httpx.post(GROQ_URL, headers={"Authorization": f"Bearer {key}"}, json={"model": GROQ_MODEL, "messages": messages, "temperature": 0.2, "reasoning_effort": "low", "max_completion_tokens": 600}, timeout=15)
+    r = httpx.post(GROQ_URL, headers={"Authorization": f"Bearer {key}"}, json={"model": GROQ_MODEL, "messages": messages, "temperature": 0.2, "reasoning_effort": "low", "max_completion_tokens": 900}, timeout=15)
     r.raise_for_status()
     return (r.json()["choices"][0]["message"].get("content") or "").strip()
 
@@ -1269,6 +1303,10 @@ def chat(body: ChatIn, me: dict | None = Depends(current)):
     if me:
         limit(me, "chat", 60, 60)
     pack, allowed = retrieve(body)
+    if me:
+        past = [f"{r['updated']:%d %b}: {r.get('summary') or r['title']}" for r in get_db().chats.find({"user": me["_id"], "_id": {"$ne": body.chatId}}, {"msgs": 0}).sort("updated", -1).limit(CHAT_CONTEXT)]
+        if past:
+            pack["earlierChats"] = past
     messages = [{"role": "system", "content": system_prompt(body, pack["city"])}]
     messages += [{"role": "user" if t.role == "user" else "assistant", "content": t.text[:1000]} for t in body.history[-6:]]
     messages.append({"role": "user", "content": f"FACTS: {json.dumps(pack, ensure_ascii=False)}\n\nRaahi asks: {body.text}"})
@@ -1282,16 +1320,84 @@ def chat(body: ChatIn, me: dict | None = Depends(current)):
             over = overclaims(answer, pack) or bool(re.search(r"todaysverdict|howsure|appguide|maybemention", answer, re.I) or re.search(r"\bFACTS\b", answer))
             wrong = renamed(answer or "", pack)
             if answer and ok and not extra and not over and not wrong:
-                return {"ai": True, "text": answer, "placeIds": [p["id"] for p in pack["places"]], "followUps": follow_ups(pack, body, "hi" if body.lang == "hi" else "en")}
+                return {"ai": True, "text": answer, "placeIds": shown_ids(answer, pack, body), "followUps": follow_ups(pack, body, "hi" if body.lang == "hi" else "en")}
             print(f"chat check failed: missing={missing} extra={extra} over={over} renamed={wrong}", flush=True)
             fix = ([f"values not in FACTS: {', '.join(missing)}"] if missing else []) + ([f"places not in FACTS: {', '.join(extra)}"] if extra else []) \
                 + (["\"officially confirmed\" for a fact whose howSure is different"] if over else []) \
                 + ([f"place names that are not in FACTS ({', '.join(wrong)}): write every place name exactly as FACTS spells it"] if wrong else [])
             messages += [{"role": "assistant", "content": answer}, {"role": "user", "content": f"Your reply used {' and '.join(fix) or 'nothing'}. Rewrite it using only FACTS."}]
-        return {"ai": False, "note": "grounding", "text": None, "placeIds": [p["id"] for p in pack["places"]]}
+        return {"ai": False, "note": "grounding", "text": None, "placeIds": [p["id"] for p in pack["places"]][:1]}
     except Exception as e:
         print(f"chat error: {type(e).__name__}: {str(e)[:300]}", flush=True)  # shows in the Vercel logs
         return {"ai": False, "note": "error", "text": None}
+
+
+# ---------------- saved chats ----------------
+# A signed-in raahi's chats are kept so they can reread one and carry on below it. Guests keep theirs on the phone only.
+class ChatMsg(BaseModel):
+    id: int
+    role: str = Field(pattern="^(user|bot)$")
+    text: str = Field(max_length=4000)
+    at: int | None = None
+    cards: list[dict] = []
+    chips: list[str] = []
+    ai: bool | None = None
+    note: str | None = None
+
+
+CHATS_PER_USER = 20  # saved chats per account
+CHAT_KEEP = 120  # messages kept per saved chat
+CHAT_SUMMARY_CHARS = 300  # summary per chat, fed to Yatra as context
+CHAT_CONTEXT = 3  # earlier chats Yatra sees
+
+
+class ChatSave(BaseModel):
+    title: str = Field(max_length=80)
+    city: str = Field(default="gwalior", max_length=20)
+    msgs: list[ChatMsg] = Field(max_length=400)
+
+
+@app.get("/chats")
+def chats_list(me: dict | None = Depends(current)):
+    me = need(me)
+    rows = get_db().chats.find({"user": me["_id"]}, {"msgs": 0}).sort("updated", -1).limit(30)
+    return [{"id": r["_id"], "title": r["title"], "city": r.get("city"), "count": r.get("count", 0), "updated": r["updated"].isoformat()} for r in rows]
+
+
+@app.get("/chats/{cid}")
+def chats_get(cid: str, me: dict | None = Depends(current)):
+    me = need(me)
+    r = get_db().chats.find_one({"_id": cid, "user": me["_id"]})
+    if not r:
+        raise HTTPException(404, "no such chat")
+    return {"id": r["_id"], "title": r["title"], "city": r.get("city"), "msgs": r["msgs"]}
+
+
+@app.put("/chats/{cid}")
+def chats_put(cid: str, body: ChatSave, me: dict | None = Depends(current)):
+    me = need(me)
+    if not re.fullmatch(r"[a-z0-9-]{6,40}", cid):
+        raise HTTPException(400, "bad chat id")
+    db = get_db()
+    old = db.chats.find_one({"_id": cid})
+    if old and old["user"] != me["_id"]:
+        raise HTTPException(403, "not your chat")
+    asked = [m.text.strip()[:70] for m in body.msgs if m.role == "user"]
+    summary = ("Asked: " + "; ".join(asked[-6:]))[:CHAT_SUMMARY_CHARS]
+    db.chats.replace_one({"_id": cid}, {"_id": cid, "user": me["_id"], "title": body.title, "city": body.city, "summary": summary,
+                                        "msgs": [m.model_dump() for m in body.msgs[-CHAT_KEEP:]], "count": len(body.msgs), "updated": now()}, upsert=True)
+    # Storage limit: the newest chats stay, the oldest go. The raahi is told in the app.
+    old = [r["_id"] for r in db.chats.find({"user": me["_id"]}, {"_id": 1}).sort("updated", -1).skip(CHATS_PER_USER)]
+    if old:
+        db.chats.delete_many({"_id": {"$in": old}})
+    return {"ok": True, "kept": CHATS_PER_USER, "dropped": len(old)}
+
+
+@app.delete("/chats/{cid}")
+def chats_delete(cid: str, me: dict | None = Depends(current)):
+    me = need(me)
+    get_db().chats.delete_one({"_id": cid, "user": me["_id"]})
+    return {"ok": True}
 
 
 # ---------------- saarthi ----------------

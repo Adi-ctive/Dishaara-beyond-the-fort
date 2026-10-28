@@ -704,3 +704,27 @@ def test_grounding_decimal_and_rounded_km():
     facts = [{"fromYou": {"roadKm": 26.9, "byAuto": "90 min"}}]
     assert grounding.check("It is about 26.9\u202fkm, roughly 27 km by road.", facts)[0]
     assert not grounding.check("It is 35 km away.", facts)[0]
+
+
+def test_saved_chats_belong_to_their_owner():
+    me, other = signin("Aditya"), signin("Priyangi")
+    msgs = [{"id": 1, "role": "user", "text": "Gwalior Fort", "at": 1}, {"id": 2, "role": "bot", "text": "**Gwalior Fort: You can go today.**", "at": 2}]
+    assert c.put("/chats/c-abc123", json={"title": "Gwalior Fort", "msgs": msgs}, headers=me).status_code == 200
+    rows = c.get("/chats", headers=me).json()
+    assert rows[0]["id"] == "c-abc123" and rows[0]["count"] == 2
+    assert c.get("/chats/c-abc123", headers=me).json()["msgs"][1]["text"].startswith("**Gwalior Fort")
+    assert c.get("/chats/c-abc123", headers=other).status_code == 404
+    assert c.put("/chats/c-abc123", json={"title": "x", "msgs": []}, headers=other).status_code == 403
+    assert c.get("/chats").status_code == 401  # guests keep chats on the phone only
+
+
+def test_chat_cards_only_for_places_the_reply_names(monkeypatch):
+    monkeypatch.setenv("GROQ_KEY", "test")
+    main.WRITER = lambda m: "**Teli ka Mandir is open today.**\n- **Hours:** sunrise to sunset\n*Add it to your roadmap?*"
+    r = c.post("/chat", json={"text": "what is open today", "history": [], "lang": "en", "prompt": [], "city": "gwalior"}).json()
+    assert r["ai"] and r["placeIds"] == ["teli-ka-mandir"]
+
+
+def test_chat_prompt_says_it_only_remembers_this_chat():
+    body = main.ChatIn(text="do you remember me", history=[], lang="en", prompt=[])
+    assert "You have only these summaries" in main.system_prompt(body, "Gwalior")

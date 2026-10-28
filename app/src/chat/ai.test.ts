@@ -57,7 +57,7 @@ describe('AI reply guards', () => {
     expect(calls[1].messages.at(-1)!.content).toMatch(/values not in FACTS: ₹75/);
     expect(r.ai).toBe(false);
     expect(r.note).toBe('grounding');
-    expect(r.text).toMatch(/Ticket details for Gwalior Fort/);
+    expect(r.text).toMatch(/\*\*Gwalior Fort: .*\n- \*\*Hours/);
   });
 
   it('naming a place the raahi did not ask about is caught and fixed', async () => {

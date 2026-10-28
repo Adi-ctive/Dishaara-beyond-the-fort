@@ -108,7 +108,7 @@ export function ModTwist() {
   const { s, set, data, plan } = useStore();
   const { lang } = useTheme();
   const tr = useTr();
-  const units = allUnits(data).filter((u) => u.place.guardrail.status === 'level1' || u.place.guardrail.status === 'level2');
+  const [q, setQ] = useState('');
   const tw = s.twists;
   const setTw = (p: Partial<typeof tw>) => {
     set((c) => ({ twists: { ...c.twists, ...p }, order: null }));
@@ -118,34 +118,31 @@ export function ModTwist() {
     <div className="screen">
       <h1 className="display small">{tr('Twist panel', 'ट्विस्ट पैनल')}</h1>
       <p className="muted small">{tr("For the event's Twist Card. Every change replans the roadmap right away", 'इवेंट के ट्विस्ट कार्ड के लिए। हर बदलाव से रोडमैप तुरंत बदलता है')}{apiOn() ? tr(', on every connected phone', ', हर जुड़े फ़ोन पर') : ''}{tr('.', '।')}</p>
-      <Section title={tr('Close a site today', 'आज कोई जगह बंद करें')}>
-        <div className="chips">
-          {units.map((u) => {
-            const on = tw.closed.includes(u.unit.id);
-            return (
-              <button key={u.unit.id} className={`chip${on ? ' on danger' : ''}`} onClick={() => setTw({ closed: on ? tw.closed.filter((x) => x !== u.unit.id) : [...tw.closed, u.unit.id] })}>
-                {on && <Icon name="x" size={14} />} {u.unit.name[lang]}
-              </button>
-            );
-          })}
+      <Section title={tr('A place today', 'आज कोई जगह')} note={tr('One list for both place twists. Closed: the planner drops it and Yatra says it is shut. Crowded: it stays open, the planner stops picking it unless a raahi added it, and Yatra warns and suggests other open places. Pick one part (like Gujari Mahal) to affect only that part.', 'दोनों ट्विस्ट की एक सूची। बंद: प्लानर हटा देता है, यात्रा बताती है कि बंद है। भीड़: खुली रहती है, प्लानर तब तक नहीं चुनता जब तक राही ने ख़ुद न जोड़ा हो, यात्रा चेताती है और दूसरी खुली जगहें सुझाती है। सिर्फ़ एक हिस्सा (जैसे गूजरी महल) भी चुन सकते हैं।')}>
+        <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={tr('Find a place', 'जगह खोजें')} aria-label={tr('Find a place', 'जगह खोजें')} />
+        <div className="twist-list">
+          {allUnits(data)
+            .filter((u) => !q || `${u.unit.name.en} ${u.place.name.en} ${u.unit.name.hi}`.toLowerCase().includes(q.toLowerCase()))
+            .sort((x, y) => Number([...tw.closed, ...(tw.crowded ?? [])].includes(y.unit.id)) - Number([...tw.closed, ...(tw.crowded ?? [])].includes(x.unit.id)))
+            .slice(0, q ? 40 : 12)
+            .map((u) => {
+              const shut = tw.closed.includes(u.unit.id);
+              const busy = (tw.crowded ?? []).includes(u.unit.id);
+              return (
+                <div key={u.unit.id} className="twist-row">
+                  <span className="grow">{u.unit.name[lang]}{u.place.units.length > 1 && <small className="muted"> · {u.place.name[lang]}</small>}</span>
+                  <button className={`chip tiny${shut ? ' on danger' : ''}`} onClick={() => setTw({ closed: shut ? tw.closed.filter((x) => x !== u.unit.id) : [...tw.closed, u.unit.id], crowded: (tw.crowded ?? []).filter((x) => x !== u.unit.id) })}>{tr('Closed', 'बंद')}</button>
+                  <button className={`chip tiny${busy ? ' on warn' : ''}`} onClick={() => setTw({ crowded: busy ? (tw.crowded ?? []).filter((x) => x !== u.unit.id) : [...(tw.crowded ?? []), u.unit.id], closed: tw.closed.filter((x) => x !== u.unit.id) })}>{tr('Crowded', 'भीड़')}</button>
+                </div>
+              );
+            })}
         </div>
-      </Section>
-      <Section title={tr('Crowded right now', 'अभी भीड़ है')} note={tr('Yatra tells raahis and suggests similar places that are open; the planner stops picking it. Any place, not only plannable ones.', 'यात्रा राहियों को बताती है और मिलती-जुलती खुली जगहें सुझाती है; प्लानर इसे नहीं चुनता। कोई भी जगह।')}>
-        <div className="chips">
-          {allUnits(data).filter((u) => u.place.units[0].id === u.unit.id || u.place.units.length > 1).map((u) => {
-            const on = (tw.crowded ?? []).includes(u.unit.id);
-            return (
-              <button key={u.unit.id} className={`chip${on ? ' on warn' : ''}`} onClick={() => setTw({ crowded: on ? (tw.crowded ?? []).filter((x) => x !== u.unit.id) : [...(tw.crowded ?? []), u.unit.id] })}>
-                {on && <Icon name="users" size={14} />} {u.unit.name[lang]}
-              </button>
-            );
-          })}
-        </div>
+        {!q && <small className="muted">{tr('Showing 12. Type to find any place.', '12 दिख रही हैं। कोई भी जगह खोजने के लिए लिखें।')}</small>}
       </Section>
       <Section title={tr('Conditions', 'स्थितियाँ')}>
         <Toggle on={tw.budgetHalf} onChange={(v) => setTw({ budgetHalf: v })} label={tr('Budget halved (cheapest rides)', 'बजट आधा (सबसे सस्ती सवारी)')} />
         <Toggle on={tw.rain} onChange={(v) => setTw({ rain: v })} label={tr('Rain (no walking legs)', 'बारिश (पैदल नहीं)')} />
-        <Toggle on={tw.festival} onChange={(v) => setTw({ festival: v })} label={tr('Festival crowd (daily limits reached)', 'त्योहार की भीड़ (दैनिक सीमा पूरी)')} />
+        <Toggle on={tw.festival} onChange={(v) => setTw({ festival: v })} label={tr('Festival day, whole city (every custodian daily visitor limit counts as full, so places with a limit drop out of plans)', 'त्योहार का दिन, पूरा शहर (हर संरक्षक की दैनिक सीमा पूरी मानी जाती है, सीमा वाली जगहें प्लान से हटती हैं)')} />
         <Toggle on={s.testMode} onChange={(v) => { set({ testMode: v }); api.putTwists({ testMode: v }); }} label={tr('Stamp test mode (simulated location)', 'स्टैम्प टेस्ट मोड (नकली लोकेशन)')} />
       </Section>
       <motion.div key={JSON.stringify(tw)} className="card col" initial={{ scale: 0.97, opacity: 0.4 }} animate={{ scale: 1, opacity: 1 }}>

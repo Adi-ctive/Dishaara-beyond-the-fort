@@ -39,7 +39,11 @@ Auth: `POST /auth/google` returns a token. Send `Authorization: Bearer <token>`.
 | `POST /auth/google` | `{name}` | `{token, user}` (mock until Aditya gives an OAuth client ID) |
 | `GET/PUT /me/profile` | `{interests, prefs, prompt[]}` | profile |
 | `POST /plans`, `PUT /plans/{id}`, `GET /plans/{id}` | `{input, order, done, added}` | saved plan |
-| `POST /chat` | `{text, history[{role,text}], lang, prompt[], roadmap?}` | `{ai: true, text, placeIds}` or `{ai: false, note}` or `{emergency: true}` |
+| `POST /chat` | `{text, history[{role,text}] (last 6), lang, prompt[], roadmap?, city, origin?, lastPlaces[], earlier?, chatId?}`. `earlier` is the app's short summary of older messages (max 900 chars); signed-in raahis also get their last 3 chats' summaries | `{ai: true, text (Markdown: bold answer, bullets or a table, italic question), placeIds (max 3, only places the reply names), followUps}` or `{ai: false, note}` or `{emergency: true}` |
+| `GET /chats` | signed in | the raahi's saved chats, newest first: `[{id, title, city, count, updated}]` |
+| `GET /chats/{id}` | signed in, owner only | `{id, title, city, msgs}` |
+| `PUT /chats/{id}` | `{title, city, msgs[]}` (id: `c-...`, 6 to 40 chars) | `{ok, kept, dropped}`. Keeps 20 chats per raahi, 120 messages each, and a 300-character summary |
+| `DELETE /chats/{id}` | signed in, owner only | `{ok}` |
 | `POST /stamps` | `{placeId, readings[{lat,lng,accuracy,t}], code?, ipCity?}` | `{status: confirmed/pending/rejected, rarity, points, checks[], testMode}` |
 | `GET /me/stamps`, `GET /me/progress` | | stamps; `{points, level, stamps, rare, quiet, gwalior{got,total,tier}}` |
 | `POST /feedback` | `{placeId, answers, note, proof?}` | `{ticket, points}` |

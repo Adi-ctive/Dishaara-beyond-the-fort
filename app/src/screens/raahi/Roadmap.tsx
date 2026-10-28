@@ -27,7 +27,7 @@ const REASON: Record<string, { en: string; hi: string }> = {
 
 const MODE = { walk: { en: 'walk', hi: 'पैदल' }, auto: { en: 'auto', hi: 'ऑटो' }, cab: { en: 'cab', hi: 'कैब' } };
 
-function StopRow({ st, n, done, onTick }: { st: Stop; n: number; done: boolean; onTick: () => void }) {
+function StopRow({ st, n, done, onTick, onRemove }: { st: Stop; n: number; done: boolean; onTick: () => void; onRemove: () => void }) {
   const { lang } = useTheme();
   const { open } = useNav();
   const drag = useDragControls();
@@ -56,6 +56,9 @@ function StopRow({ st, n, done, onTick }: { st: Stop; n: number; done: boolean; 
             {st.added && <span className="tag-added">{hi ? 'आपने जोड़ा, सुझाव नहीं' : 'Added by you, not suggested'}</span>}
             {st.wait > 0 && <span className="small muted">{hi ? `${st.wait} मिनट इंतज़ार` : `waits ${st.wait} min to open`}</span>}
           </span>
+        </button>
+        <button className="stop-remove" onClick={onRemove} aria-label={hi ? 'रोडमैप से हटाएँ' : 'Remove from roadmap'} title={hi ? 'हटाएँ' : 'Remove'}>
+          <Icon name="x" size={16} />
         </button>
         <span className="grip" onPointerDown={(e) => drag.start(e)} aria-label={hi ? 'खींचें' : 'Drag to reorder'} role="button">
           <Icon name="grip" size={20} />
@@ -94,7 +97,7 @@ function AddToDay() {
             <b>{p.name[lang]}</b>
             <small>{fmt(w!.open)}–{fmt(w!.close)} · {km.toFixed(1)} km{p.sensitive ? (hi ? ' · पहले नियम देखें' : ' · see the rules first') : ''}</small>
           </button>
-          <button className="btn ghost small" onClick={() => set((c) => ({ added: [...c.added, p.id], order: null }))}>
+          <button className="btn ghost small" onClick={() => set((c) => ({ added: [...c.added, p.id], removed: (c.removed ?? []).filter((x) => !p.units.some((u) => u.id === x)), order: null }))}>
             <Icon name="plus" size={16} /> {hi ? 'जोड़ें' : 'Add'}
           </button>
         </div>
@@ -261,9 +264,21 @@ export function RoadmapTab() {
         </div>
       )}
 
+      {(s.removed ?? []).length > 0 && (
+        <div className="done-today">
+          <span className="small muted">{hi ? 'आपने हटाया (वापस जोड़ने के लिए टैप करें)' : 'You removed (tap to put back)'}</span>
+          {(s.removed ?? []).map((id) => (
+            <button key={id} className="chip tiny" onClick={() => set((c) => ({ removed: c.removed.filter((x) => x !== id), order: null }))}>
+              <Icon name="plus" size={12} /> {data.places.flatMap((p) => p.units).find((u) => u.id === id)?.name[lang] ?? id}
+            </button>
+          ))}
+        </div>
+      )}
+
       <Reorder.Group axis="y" values={ids} onReorder={(o) => set({ order: o })} className="stops">
         {plan.stops.map((st, i) => (
-          <StopRow key={st.unit.id} st={st} n={i + 1} done={s.done.includes(st.unit.id)} onTick={() => set((c) => (c.done.includes(st.unit.id) ? { done: c.done.filter((x) => x !== st.unit.id) } : { done: [...c.done, st.unit.id], ...award(c, `tick:${st.unit.id}`, 10) }))} />
+          <StopRow key={st.unit.id} st={st} n={i + 1} done={s.done.includes(st.unit.id)} onTick={() => set((c) => (c.done.includes(st.unit.id) ? { done: c.done.filter((x) => x !== st.unit.id) } : { done: [...c.done, st.unit.id], ...award(c, `tick:${st.unit.id}`, 10) }))}
+            onRemove={() => set((c) => ({ removed: [...new Set([...(c.removed ?? []), st.unit.id])], added: st.place.units.every((x) => x.id === st.unit.id || (c.removed ?? []).includes(x.id)) ? c.added.filter((x) => x !== st.place.id) : c.added, order: c.order?.filter((x) => x !== st.unit.id) ?? null }))} />
         ))}
       </Reorder.Group>
       <AddToDay />

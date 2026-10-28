@@ -54,3 +54,15 @@
 .st-actions { display: grid; gap: 10px; width: 100%; }
 .st-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 50px; border-radius: 999px; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .35); color: #fff; font-weight: 700; font-size: 15px; }
 .st-btn.primary { background: #fff; color: var(--sink); }
+
+/* 28 Oct: cards fill from the top, never run off the side, and group facts in a two-column grid. */
+.st-slide { min-width: 0; }
+.st-body { justify-content: flex-start; padding-top: 28px; }
+.st-tile { min-width: 0; overflow-wrap: anywhere; }
+.st-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.st-grid .st-tile { padding: 12px 14px; }
+.st-grid .st-tile p { font-size: 15px; }
+.st-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.st-facts span { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 14px; background: rgba(255, 255, 255, .14); font-size: 13px; }
+.st-cover { justify-content: flex-start; }
+.st-line { display: flex; justify-content: space-between; gap: 12px; }

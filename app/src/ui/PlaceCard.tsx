@@ -5,7 +5,7 @@ import { StampArt, rarityOf } from '../art/Stamp';
 import { useNav } from '../nav';
 import { useStore } from '../store';
 import { useTheme } from '../theme/ThemeProvider';
-import { ConfirmWhat, TrustChip, VERDICT_TEXT } from './facts';
+import { ConfirmWhat, LiveAlert, TrustChip, VERDICT_TEXT } from './facts';
 import { Icon } from './Icon';
 
 // R4: the place card. Each place has its own cover art and colours (src/art/PlaceCover.tsx).
@@ -74,17 +74,7 @@ export function PlaceCard({ place, i = 0 }: { place: Place; i?: number }) {
             {lang === 'hi' ? ' (अनुमान)' : ' (estimate)'}
           </span>
         )}
-        {(() => {
-          const crowd = place.units.filter((x) => s.twists.crowded?.includes(x.id));
-          const shut = place.units.filter((x) => s.twists.closed.includes(x.id));
-          const part = (l: typeof crowd) => (l.length < place.units.length ? `${l.map((x) => x.name[lang]).join(', ')}: ` : '');
-          return (
-            <>
-              {shut.length > 0 && <span className="pc-alert bad">{part(shut)}{lang === 'hi' ? 'आज बंद (मॉडरेटर सूचना)' : 'Closed today (moderator alert)'}</span>}
-              {crowd.length > 0 && <span className="pc-alert">{part(crowd)}{lang === 'hi' ? 'अभी बहुत भीड़ (मॉडरेटर सूचना)' : 'Very crowded right now (moderator alert)'}</span>}
-            </>
-          );
-        })()}
+        <LiveAlert p={place} twists={s.twists} lang={lang} compact />
         <ConfirmWhat c={check} data={data} p={place} u={u} lang={lang} compact />
         <span className="pc-row between">
           <TrustChip f={u.hours} lang={lang} data={data} />

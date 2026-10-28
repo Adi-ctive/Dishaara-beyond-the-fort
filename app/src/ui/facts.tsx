@@ -81,3 +81,38 @@ export function FactLine({ title, f, lang, data }: { title: string; f?: Fact; la
 
 export const placeName = (p: Place, lang: Lang) => p.name[lang];
 export const time = (m: number) => fmt(m);
+
+/** A moderator's live alert on a place: closed today, or very crowded right now, with what it means for the raahi.
+ * Shown on every view of the place (card, story, full details, map), naming the part when only one part is affected. */
+export function LiveAlert({ p, twists, lang, compact = false }: { p: Place; twists: { closed: string[]; crowded?: string[] }; lang: 'en' | 'hi'; compact?: boolean }) {
+  const hi = lang === 'hi';
+  const part = (ids: string[]) => {
+    const hit = p.units.filter((u) => ids.includes(u.id));
+    return { hit, label: hit.length && hit.length < p.units.length ? `${hit.map((u) => u.name[lang]).join(', ')}: ` : '' };
+  };
+  const shut = part(twists.closed);
+  const busy = part(twists.crowded ?? []);
+  if (!shut.hit.length && !busy.hit.length) return null;
+  return (
+    <span className={`live-alert${compact ? ' compact' : ''}`} onClick={(e) => e.stopPropagation()}>
+      {shut.hit.length > 0 && (
+        <span className="la bad">
+          <b>{shut.label}{hi ? 'आज बंद' : 'Closed today'}</b>
+          {!compact && <small>{hi ? 'मॉडरेटर सूचना। प्लानर इसे रोडमैप से हटा देता है।' : 'Moderator alert. The planner leaves it out of your roadmap.'}</small>}
+        </span>
+      )}
+      {busy.hit.length > 0 && (
+        <span className="la">
+          <b>{busy.label}{hi ? 'अभी बहुत भीड़' : 'Very crowded right now'}</b>
+          <small>
+            {compact
+              ? hi ? 'लंबी कतार, ज़्यादा समय लगेगा' : 'Long queues, takes longer than usual'
+              : hi
+                ? 'मॉडरेटर सूचना। टिकट और गेट पर लंबी कतार, सामान्य से ज़्यादा समय लगेगा। फ़ोन और पर्स संभालकर रखें, बच्चों और बुज़ुर्गों का साथ न छूटे। हो सके तो बाद में जाएँ या पहले पास की कोई दूसरी जगह देखें।'
+                : 'Moderator alert. Expect long queues at the ticket counter and gate, so your visit will take longer than the usual time. Keep your phone and wallet close, and keep children and elders with you. If you can, go later or see a nearby place first.'}
+          </small>
+        </span>
+      )}
+    </span>
+  );
+}

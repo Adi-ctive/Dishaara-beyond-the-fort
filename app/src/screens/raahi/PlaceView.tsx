@@ -6,7 +6,7 @@ import { PlaceCover, artFor } from '../../art/PlaceCover';
 import { useNav } from '../../nav';
 import { award, todayIST, useStore } from '../../store';
 import { useTheme, type Lang } from '../../theme/ThemeProvider';
-import { ConfirmWhat, FactLine, TrustChip, VERDICT_TEXT, tx } from '../../ui/facts';
+import { ConfirmWhat, FactLine, LiveAlert, TrustChip, VERDICT_TEXT, tx } from '../../ui/facts';
 import { Icon } from '../../ui/Icon';
 import { LayerPage, Section } from '../../ui/Layer';
 import { speak } from '../../voice';
@@ -132,6 +132,7 @@ export function PlaceView({ id }: { id: string }) {
               <b>{vt[lang]}</b>
               <span className="small">{hi ? 'नियमों से तय, AI से नहीं' : 'Decided by rules, not by AI'}</span>
             </div>
+            <LiveAlert p={{ ...p, units: [u] }} twists={s.twists} lang={lang} />
             <ConfirmWhat c={c} data={data} p={p} u={u} lang={lang} />
             <FactLine title={hi ? 'समय' : 'Hours'} f={u.hours} lang={lang} data={data} />
             <FactLine title={hi ? 'साप्ताहिक बंदी' : 'Weekly closing'} f={u.weeklyClosed} lang={lang} data={data} />

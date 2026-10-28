@@ -14,7 +14,7 @@ import { useShops } from './Bazaar';
 import { PlaceCover, artFor } from '../../art/PlaceCover';
 import { BizCover, BizIcon } from '../../art/BizArt';
 import { checkUnit } from '../../core';
-import { VERDICT_TEXT } from '../../ui/facts';
+import { LiveAlert, VERDICT_TEXT } from '../../ui/facts';
 
 const W = 360;
 const H = 440;
@@ -261,7 +261,7 @@ export function MapTab() {
 
 // The card that appears over the map when a pin or strip card is chosen.
 function MapPreview({ id, onClose, shops }: { id: string; onClose: () => void; shops: Shop[] }) {
-  const { data, today } = useStore();
+  const { data, today, s } = useStore();
   const { lang } = useTheme();
   const { open } = useNav();
   const hi = lang === 'hi';
@@ -278,6 +278,7 @@ function MapPreview({ id, onClose, shops }: { id: string; onClose: () => void; s
           <b>{p ? p.name[lang] : b!.name}</b>
           <small>{p ? p.type[lang] : hi ? 'मालिक की दी जानकारी' : 'Owner-provided'}</small>
           {v ? <span className={`verdict ${v.tone}`}>{v[lang]}</span> : b && <span className={`biz-kind ${b.kind}`}><BizIcon kind={b.kind} size={18} /></span>}
+          {p && <LiveAlert p={p} twists={s.twists} lang={lang} compact />}
         </span>
         <span className="pc-go"><Icon name="arrow" size={16} /></span>
       </button>

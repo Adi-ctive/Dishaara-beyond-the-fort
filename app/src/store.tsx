@@ -39,6 +39,7 @@ export type State = {
   order: string[] | null; // unit ids in the raahi's own order
   done: string[]; // unit ids ticked
   skip: string[]; // unit ids already visited, left out when the day is replanned
+  removed: string[]; // unit ids the raahi took out of the roadmap; the planner never puts them back
   awarded: string[]; // points already given (tick:<unit>, visit:<biz>:<date>, still:<place>:<date>) so taps cannot farm points
   added: string[]; // place ids the raahi added by name
   stamps: Record<string, Stamp>;
@@ -84,6 +85,7 @@ const INITIAL: State = {
   order: null,
   done: [],
   skip: [],
+  removed: [],
   awarded: [],
   added: [],
   stamps: {},
@@ -284,7 +286,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       profile,
       counts,
       // Crowded (moderator alert): the planner does not pick it today; a place the raahi added stays.
-      exclude: [...s.twists.closed, ...s.skip, ...(s.twists.crowded ?? []).filter((id) => !s.added.includes(data.places.find((p) => p.units.some((u) => u.id === id))?.id ?? ''))],
+      exclude: [...s.twists.closed, ...s.skip, ...(s.removed ?? []), ...(s.twists.crowded ?? []).filter((id) => !s.added.includes(data.places.find((p) => p.units.some((u) => u.id === id))?.id ?? ''))],
       added: s.added,
       maxVisit: s.prefs.maxPerPlace,
     };
@@ -294,12 +296,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       return timeSequence(data, input, seq);
     }
     return buildPlan(data, input);
-  }, [s.quick, s.order, s.added, s.skip, s.prefs.maxPerPlace, s.prefs.modes, s.prefs.group, s.prefs.payment, s.twists, profile, counts, data, today]);
+  }, [s.quick, s.order, s.added, s.skip, s.removed, s.prefs.maxPerPlace, s.prefs.modes, s.prefs.group, s.prefs.payment, s.twists, profile, counts, data, today]);
 
   const reset = useCallback(() => setS(INITIAL), []);
   // A plan belongs to one city: switching starts the day fresh.
   const setCity = useCallback((c: CityId) => {
-    setS((cur) => (cur.city === c ? cur : { ...cur, city: c, quick: null, order: null, done: [], skip: [], added: [], mapFocus: null }));
+    setS((cur) => (cur.city === c ? cur : { ...cur, city: c, quick: null, order: null, done: [], skip: [], removed: [], added: [], mapFocus: null }));
   }, []);
 
   // With location on, the app opens in the city the raahi is standing in.
