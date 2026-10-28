@@ -13,6 +13,7 @@ import { tierOf } from './Stamps';
 import { AVATARS, Avatar, BANNERS, Banner, FRAMES, isOpen, unlockText } from '../../art/Avatars';
 import { Medal } from '../../art/Medal';
 import { SignInCard } from '../../ui/SignIn';
+import { showMeAround } from '../../ui/Tour';
 import { api, apiOn, lastError } from '../../api';
 
 export function useProgress() {
@@ -43,6 +44,9 @@ export function useProgress() {
 }
 
 // R12: profile. Level, points, passport, quests, rewards, badges, personalisation, history, settings.
+// "App tutorial": replays the Show me around tour for the role on screen.
+const TUTORIAL = (hi: boolean) => ({ icon: 'sparkle', title: hi ? 'ऐप ट्यूटोरियल' : 'App tutorial', sub: hi ? 'मुझे घुमाओ: हर हिस्सा एक-एक करके' : 'Show me around: each part, one at a time', go: showMeAround, tour: true });
+
 export function ProfileTab() {
   const { s, level } = useStore();
   const { lang, theme } = useTheme();
@@ -68,6 +72,7 @@ export function ProfileTab() {
     const guestRows = [
       { icon: 'edit', title: hi ? 'मेरी पसंद' : 'My personalisation', sub: hi ? 'प्लानिंग के लिए' : 'Used to plan your day', go: () => open({ kind: 'prompt' }) },
       { icon: 'settings', title: hi ? 'सेटिंग्स' : 'Settings', sub: hi ? 'भाषा, आवाज़, रूप' : 'Language, voice, appearance', go: () => open({ kind: 'settings' }) },
+      TUTORIAL(hi),
     ];
     return (
       <div className="screen">
@@ -78,7 +83,7 @@ export function ProfileTab() {
         </div>
         <p className="small muted center-text">{hi ? 'पासपोर्ट, स्टैम्प, बैज, लेवल और अवतार साइन इन के बाद।' : 'Passport, stamps, badges, levels and avatars unlock after sign-in.'}</p>
         {guestRows.map((r) => (
-          <button key={r.title} className="card row" onClick={r.go}>
+          <button key={r.title} className="card row" onClick={r.go} data-tour={'tour' in r ? 'tutorial' : undefined}>
             <Icon name={r.icon} size={22} />
             <span className="grow"><b>{r.title}</b><small>{r.sub}</small></span>
             <Icon name="arrow" size={16} />
@@ -87,7 +92,7 @@ export function ProfileTab() {
       </div>
     );
   }
-  const rows: { icon: string; title: string; sub: string; go: () => void }[] = [
+  const rows: { icon: string; title: string; sub: string; go: () => void; tour?: boolean }[] = [
     { icon: 'stamp', title: hi ? 'पासपोर्ट' : 'Passport', sub: passport, go: () => open({ kind: 'passport' }) },
     { icon: 'trophy', title: hi ? 'लीडरबोर्ड' : 'Leaderboard', sub: hi ? 'इस हफ़्ते के सबसे सक्रिय राही' : 'Top raahis this week', go: () => open({ kind: 'leaders' }) },
     { icon: 'flag', title: hi ? 'क्वेस्ट' : 'Quests', sub: hi ? 'छोटे स्थानीय काम' : 'Short local side quests', go: () => open({ kind: 'quests' }) },
@@ -96,6 +101,7 @@ export function ProfileTab() {
     { icon: 'history', title: hi ? 'यात्रा इतिहास' : 'Travel history', sub: `${s.history.length} ${hi ? 'दिन' : 'days'}`, go: () => open({ kind: 'history' }) },
     { icon: 'palette', title: hi ? 'रूप' : 'Appearance', sub: theme.name[lang], go: () => open({ kind: 'settings' }) },
     { icon: 'settings', title: hi ? 'सेटिंग्स' : 'Settings', sub: hi ? 'भाषा, आवाज़, लोकेशन' : 'Language, voice, location, account', go: () => open({ kind: 'settings' }) },
+    TUTORIAL(hi),
   ];
   return (
     <div className="screen">
@@ -132,7 +138,7 @@ export function ProfileTab() {
         })}
       </div>
       {rows.map((r, i) => (
-        <motion.button key={r.title} className="card row" onClick={r.go} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+        <motion.button key={r.title} className="card row" onClick={r.go} data-tour={'tour' in r ? 'tutorial' : undefined} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
           <Icon name={r.icon} size={22} />
           <span className="grow"><b>{r.title}</b><small>{r.sub}</small></span>
           <Icon name="arrow" size={16} />
@@ -302,6 +308,11 @@ export function Settings() {
   };
   return (
     <LayerPage title={hi ? 'सेटिंग्स' : 'Settings'}>
+      <button className="card row" onClick={showMeAround}>
+        <Icon name="sparkle" size={22} />
+        <span className="grow"><b>{hi ? 'ऐप ट्यूटोरियल' : 'App tutorial'}</b><small>{hi ? 'मुझे घुमाओ: इस भूमिका के हर हिस्से की सैर' : 'Show me around: a tour of every part for this role'}</small></span>
+        <Icon name="arrow" size={16} />
+      </button>
       <Section title={hi ? 'भाषा' : 'Language'}>
         <Seg value={lang} onChange={setLang} options={[{ v: 'en', label: 'English' }, { v: 'hi', label: 'हिन्दी' }]} />
       </Section>

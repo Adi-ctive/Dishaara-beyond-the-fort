@@ -7,7 +7,7 @@ export function CityPick() {
   const { s, setCity } = useStore();
   const { lang } = useTheme();
   return (
-    <label className="city-pick">
+    <label className="city-pick" data-tour="city">
       <span className="sr-only">{lang === 'hi' ? 'शहर' : 'City'}</span>
       <select value={s.city} onChange={(e) => setCity(e.target.value as typeof s.city)}>
         {CITY_IDS.map((c) => (

@@ -178,3 +178,15 @@ a { color: inherit; }
 .leader .grow { display: flex; flex-direction: column; }
 .leader-rank { width: 28px; text-align: center; font-weight: 800; font-size: 18px; }
 .leader-pts { font-size: 18px; }
+
+/* Show me around (ui/Tour.tsx): the lit part stays clear, the rest dims, the note never covers the part. */
+.tour { position: fixed; inset: 0; z-index: 200; }
+.tour-dim { position: absolute; inset: 0; background: rgba(10, 12, 30, .62); }
+.tour-spot { position: absolute; border-radius: 16px; box-shadow: 0 0 0 9999px rgba(10, 12, 30, .62); outline: 3px solid var(--primary); pointer-events: none; }
+.tour-tip { position: absolute; max-width: 420px; margin: 0 auto; padding: 16px; border-radius: 18px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 18px 40px rgba(0, 0, 0, .35); }
+.tour-tip p { margin: 6px 0 12px; font-size: 15px; line-height: 1.5; }
+.tour-count { color: var(--primary); font-weight: 700; font-size: 12px; letter-spacing: .02em; }
+.tour-row { display: flex; align-items: center; gap: 8px; }
+.tour-row .btn.small { height: 38px; padding: 0 16px; font-size: 14px; }
+.tour-row .btn:not(.ghost) { background: var(--primary); color: var(--onPrimary); }
+.tour-skip { border: 0; background: none; color: var(--muted); font-size: 13px; text-decoration: underline; cursor: pointer; padding: 0; }

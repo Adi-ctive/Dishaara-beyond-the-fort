@@ -98,7 +98,7 @@ export function Emergency({ variant = 'float' }: { variant?: 'float' | 'top' }) 
   return (
     <>
       {variant === 'top' ? (
-        <button className="icon-btn sos-top" onClick={() => setOpen(true)} aria-label={t('sos', lang)} title={t('sos', lang)}>
+        <button className="icon-btn sos-top" data-tour="sos" onClick={() => setOpen(true)} aria-label={t('sos', lang)} title={t('sos', lang)}>
           <Icon name="shield" size={19} />
         </button>
       ) : (

@@ -30,6 +30,7 @@ import { Emergency, useTripLive } from './ui/Emergency';
 import { CityPick } from './ui/CityPick';
 import { Icon } from './ui/Icon';
 import { ThemeSheet } from './ui/ThemeSheet';
+import { Tour } from './ui/Tour';
 
 type TabDef = { id: Tab; icon: string; en: string; hi: string };
 const TABS: Record<Role, TabDef[]> = {
@@ -141,7 +142,7 @@ export function App() {
             {entered && s.role === 'raahi' && <CityPick />}
             {entered && s.role === 'raahi' && <Emergency variant="top" />}
             {entered && s.role !== 'raahi' && (
-              <button className="icon-btn" onClick={() => open({ kind: 'settings' })} aria-label={lang === 'hi' ? 'सेटिंग्स' : 'Settings'} title={lang === 'hi' ? 'सेटिंग्स' : 'Settings'}>
+              <button className="icon-btn" data-tour="settings" onClick={() => open({ kind: 'settings' })} aria-label={lang === 'hi' ? 'सेटिंग्स' : 'Settings'} title={lang === 'hi' ? 'सेटिंग्स' : 'Settings'}>
                 <Icon name="settings" size={19} />
               </button>
             )}
@@ -179,7 +180,7 @@ export function App() {
           </AnimatePresence>
           <nav className="tabbar" aria-label="Main" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
             {tabs.map((x) => (
-              <button key={x.id} className={`tab${shown === x.id ? ' on' : ''}`} onClick={() => go(x.id)} aria-current={shown === x.id ? 'page' : undefined}>
+              <button key={x.id} data-tour={`tab-${x.id}`} className={`tab${shown === x.id ? ' on' : ''}`} onClick={() => go(x.id)} aria-current={shown === x.id ? 'page' : undefined}>
                 {shown === x.id && <motion.span layoutId="tab-dot" className="tab-glow" transition={{ type: 'spring', damping: 26, stiffness: 340 }} />}
                 <Icon name={x.icon} size={22} />
                 <span>{x[lang]}</span>
@@ -195,6 +196,7 @@ export function App() {
           </Boundary>
         ))}
       </AnimatePresence>
+      <Tour ready={entered} />
       <ThemeSheet open={themeOpen} onClose={() => setThemeOpen(false)} />
       {s.role === 'raahi' && s.signedIn && <LevelUp />}
     </div>
