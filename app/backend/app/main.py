@@ -1008,6 +1008,7 @@ def place_pack(d: dict, p: dict, lang: str, day: str, origin: dict | None = None
 
 ASSISTANT = {"en": "Yatra", "hi": "यात्रा"}
 FOLLOW_Q = re.compile(r"\b(this|that|it|there|here|these|those|listed|where is|how far|how long|get there|reach)\b|यह|वह|वहाँ|कहाँ", re.I)
+RECO_Q = re.compile(r"where (should|can|do) (i|we) go|what should (i|we) (see|visit|do)|where to go|suggest|recommend|what to (see|visit)|best place|must see|kaha(n)? ja(u|un|yen)|कहाँ जाएँ|कहाँ जाऊँ|क्या देखें|सुझाव", re.I)
 HOW_KNOW_Q = re.compile(r"source|verif|how do you know|where .*(info|data|information)|trust|accurate|reliable|kaha se|kahan se|स्रोत|सत्यापि|कहाँ से|भरोसा", re.I)
 NEAR_Q = re.compile(r"\bnear|nearby|close to|around\b|पास", re.I)
 HOW_WE_KNOW = {
@@ -1081,17 +1082,29 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
     lang = "hi" if body.lang == "hi" else "en"
     tw = twists()
     ids = [h["id"] for h in rules.search_places(d, body.text)]
+    # "Where should I go?": the places the planner itself may use today (Level 1 or 2, open, no alert), Level 2 first.
+    # Never a search hit: that could name an unflagged place (Decision 28).
+    reco = not ids and bool(RECO_Q.search(body.text))
+    if reco:
+        ok = [p for p in d["places"] if guard_ok(p) and not live_alert(p, tw, lang)
+              and rules.check_feasibility(d, p["units"][0], day)["verdict"] != "not feasible"]
+        ids = [p["id"] for p in sorted(ok, key=lambda p: (p["guardrail"]["status"] != "level2"))][:3]
     # "Where is this listed?", "how do I get there?": a follow-up with no place name is about the last reply's places.
-    follow = not ids and (FOLLOW_Q.search(body.text) or len(body.text.split()) <= 6)
+    # Only when there was a last reply with places: in a new chat a short question is a new question.
+    follow = not ids and bool(body.lastPlaces) and bool(FOLLOW_Q.search(body.text) or len(body.text.split()) <= 6)
     if follow:
         ids = [pid for pid in body.lastPlaces if rules.get_place(d, pid)][:3]
     # A question about using the app only brings in places it names.
     how_to = bool(APP_Q.search(body.text)) and guide_for(body.text, lang)
-    for pid in ([] if (how_to and not ids) or follow else rag.places_for(city, body.text, lang)):
+    for pid in ([] if (how_to and not ids) or follow or reco else rag.places_for(city, body.text, lang)):
         if pid not in ids:
             ids.append(pid)
     pack = {"today": f"{day} ({datetime.fromisoformat(day).strftime('%A')})", "city": d["city"]["name"][lang],
             "places": [place_pack(d, rules.get_place(d, pid), lang, day, body.origin, tw) for pid in ids[:3] if rules.get_place(d, pid)]}
+    if reco:
+        pack["suggestedBecause"] = ("These are the places Plan my day can use today: their custodians publish them open and ticketed. "
+                                    "A place whose custodian asked for more visitors comes first. Others can be added by name.") if lang == "en" else             ("ये वे जगहें हैं जिन्हें 'मेरा दिन प्लान करो' आज इस्तेमाल कर सकता है: इनके संरक्षक इन्हें खुला और टिकट वाला बताते हैं। "
+             "जिस जगह के संरक्षक ने ज़्यादा आगंतुक चाहे, वह पहले है। बाकी जगहें नाम से जोड़ी जा सकती हैं।")
     if body.origin:
         pack["raahiStartsFrom"] = str(body.origin.get("name") or "")[:60]
     alerts = [{"place": p["name"][lang], "alert": a} for p in d["places"] if (a := live_alert(p, tw, lang))]
@@ -1279,6 +1292,8 @@ def system_prompt(body: ChatIn, city: str) -> str:
         "6k. Write Getting there only from fromYou. If a place has no fromYou, leave Getting there out: never give a travel time, distance or fare for it.",
         "6g. If a place has fromYou, give the time from the raahi's start (by auto, and on foot when given) and the autoFare, and call it an estimate.",
         "6h. If FACTS has howWeKnow, explain in plain words how the app knows and checks facts, using it.",
+        "6l. If FACTS has suggestedBecause, reply with a bold first line, then one bullet per place \"- **Name**: hours, today's verdict\", then one line with suggestedBecause in your own words, then offer Plan my day to fit them into their time. Never say there are no places.",
+        "6m. If FACTS has no places, no openToday and no cityNumbers, do not use the labelled bullets: answer in one or two plain lines and ask what they want to see.",
         "6j. If FACTS has weatherToday and it has a tip (heat, rain, strong sun), you may give that tip as Good to know.",
         "6i. If FACTS has nearby, name two or three of them with distance.",
         "6a. If FACTS has openToday, the reply is only: a bold first line; then up to 5 bullets \"- **Name**: hours\", adding \"(very crowded now)\" or the alert when that place has liveAlert, and listing places without an alert first; one line saying how many more are open and that the Map tab shows them all; the italic question. No other labels, no nested lists, never list a place twice. Places without hours on record are not listed. Do not say how sure each one is.",

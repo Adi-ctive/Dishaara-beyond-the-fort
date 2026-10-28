@@ -745,3 +745,19 @@ def test_chat_travel_without_a_start_is_rejected(monkeypatch):
     main.WRITER = lambda m: next(replies)
     r = c.post("/chat", json={"text": "Tell me about Teli ka Mandir", "history": [], "lang": "en", "prompt": [], "city": "gwalior"}).json()
     assert r["ai"] and "by auto" not in r["text"]
+
+
+def test_where_should_i_go_suggests_plannable_places_in_a_new_chat(monkeypatch):
+    body = main.ChatIn(text="where should i go", history=[], lang="en", prompt=[], city="gwalior")
+    pack, _ = main.retrieve(body)
+    ids = [p["id"] for p in pack["places"]]
+    assert ids and ids[0] == "teli-ka-mandir"  # Level 2 first
+    d = main.data("gwalior")
+    assert all(main.guard_ok(main.rules.get_place(d, i)) for i in ids)  # never an unflagged search hit
+    assert "suggestedBecause" in pack
+
+
+def test_short_new_question_is_not_a_follow_up():
+    body = main.ChatIn(text="tell me something nice", history=[], lang="en", prompt=[], city="gwalior", lastPlaces=[])
+    pack, _ = main.retrieve(body)
+    assert "suggestedBecause" not in pack

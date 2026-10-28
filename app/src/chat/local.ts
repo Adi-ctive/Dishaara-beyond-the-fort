@@ -14,6 +14,7 @@ const FEE = /ticket|fee|price|cost|₹|टिकट|शुल्क|कीमत
 const FOOD = /food|eat|lunch|snack|shop|souvenir|खाना|नाश्ता|दुकान/i;
 const FOLLOW = /(this|that|it|there|these|those|listed|where is|how far|how long|get there)|यह|वह|वहाँ|कहाँ/i;
 const MYDAY = /my (plan|day|roadmap|trip)|roadmap|schedule|timeline|budget|total cost|cost of (my|the) day|how much (will|does) (it|my day)|मेरा (प्लान|दिन)|रोडमैप|बजट|कुल खर्च/i;
+const RECO = /where (should|can|do) (i|we) go|what should (i|we) (see|visit|do)|where to go|suggest|recommend|what to (see|visit)|best place|must see|कहाँ जाएँ|कहाँ जाऊँ|क्या देखें|सुझाव/i;
 const LESSER = /hidden|lesser|less known|offbeat|quiet|unusual|छुपे|कम भीड़|अनजान/i;
 
 // Starter questions for the city on screen: the ticket chip names its first plannable place (Gwalior Fort, Central Museum...).
@@ -120,6 +121,24 @@ export function respond(text: string, data: Data, today: string, lang: Lang, las
   if (named.length) {
     const p = data.places.find((x) => x.id === named[0])!;
     return { text: placeCard(data, p, today, lang, tw), cards: [{ kind: 'place', id: p.id }], chips: starterChips(hi, data) };
+  }
+  // "Where should I go?": the places the planner may use today (custodian-published, Level 2 first), never a search hit.
+  if (RECO.test(text) && !named.length) {
+    const ok = data.places
+      .filter((p) => guardrail(p, today).ok && !p.units.some((u) => tw?.closed.includes(u.id) || tw?.crowded?.includes(u.id)) && verdictToday(data, p, today) !== 'not')
+      .sort((a, b) => Number(b.guardrail.status === 'level2') - Number(a.guardrail.status === 'level2'))
+      .slice(0, 3);
+    if (ok.length)
+      return {
+        text: [
+          hi ? '**आज ये जगहें आपके दिन में फ़िट हो सकती हैं:**' : '**These places can fit into your day today:**',
+          ...ok.map((p) => { const w = windowFor(data, p.units[0], today); return `- **${p.name[lang]}**: ${w ? `${fmt(w.open)} to ${fmt(w.close)}` : hi ? 'समय दर्ज नहीं' : 'hours not on record'}`; }),
+          hi ? 'इनके संरक्षक इन्हें खुला और टिकट वाला बताते हैं। बाकी जगहें नाम से जोड़ सकते हैं।' : 'Their custodians publish them open and ticketed. You can add any other place by name.',
+          hi ? '*इन्हें आपके समय में फ़िट करें?*' : '*Shall I fit them into your time?*',
+        ].join('\n'),
+        cards: [{ kind: 'places', ids: ok.map((p) => p.id) }, { kind: 'quick' }],
+        chips: starterChips(hi, data),
+      };
   }
   if (PLAN.test(text)) {
     const hours = trip.hours && trip.hours <= 12 ? Math.round(trip.hours) : undefined;
