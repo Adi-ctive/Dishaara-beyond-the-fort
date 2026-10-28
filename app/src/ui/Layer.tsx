@@ -11,6 +11,9 @@ export function LayerPage({ title, children, actions }: { title?: string; childr
   return (
     <motion.div
       className="layer"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
       initial={still ? { opacity: 0 } : { x: '100%' }}
       animate={still ? { opacity: 1 } : { x: 0 }}
       exit={still ? { opacity: 0 } : { x: '100%' }}
@@ -20,7 +23,7 @@ export function LayerPage({ title, children, actions }: { title?: string; childr
         <button className="icon-btn" onClick={back} aria-label="Back">
           <Icon name="back" size={20} />
         </button>
-        {title && <h2 className="layer-title">{title}</h2>}
+        {title && <h1 className="layer-title">{title}</h1>}
         <div className="layer-actions">{actions}</div>
       </div>
       <div className="layer-body">{children}</div>
@@ -31,7 +34,7 @@ export function LayerPage({ title, children, actions }: { title?: string; childr
 export function Section({ title, children, note }: { title: string; children: ReactNode; note?: string }) {
   return (
     <section className="section">
-      <h3 className="section-title">{title}</h3>
+      <h2 className="section-title">{title}</h2>
       {note && <p className="muted small section-note">{note}</p>}
       {children}
     </section>

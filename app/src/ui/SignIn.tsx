@@ -95,11 +95,12 @@ export function SignInCard({ compact = false, team = false, onUser }: { compact?
     setBusy(true);
     api.signInDemo('Raahi').then(done);
   };
+  const [byEmail, setByEmail] = useState(false);
   const staffSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     setErr('');
-    api.signInStaff(user.trim(), pw).then((u) => {
+    (byEmail ? api.signInEmail(user.trim(), pw) : api.signInStaff(user.trim(), pw)).then((u) => {
       setPw('');
       done(u);
     });
@@ -123,12 +124,19 @@ export function SignInCard({ compact = false, team = false, onUser }: { compact?
         </button>
       )}
       {!staff && !google && !demo && <small className="muted">{tr('Sign-in is not available right now.', 'अभी साइन इन उपलब्ध नहीं है।')}</small>}
-      {apiOn() && staff && (
+      {apiOn() && (staff || byEmail) && (
         <form className="staff-form" onSubmit={staffSignIn}>
-          <input value={user} onChange={(e) => setUser(e.target.value)} placeholder={tr('Team username', 'टीम यूज़रनेम')} autoComplete="username" required />
-          <input value={pw} onChange={(e) => setPw(e.target.value)} type="password" placeholder={tr('Password', 'पासवर्ड')} autoComplete="current-password" required />
-          <button className="btn primary" disabled={busy}>{tr('Team sign-in', 'टीम साइन इन')}</button>
+          <label className="sr-only" htmlFor="signin-user">{staff ? tr('Team username', 'टीम यूज़रनेम') : tr('Email', 'ईमेल')}</label>
+          <input id="signin-user" value={user} onChange={(e) => setUser(e.target.value)} placeholder={staff ? tr('Team username', 'टीम यूज़रनेम') : tr('Email', 'ईमेल')} type={staff ? 'text' : 'email'} autoComplete={staff ? 'username' : 'email'} required />
+          <label className="sr-only" htmlFor="signin-pw">{tr('Password', 'पासवर्ड')}</label>
+          <input id="signin-pw" value={pw} onChange={(e) => setPw(e.target.value)} type="password" placeholder={tr('Password', 'पासवर्ड')} autoComplete="current-password" required />
+          <button className="btn primary" disabled={busy}>{staff ? tr('Team sign-in', 'टीम साइन इन') : tr('Sign in with email', 'ईमेल से साइन इन')}</button>
         </form>
+      )}
+      {apiOn() && !staff && !byEmail && (
+        <button type="button" className="link small" onClick={() => setByEmail(true)}>
+          {tr('Test account? Sign in with email', 'टेस्ट अकाउंट? ईमेल से साइन इन करें')}
+        </button>
       )}
       {err && <small className="err">{err}</small>}
     </div>

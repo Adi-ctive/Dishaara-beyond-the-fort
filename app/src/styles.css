@@ -123,7 +123,7 @@ a { color: inherit; }
 .theme-swatches { display: flex; }
 .theme-swatches i { width: 24px; height: 24px; border-radius: 50%; margin-right: -6px; border: 2px solid rgba(255, 255, 255, .6); }
 .theme-name { font-family: var(--serif); font-size: 17px; font-weight: 600; }
-.theme-hint { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+.theme-hint { display: flex; align-items: center; gap: 4px; font-size: 12px; color: color-mix(in srgb, var(--muted) 75%, var(--ink)); }
 .theme-check { position: absolute; top: 12px; right: 12px; }
 .mode-row { display: flex; justify-content: center; margin-top: 14px; }
 .pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; }
@@ -168,7 +168,7 @@ a { color: inherit; }
 .say.playing { color: var(--accent); }
 @keyframes say-wait { 50% { opacity: .35; } }
 .streak-pill { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 800; background: color-mix(in srgb, #ff7a2f 18%, var(--surface)); color: #d9561c; }
-.next-unlock { display: block; margin-top: 4px; font-weight: 700; color: var(--accent); }
+.next-unlock { display: block; margin-top: 4px; font-weight: 700; color: color-mix(in srgb, var(--accent) 50%, var(--ink)); }
 .my-rank { display: flex; align-items: baseline; gap: 8px; }
 .my-rank b { font-size: 28px; }
 .leaders { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }

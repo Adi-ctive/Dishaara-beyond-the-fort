@@ -89,7 +89,7 @@ function AddToDay() {
   if (!options.length) return null;
   return (
     <section className="add-to-day">
-      <h3 className="section-title">{hi ? 'अपने दिन में जोड़ें' : 'Add to your day'}</h3>
+      <h2 className="section-title">{hi ? 'अपने दिन में जोड़ें' : 'Add to your day'}</h2>
       <p className="small muted">{hi ? 'आज खुली जगहें जिन्हें हम अपने आप नहीं जोड़ते। टैप करें, रोडमैप में फ़िट हो जाएँगी।' : 'Open today, but not added by us on our own. Tap to add, and the roadmap fits them in.'}</p>
       {options.map(({ p, w, km }) => (
         <div key={p.id} className="card row">
@@ -131,7 +131,7 @@ function Breakdown({ plan, data, lang }: { plan: Plan; data: Data; lang: 'en' | 
   return (
     <details className="breakdown">
       <summary>{hi ? 'यह कैसे निकला: हर रुपया और मिनट' : 'How this is worked out: every rupee and minute'}</summary>
-      <h4>{hi ? 'टिकट' : 'Tickets'}</h4>
+      <h3>{hi ? 'टिकट' : 'Tickets'}</h3>
       <ul>
         {plan.stops.map((st) => {
           if (seen.has(st.unit.ticket)) {
@@ -152,12 +152,12 @@ function Breakdown({ plan, data, lang }: { plan: Plan; data: Data; lang: 'en' | 
           );
         })}
       </ul>
-      <h4>{hi ? 'सवारी' : 'Rides'}</h4>
+      <h3>{hi ? 'सवारी' : 'Rides'}</h3>
       <ul>
         {plan.stops.map((st, i) => legLine(st.leg, names[i], names[i + 1]))}
         {plan.returnLeg && legLine(plan.returnLeg, names[names.length - 1], names[0])}
       </ul>
-      <h4>{hi ? 'समय' : 'Time at each place'}</h4>
+      <h3>{hi ? 'समय' : 'Time at each place'}</h3>
       <ul>
         {plan.stops.map((st) => {
           const w = windowFor(data, st.unit, plan.input.date);

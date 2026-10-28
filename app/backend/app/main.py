@@ -79,7 +79,24 @@ def boot() -> None:
     global _booted
     if not _booted:
         seed_demo()
+        seed_testers()
         _booted = True
+
+
+def seed_testers() -> None:
+    """Each test account starts with its own data (a saved chat, a shop for the business one), different per
+    account, so a scan signed in as two of them can tell whether one can reach the other's records."""
+    db = get_db()
+    for u in auth.sync_testers():
+        tag = u["name"]
+        if not db.chats.find_one({"user": u["_id"]}):
+            db.chats.insert_one({"_id": f"test-{u['_id'][:12]}", "user": u["_id"], "title": f"{tag}: what is open today", "city": "gwalior",
+                                 "summary": f"Asked: what is open today ({tag})", "count": 1, "updated": now(),
+                                 "msgs": [{"id": 1, "role": "user", "text": f"What is open today? ({tag})", "at": None, "cards": [], "chips": []}]})
+        if "business" in u["roles"] and not db.business.find_one({"owner": u["_id"]}):
+            # status "test": the owner can edit it, it never shows in the Bazaar.
+            db.business.insert_one({"_id": f"btest{u['_id'][:6]}", "owner": u["_id"], "ownerName": tag, "name": f"{tag} shop", "kind": "food",
+                                    "city": "gwalior", "near": "", "details": "Test shop for outside security testing. Not listed.", "status": "test", "at": now()})
 
 
 @app.middleware("http")
@@ -198,6 +215,20 @@ class StaffIn(BaseModel):
 def sign_in_staff(body: StaffIn):
     """Direct sign-in for the moderators. Accounts are made with admin.py, never through the API."""
     u = auth.staff_login(body.username, body.password)
+    return {"token": auth.issue(u["_id"]), "user": auth.public(u)}
+
+
+class EmailIn(BaseModel):
+    email: str = Field(min_length=5, max_length=120)
+    password: str = Field(min_length=1, max_length=200)
+
+
+@app.post("/auth/email")
+def sign_in_email(body: EmailIn):
+    """Email and password sign-in, only for the test accounts in TEST_LOGINS (raahis use Google)."""
+    u = auth.staff_login(body.email.strip(), body.password, kind="test")
+    if not u.get("roles"):
+        raise HTTPException(403, "this test account is closed")
     return {"token": auth.issue(u["_id"]), "user": auth.public(u)}
 
 

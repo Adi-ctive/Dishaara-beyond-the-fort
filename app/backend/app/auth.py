@@ -8,6 +8,7 @@ role change takes effect at once.
 """
 from __future__ import annotations
 
+import json
 import os
 import secrets
 import time
@@ -93,17 +94,45 @@ def make_staff(username: str, name: str, pw: str) -> dict:
     return new_user(kind="staff", username=username.lower(), name=name, pwHash=hash_pw(pw), roles=STAFF_ROLES)
 
 
-def staff_login(username: str, pw: str) -> dict:
+def staff_login(username: str, pw: str, kind: str = "staff") -> dict:
     db = get_db()
     key = f"login:{username.lower()}"
     since = now() - timedelta(minutes=15)
     if db.hits.count_documents({"user": key, "action": "fail", "at": {"$gte": since}}) >= 8:
         raise HTTPException(429, "too many tries, wait 15 minutes")
-    u = db.users.find_one({"username": username.lower(), "kind": "staff"})
+    u = db.users.find_one({"username": username.lower(), "kind": kind})
     if not u or not bcrypt.checkpw(pw.encode(), u["pwHash"].encode()):
         db.hits.insert_one({"user": key, "action": "fail", "at": now()})
         raise HTTPException(401, "wrong username or password")
     return u
+
+
+# ---------------- test logins ----------------
+TESTER_ROLES = {"raahi", "saarthi", "business"}  # never moderator
+
+
+def sync_testers() -> list[dict]:
+    """Email and password accounts for outside testers (ArgosX Pro scans cannot click through Google sign-in).
+    They come from the TEST_LOGINS server setting: a JSON list of {email, name, roles, hash}, where hash is a
+    bcrypt hash, so no password is stored in plain text anywhere. Removing a row from the setting does not
+    delete the account: set its roles to [] to shut it."""
+    raw = os.getenv("TEST_LOGINS")
+    if not raw:
+        return []
+    out = []
+    db = get_db()
+    for t in json.loads(raw):
+        email = t["email"].strip().lower()
+        roles = [r for r in t.get("roles", ["raahi"]) if r in TESTER_ROLES]
+        fields = {"pwHash": t["hash"], "roles": roles, "name": t.get("name", "Tester"), "email": email}
+        u = db.users.find_one({"username": email, "kind": "test"})
+        if u:
+            db.users.update_one({"_id": u["_id"]}, {"$set": fields})
+            u = db.users.find_one({"_id": u["_id"]})
+        else:
+            u = new_user(kind="test", username=email, **fields)
+        out.append(u)
+    return out
 
 
 # ---------------- request helpers ----------------

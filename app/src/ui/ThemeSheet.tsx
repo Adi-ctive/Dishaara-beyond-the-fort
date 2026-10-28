@@ -34,7 +34,7 @@ export function ThemeSheet({ open, onClose }: { open: boolean; onClose: () => vo
                 <i style={{ background: tk.surface }} />
               </span>
               <span className="theme-name">{th.name[lang]}</span>
-              <span className="theme-hint" style={{ color: tk.muted }}>
+              <span className="theme-hint" style={{ color: `color-mix(in srgb, ${tk.muted} 70%, ${tk.ink})` }}>
                 {open ? (th.unlock.kind === 'season' ? unlockHint(th, lang) : '') : (
                   <>
                     <Icon name="lock" size={12} /> {unlockHint(th, lang)}

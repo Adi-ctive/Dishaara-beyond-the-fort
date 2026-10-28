@@ -244,6 +244,7 @@ export function ChatTab() {
 
   return (
     <div className="screen chat">
+      {msgs.length > 0 && <h1 className="sr-only">{hi ? 'यात्रा से चैट' : 'Chat with Yatra'}</h1>}
       <div className="chat-bar">
         <button type="button" className="chip" onClick={showPast}><Icon name="clock" size={14} /> {hi ? 'पिछली चैट' : 'Past chats'}</button>
         {msgs.length > 0 && <button type="button" className="chip" onClick={newChat}><Icon name="sparkle" size={14} /> {hi ? 'नई चैट' : 'New chat'}</button>}

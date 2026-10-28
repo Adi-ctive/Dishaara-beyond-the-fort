@@ -197,7 +197,7 @@ export function Rewards() {
             return (
               <button key={t.id} className={`theme-tile${on ? '' : ' locked'}`} style={{ background: t.light.bg, color: t.light.ink, borderColor: t.light.line }} onClick={(e) => on && setTheme(t.id, { x: e.clientX, y: e.clientY })}>
                 <span className="theme-name">{t.name[lang]}</span>
-                <span className="theme-hint" style={{ color: t.light.muted }}>{on ? (hi ? 'खुला' : 'Unlocked') : <><Icon name="lock" size={12} /> {unlockHint(t, lang)}</>}</span>
+                <span className="theme-hint" style={{ color: `color-mix(in srgb, ${t.light.muted} 70%, ${t.light.ink})` }}>{on ? (hi ? 'खुला' : 'Unlocked') : <><Icon name="lock" size={12} /> {unlockHint(t, lang)}</>}</span>
               </button>
             );
           })}

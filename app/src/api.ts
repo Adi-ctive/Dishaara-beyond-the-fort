@@ -120,6 +120,7 @@ export const api = {
   signInGoogle: async (credential: string) => signedIn(await call<{ token: string; user: Me }>('POST', '/auth/google', { credential })),
   signInDemo: async (name: string) => signedIn(await call<{ token: string; user: Me }>('POST', '/auth/google', { name })),
   signInStaff: async (username: string, password: string) => signedIn(await call<{ token: string; user: Me }>('POST', '/auth/staff', { username, password })),
+  signInEmail: async (email: string, password: string) => signedIn(await call<{ token: string; user: Me }>('POST', '/auth/email', { email, password })),
   me: () => (token() ? call<Me>('GET', '/me') : Promise.resolve(null)),
   signOut: () => keep(null),
   putProfile: (p: { interests?: string[]; prefs?: object; prompt?: string[]; avatar?: string; frame?: string; banner?: string; city?: string }) => call('PUT', '/me/profile', p),

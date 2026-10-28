@@ -354,6 +354,9 @@ export function PlaceStory({ id }: { id: string }) {
       </div>
       <motion.div
         className="st-stage"
+        tabIndex={0}
+        role="region"
+        aria-label={`${p.name[lang]}, ${i + 1}/${n}`}
         onClick={tap}
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}

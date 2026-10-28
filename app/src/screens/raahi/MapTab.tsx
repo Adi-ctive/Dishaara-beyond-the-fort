@@ -167,11 +167,11 @@ export function MapTab() {
           <p className="small muted">
             {road === true ? (hi ? 'रास्ता OpenStreetMap से। समय हमारा अनुमान है।' : 'Road shape from OpenStreetMap routing. Times are our estimates.') : road === false ? (hi ? 'रास्ता नहीं मिला, सीधी रेखाएँ दिखाईं।' : 'Routing unavailable, showing straight lines.') : hi ? 'रोडमैप बनाने पर रास्ता दिखेगा।' : 'Make a roadmap to see the route.'}
           </p>
-          <div className="map-strip" role="list">
+          <div className="map-strip" role="group" aria-label={hi ? 'जगहें' : 'Places'}>
             {data.places.map((p) => {
               const v = VERDICT_TEXT[checkUnit(data, p.units[0], today).verdict];
               return (
-                <button key={p.id} role="listitem" className={`strip-card${sel === p.id ? ' on' : ''}`} style={{ ['--pc1' as string]: artFor(p.id).sky[0] }} onClick={() => choose(p.id)}>
+                <button key={p.id} className={`strip-card${sel === p.id ? ' on' : ''}`} style={{ ['--pc1' as string]: artFor(p.id).sky[0] }} onClick={() => choose(p.id)}>
                   <PlaceCover id={p.id} height={64} />
                   <b>{p.name[lang]}</b>
                   <span className={`verdict ${v.tone}`}>{v[lang]}</span>

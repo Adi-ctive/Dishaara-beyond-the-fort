@@ -72,11 +72,13 @@ export function Tour({ ready }: { ready: boolean }) {
   const [vw, setVw] = useState(() => window.innerWidth);
 
   // First entry for each role: once nothing else is open (the raahi's interests screen comes first).
+  // Outside test accounts (security scanners) never get it on their own: it would sit over every screen they test.
+  const tester = s.user?.kind === 'test';
   useEffect(() => {
-    if (!ready || layers.length || i !== null || seen(s.role)) return;
+    if (!ready || tester || layers.length || i !== null || seen(s.role)) return;
     const t = setTimeout(() => setI(0), 900);
     return () => clearTimeout(t);
-  }, [ready, layers.length, s.role, i]);
+  }, [ready, tester, layers.length, s.role, i]);
   useEffect(() => {
     const replay = () => {
       closeAll();

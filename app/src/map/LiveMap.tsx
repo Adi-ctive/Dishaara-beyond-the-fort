@@ -257,5 +257,5 @@ export function LiveMap({ data, plan, ids, stamps, tokens, lang, me, onPick, onR
   }, [ready, me]);
 
   if (failed) return <div className="map-failed">Map tiles could not load. Showing the sketch map is the offline option.</div>;
-  return <div ref={box} className="live-map" role="region" aria-label="Map" />;
+  return <div ref={box} className="live-map" role="region" aria-label="Live map of places" />;
 }
