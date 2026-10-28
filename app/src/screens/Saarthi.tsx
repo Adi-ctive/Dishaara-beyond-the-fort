@@ -117,6 +117,66 @@ export function ProofThumb({ url, type }: { url: string; type: string }) {
   return <a href={url} target="_blank" rel="noreferrer"><img src={url} alt="Proof" className="proof-thumb" /></a>;
 }
 
+// The saarthi's own entries with their review status. Photos or clips can be added while an entry still waits,
+// so a report filed from notes on the day gets its proof once the photos are off the phone.
+function MyEntries({ refresh }: { refresh: string }) {
+  const { data } = useStore();
+  const { lang } = useTheme();
+  const tr = useTr();
+  const [rows, setRows] = useState<Awaited<ReturnType<typeof api.myFacts>>>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [note, setNote] = useState('');
+  const load = () => api.myFacts().then(setRows);
+  useEffect(() => {
+    load();
+  }, [refresh]);
+  const attach = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = [...(e.target.files ?? [])];
+    e.target.value = '';
+    if (!files.length) return;
+    setBusy(id);
+    const ids: string[] = [];
+    for (const f of files.slice(0, 5)) {
+      if (!f.type.startsWith('image/') && f.size > 4_000_000) {
+        setNote(tr(`${f.name} is over 4 MB. Send a shorter clip.`, `${f.name} 4 MB से बड़ी है। छोटी क्लिप भेजें।`));
+        continue;
+      }
+      const pid = f.type.startsWith('image/') ? await uploadProof(await shrink(f)) : await uploadProof(f, f.name || 'clip');
+      if (pid) ids.push(pid);
+      else setNote(lastError);
+    }
+    if (ids.length && (await api.addProofLater(id, ids))) setNote(tr(`Added ${ids.length} to the entry.`, `एंट्री में ${ids.length} जोड़े।`));
+    setBusy(null);
+    load();
+  };
+  if (!rows?.length) return null;
+  const STATUS: Record<string, [string, string]> = { review: ['With a moderator', 'मॉडरेटर के पास'], pending: ['With a saarthi', 'सारथी के पास'], approved: ['Approved', 'मंज़ूर'], flagged: ['Flagged', 'फ़्लैग'], rejected: ['Rejected', 'नामंज़ूर'] };
+  return (
+    <Section title={tr('My entries', 'मेरी एंट्री')} note={tr('Add photos or short clips to an entry while it waits for review.', 'समीक्षा से पहले एंट्री में फ़ोटो या छोटी क्लिप जोड़ें।')}>
+      {note && <p className="small muted">{note}</p>}
+      {rows.map((v) => {
+        const open = v.status === 'review' || v.status === 'pending';
+        const where = v.place === 'city' ? tr('Whole city', 'पूरा शहर') : data.places.find((p) => p.id === v.place)?.name[lang] ?? v.place;
+        return (
+          <div key={v.id} className="card col my-entry" data-entry={v.id}>
+            <b>{where} · {v.field}</b>
+            <small>{v.value}</small>
+            <span className="row-actions">
+              <span className="small muted">{tr(...(STATUS[v.status] ?? [v.status, v.status]))} · {v.proofCount} {tr('proof', 'सबूत')}</span>
+              {open && (
+                <label className="btn ghost small">
+                  {busy === v.id ? tr('Uploading…', 'अपलोड हो रहा…') : tr('Add photo or video', 'फ़ोटो या वीडियो जोड़ें')}
+                  <input type="file" accept="image/*,video/*,audio/*" multiple hidden onChange={(e) => attach(v.id, e)} disabled={busy !== null} />
+                </label>
+              )}
+            </span>
+          </div>
+        );
+      })}
+    </Section>
+  );
+}
+
 // A3: what to collect (every missing or weak fact, from the database), and the form, field by field.
 // In a saarthi's first week each entry goes to a moderator; after that, to another saarthi of the region.
 export function SaarthiForm() {
@@ -199,6 +259,7 @@ export function SaarthiForm() {
           </details>
         ))}
       </Section>
+      <MyEntries refresh={sent} />
       <div id="saarthi-form" />
       <label className="field"><span>{tr('Place', 'जगह')}</span>
         <select value={place} onChange={(e) => { setPlace(e.target.value); setUnit(null); setField(e.target.value === 'city' ? CITY_FIELDS[0][0] : FIELDS[0][0]); }}>

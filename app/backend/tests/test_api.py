@@ -778,3 +778,20 @@ def test_city_tip_and_place_note_go_through_review():
     assert bt["activities"][0]["s"] == "locally verified" and not main.guard_ok(bt)
     cities.import_city("gwalior")  # a redeploy keeps approved city tips
     assert "localTips" in main.retrieve(body)[0]
+
+
+def test_saarthi_adds_proof_to_a_filed_entry():
+    a, b = staff("aditya", "Aditya"), staff("priyangi", "Priyangi")
+    e = c.post("/facts", json={"placeId": "moti-mahal", "field": "Good to know", "value": "10 minutes per section.", "label": "locally verified"}, headers=a).json()
+    pid = c.post("/proofs", files={"file": ("t.jpg", b"\xff\xd8\xff" + b"0" * 100, "image/jpeg")}, headers=a).json()["id"]
+    assert c.post(f"/facts/{e['id']}/proof", json={"proof": [pid]}, headers=b).status_code == 404  # not hers
+    assert c.post(f"/facts/{e['id']}/proof", json={"proof": [pid]}, headers=a).json()["proof"] == [pid]
+    assert main.get_db().queue.find_one({"_id": f"m-fact-{e['id']}"})["proof"] == [pid]
+    assert next(x for x in c.get("/facts/mine", headers=a).json() if x["id"] == e["id"])["proofCount"] == 1
+
+
+def test_news_keeps_local_visitor_news_only():
+    keep = ["Rajwada to stay closed for restoration till November", "Indore: traffic diverted near Rajwada for Diwali procession"]
+    drop = ["Lula bucks the rightward tide in Latin America", "Pune techie travels to Indore firm, realises he lost Rs 2.17 crore in stock scam"]
+    assert not any(main.junk_news(t, "The Indian Express", "indore") for t in keep)
+    assert all(main.junk_news(t, "The Indian Express", "indore") for t in drop)

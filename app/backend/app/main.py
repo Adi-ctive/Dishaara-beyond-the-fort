@@ -646,7 +646,7 @@ def fetch_news(city: str) -> None:
         pub = (re.search(r"<pubDate>(.*?)</pubDate>", it, re.S) or [None, ""])[1].strip()
         title, src = html.unescape(title), html.unescape(src)
         title = re.sub(rf"\s+-\s+{re.escape(src)}$", "", title).strip()  # Google appends " - Source"
-        if junk_news(title, src) or stale_news(pub):
+        if junk_news(title, src, city) or stale_news(pub):
             continue
         try:
             when = parsedate_to_datetime(pub).astimezone(IST).strftime("%d %b %Y %H:%M")
@@ -657,7 +657,7 @@ def fetch_news(city: str) -> None:
                                                            "published": pub, "at": when, "ts": news_ts(pub), "status": "pending"}}, upsert=True)
     # Clear older pending items that today's filter would have dropped.
     for n in db.news.find({"city": city, "status": "pending"}, {"en": 1, "source": 1}):
-        if junk_news(n["en"], n.get("source", "")):
+        if junk_news(n["en"], n.get("source", ""), city):
             db.news.delete_one({"_id": n["_id"]})
 
 
@@ -680,10 +680,26 @@ def stale_news(pub: str) -> bool:
         return False
 
 
-def junk_news(title: str, src: str) -> bool:
-    """Not news a visitor needs: videos, weather or air-quality widget pages, and pages titled only with a place name."""
+# What a visitor can act on: getting around, closures, crowds, events, the places themselves.
+NEWS_TOPIC = re.compile(r"traffic|road|route|divert|diversion|jam|closed|closure|shut|reopen|open(s|ed)? (to|for)|ban|curfew|protest|bandh|strike|"
+                        r"festival|mela|fair|utsav|event|celebrat|procession|holiday|diwali|navratri|dussehra|holi|"
+                        r"touris|visitor|heritage|monument|fort|palace|temple|museum|zoo|lake|dam|garden|park|light and sound|ticket|"
+                        r"station|railway|train|airport|flight|bus|metro|auto|rickshaw|cab|fare|"
+                        r"rain|flood|heat|cold wave|fog|storm|alert|crowd|stampede|safety|police advisory|hotel|food street|market", re.I)
+
+
+def junk_news(title: str, src: str, city: str | None = None) -> bool:
+    """Not news a visitor needs: videos, weather or air-quality widget pages, pages titled only with a place name, and,
+    for a city, headlines that are not about that city or not about anything a visitor acts on (Google files national
+    stories under a city section: "Lula bucks the rightward tide" under Indore)."""
     if not title or src in NEWS_SKIP_SOURCES:
         return True
+    if city in cities.CITY_IDS:
+        d = data(city)
+        local = [d["city"]["name"]["en"]] + [p["name"]["en"].split(" (")[0].split(",")[0] for p in d["places"]]
+        here = any(re.search(rf"\b{re.escape(n)}\b", title, re.I) for n in local if len(n) > 3)
+        if not here or not (NEWS_TOPIC.search(title) or any(re.search(rf"\b{re.escape(n)}\b", title, re.I) for n in local[1:] if len(n) > 3)):
+            return True
     if re.search(r"forecast|weather today|air quality|\bAQI\b|#vlog|youtube|hourly|10[- ]day", title, re.I):
         return True
     bare = re.sub(rf"\s+-\s+{re.escape(src)}$", "", title)
@@ -1131,7 +1147,7 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
         w = weather_alert(city)
         if w:
             pack["weatherToday"] = w[lang]
-    if re.search(r"open|open (today|now)|what.*open|खुल", body.text, re.I):
+    if re.search(r"\bopen\b|open (today|now)|what.*open|खुल", body.text, re.I):
         pack["openToday"] = open_today(d, lang, day, tw)
         pack["places"] = []  # the compact list answers it; full records would overflow the free tier's per-minute limit
         ids += [p["id"] for p in d["places"] if p["name"][lang] in {o["name"] for o in pack["openToday"]} and p["id"] not in ids]
@@ -1494,6 +1510,34 @@ def add_fact(body: FactIn, me: dict | None = Depends(current)):
     return {**strip(e), "route": "moderator" if new else "saarthi"}
 
 
+class ProofAdd(BaseModel):
+    proof: list[str] = Field(min_length=1, max_length=5)
+
+
+@app.post("/facts/{vid}/proof")
+def add_proof_later(vid: str, body: ProofAdd, me: dict | None = Depends(current)):
+    """A saarthi adds photos or clips to their own entry while it still waits for review (filed first, proof later)."""
+    me = need(me, "saarthi")
+    db = get_db()
+    v = db.verify.find_one({"_id": vid})
+    if not v or v.get("byUser") != me["_id"]:
+        raise HTTPException(404, "no such entry of yours")
+    if v.get("status") not in ("review", "pending"):
+        raise HTTPException(409, "this entry was already reviewed")
+    mine = [x for x in body.proof if db.proofs.find_one({"_id": x, "by": me["_id"]}, {"_id": 1})]
+    proof = list(dict.fromkeys((v.get("proof") or []) + mine))[:8]
+    db.verify.update_one({"_id": vid}, {"$set": {"proof": proof}})
+    db.queue.update_one({"_id": f"m-fact-{vid}"}, {"$set": {"proof": proof}})
+    return strip(db.verify.find_one({"_id": vid}))
+
+
+@app.get("/facts/mine")
+def my_facts(me: dict | None = Depends(current)):
+    """The saarthi's own entries, newest first, with their review status and how many proofs each has."""
+    me = need(me, "saarthi")
+    return [{**strip(v), "proofCount": len(v.get("proof") or [])} for v in get_db().verify.find({"byUser": me["_id"]}).sort("at", -1).limit(60)]
+
+
 PROBATION_DAYS = 7
 
 
@@ -1828,8 +1872,8 @@ def mod_news(me: dict | None = Depends(current)):
     for c in cities.CITY_IDS:
         fetch_news(c)
     db = get_db()
-    for n in db.news.find({"status": "pending"}, {"en": 1, "source": 1, "published": 1}):
-        if junk_news(n["en"], n.get("source", "")) or stale_news(n.get("published", "")):
+    for n in db.news.find({"status": "pending"}, {"en": 1, "source": 1, "published": 1, "city": 1}):
+        if junk_news(n["en"], n.get("source", ""), n.get("city")) or stale_news(n.get("published", "")):
             db.news.delete_one({"_id": n["_id"]})
             continue
         # Items saved before 25 Oct evening: drop the " - Source" tail and show the publish time.

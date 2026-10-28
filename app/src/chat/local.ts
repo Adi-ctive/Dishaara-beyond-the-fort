@@ -12,7 +12,7 @@ const PLAN = /plan|itinerar|trip|day out|hours?\b|roadmap|घंटे|प्ल
 const OPEN = /open|today|खुला|आज/i;
 const FEE = /ticket|fee|price|cost|₹|टिकट|शुल्क|कीमत/i;
 const FOOD = /food|eat|lunch|snack|shop|souvenir|खाना|नाश्ता|दुकान/i;
-const FOLLOW = /(this|that|it|there|these|those|listed|where is|how far|how long|get there)|यह|वह|वहाँ|कहाँ/i;
+const FOLLOW = /\b(this|that|it|there|these|those|listed|where is|how far|how long|get there)\b|यह|वह|वहाँ|कहाँ/i;
 const MYDAY = /my (plan|day|roadmap|trip)|roadmap|schedule|timeline|budget|total cost|cost of (my|the) day|how much (will|does) (it|my day)|मेरा (प्लान|दिन)|रोडमैप|बजट|कुल खर्च/i;
 const RECO = /where (should|can|do) (i|we) go|what should (i|we) (see|visit|do)|where to go|suggest|recommend|what to (see|visit)|best place|must see|कहाँ जाएँ|कहाँ जाऊँ|क्या देखें|सुझाव/i;
 const LESSER = /hidden|lesser|less known|offbeat|quiet|unusual|छुपे|कम भीड़|अनजान/i;
@@ -99,7 +99,7 @@ export function planTable(plan: Plan, lang: Lang, payment: 'cash' | 'online' = '
 export function respond(text: string, data: Data, today: string, lang: Lang, last: string[] = [], plan?: Plan | null, payment: 'cash' | 'online' = 'cash', tw?: Alerts): Reply {
   const hi = lang === 'hi';
   // "My plan", "budget", "schedule" with a roadmap made: the whole day as a table. Without one, the planner below answers.
-  if (MYDAY.test(text) && !/plan (my|a|the) day|प्लान करो/i.test(text) && !rankedPlaces(data, text).length && plan?.stops.length)
+  if (MYDAY.test(text) && !/\bplan (my|a|the) day\b|प्लान करो/i.test(text) && !rankedPlaces(data, text).length && plan?.stops.length)
     return { text: planTable(plan, lang, payment), cards: [{ kind: 'roadmap' }], chips: starterChips(hi, data) };
   // A follow-up with no place name ("how much is it?") is about the places the last reply showed.
   const named = rankedPlaces(data, text).length ? rankedPlaces(data, text) : FOLLOW.test(text) ? last.filter((id) => data.places.some((p) => p.id === id)) : [];
