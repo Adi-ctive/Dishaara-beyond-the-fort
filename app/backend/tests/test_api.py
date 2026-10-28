@@ -728,3 +728,12 @@ def test_chat_cards_only_for_places_the_reply_names(monkeypatch):
 def test_chat_prompt_says_it_only_remembers_this_chat():
     body = main.ChatIn(text="do you remember me", history=[], lang="en", prompt=[])
     assert "You have only these summaries" in main.system_prompt(body, "Gwalior")
+
+
+def test_daily_cron_pulls_news_for_every_city(monkeypatch):
+    pulled = []
+    monkeypatch.setattr(main, "fetch_news", lambda city: pulled.append(city))
+    assert c.get("/cron/news").json()["ok"] and sorted(pulled) == sorted(cities.CITY_IDS)
+    monkeypatch.setenv("CRON_SECRET", "s3cret")
+    assert c.get("/cron/news").status_code == 401
+    assert c.get("/cron/news", headers={"Authorization": "Bearer s3cret"}).status_code == 200

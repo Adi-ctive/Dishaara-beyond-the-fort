@@ -20,7 +20,7 @@ from pathlib import Path
 
 import httpx
 from bson.binary import Binary
-from fastapi import Depends, FastAPI, File, Form, HTTPException, Response, UploadFile
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -689,6 +689,20 @@ def junk_news(title: str, src: str) -> bool:
     bare = re.sub(rf"\s+-\s+{re.escape(src)}$", "", title)
     # "Indore, Madhya Pradesh, India": only place words, no news in it
     return bool(re.fullmatch(r"[A-Za-z .]+(,\s*[A-Za-z .]+){1,3}", bare)) and len(bare.split()) <= 6
+
+
+@app.get("/cron/news")
+def cron_news(authorization: str | None = Header(None)):
+    """Vercel Cron calls this once a day (vercel.json), so news reaches the moderators even when nobody opens the app.
+    Harmless if anyone else calls it: each city pulls at most once per 6-hour slot. With CRON_SECRET set on the
+    server, only Vercel's call (which sends that secret) is accepted."""
+    secret = os.getenv("CRON_SECRET")
+    if secret and authorization != f"Bearer {secret}":
+        raise HTTPException(401, "cron only")
+    boot()
+    for c in cities.CITY_IDS:
+        fetch_news(c)
+    return {"ok": True, "pending": get_db().news.count_documents({"status": "pending"})}
 
 
 @app.get("/alerts")

@@ -9,6 +9,12 @@
       "includeFiles": "{backend/app/**,src/data/*.json}"
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/news",
+      "schedule": "30 0 * * *"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
