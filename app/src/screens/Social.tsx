@@ -3,7 +3,7 @@
 // reporting and check-ins need an account (useGate opens sign-in).
 import { motion } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
-import { api, apiOn, lastError, mediaUrl, type SaarthiPage as SaarthiData, type ServerComment, type ServerPost, type Shop } from '../api';
+import { api, apiOn, lastError, mediaUrl, uploadPostPhoto, type SaarthiPage as SaarthiData, type ServerComment, type ServerPost, type Shop } from '../api';
 import { Avatar, Banner } from '../art/Avatars';
 import { BizCover, BizIcon } from '../art/BizArt';
 import { PlaceCover } from '../art/PlaceCover';
@@ -14,6 +14,7 @@ import { Icon } from '../ui/Icon';
 import { LayerPage, Section, Seg } from '../ui/Layer';
 import { useTr } from '../ui/tr';
 import { useGate } from '../ui/SignIn';
+import { shrink } from './Saarthi';
 
 const KIND_LABEL: Record<string, [string, string]> = {
   post: ['Post', 'पोस्ट'],
@@ -89,6 +90,11 @@ export function LivePostCard({ post, i = 0, onChange }: { post: ServerPost; i?: 
         <span className={`post-kind ${p.kind}`}>{tr(...(KIND_LABEL[p.kind] ?? ['Post', 'पोस्ट']))}</span>
       </header>
       <p className="post-text">{p.text}</p>
+      {(p.media ?? []).length > 0 && (
+        <div className={`post-photos n${Math.min(p.media!.length, 4)}`}>
+          {p.media!.map((m) => <img key={m} src={mediaUrl(m)} alt={tr('Photo with the post', 'पोस्ट की फ़ोटो')} loading="lazy" />)}
+        </div>
+      )}
       {place && (
         <button className="post-place" onClick={() => open({ kind: 'place', id: place.id })}>
           <Icon name="pin" size={14} /> {place.name[lang]}
@@ -201,6 +207,18 @@ export function Community() {
   const [text, setText] = useState('');
   const [place, setPlace] = useState('');
   const [note, setNote] = useState('');
+  const [photos, setPhotos] = useState<{ id: string; url: string }[]>([]);
+  const [busy, setBusy] = useState(false);
+  const addPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    setBusy(true);
+    const r = await uploadPostPhoto(await shrink(f));
+    setBusy(false);
+    if (!r) return setNote(lastError);
+    setPhotos((x) => [...x, { id: r.id, url: URL.createObjectURL(f) }]);
+  };
   const [refresh, setRefresh] = useState(0);
   const [posts, setPosts] = useState<ServerPost[] | null>(null);
   const keep = useCallback(() => undefined, []);
@@ -211,9 +229,10 @@ export function Community() {
   }, [community, sort, refresh, s.signedIn]);
   const post = gate(() => {
     if (!text.trim()) return;
-    api.post({ kind: kind as 'post', text: text.trim(), placeId: place || undefined, city: s.city, community, as: s.role }).then((p) => {
+    api.post({ kind: kind as 'post', text: text.trim(), placeId: place || undefined, city: s.city, community, as: s.role, media: photos.map((x) => x.id) }).then((p) => {
       if (!p) return setNote(lastError);
       setText('');
+      setPhotos([]);
       setNote('');
       setSort('new');
       setRefresh((r) => r + 1);
@@ -235,8 +254,13 @@ export function Community() {
             <option value="">{tr('No place', 'कोई जगह नहीं')}</option>
             {data.places.map((p) => <option key={p.id} value={p.id}>{p.name[lang]}</option>)}
           </select>
+          <label className="btn ghost">
+            <Icon name="camera" size={18} /> {busy ? tr('Uploading', 'अपलोड हो रहा है') : tr('Photo', 'फ़ोटो')}
+            <input type="file" accept="image/*" hidden onChange={addPhoto} disabled={busy || photos.length >= 4} />
+          </label>
           <button className="btn primary" onClick={post}>{tr('Post', 'पोस्ट')}</button>
         </div>
+        {photos.length > 0 && <div className="post-photos n1">{photos.map((x) => <img key={x.id} src={x.url} alt="" />)}</div>}
         {note && <small className="err">{note}</small>}
       </div>
       <Seg value={sort} onChange={setSort} options={[{ v: 'new', label: tr('New', 'नई') }, { v: 'top', label: tr('Top', 'टॉप') }]} />

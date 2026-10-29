@@ -126,3 +126,15 @@ def test_html_never_stored_and_sos_location_bounded():
     assert c.put("/me/profile", json={"name": "<b>Ann</b>"}, headers=a).json()["name"] == "Ann"
     assert c.post("/chat", json={"text": "under <5 km and 3<4", "city": "gwalior"}, headers=a).status_code == 200  # not tags, kept
     assert c.post("/sos", json={"lat": 999, "lng": 999}, headers=a).status_code == 422
+
+
+def test_post_with_photos():
+    a, _ = signin("Alice")
+    b, _ = signin("Bob")
+    img = ("p.jpg", io.BytesIO(b"\xff\xd8\xff" + b"0" * 300), "image/jpeg")
+    m = c.post("/posts/media", files={"file": img}, headers=a).json()["id"]
+    bm = c.post("/posts/media", files={"file": ("q.jpg", io.BytesIO(b"\xff\xd8\xff1"), "image/jpeg")}, headers=b).json()["id"]
+    p = c.post("/posts", json={"kind": "post", "text": "Baija Taal at dusk", "city": "gwalior", "media": [m, bm]}, headers=a).json()
+    assert p["media"] == [m]  # someone else's photo is dropped
+    assert c.get(f"/media/{m}").status_code == 200
+    assert c.post("/posts/media", files={"file": ("x.svg", io.BytesIO(b"<svg/>"), "image/svg+xml")}, headers=a).status_code == 415

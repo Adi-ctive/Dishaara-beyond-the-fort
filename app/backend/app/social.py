@@ -10,7 +10,8 @@ from __future__ import annotations
 import re
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from bson import Binary
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 from pymongo.errors import DuplicateKeyError
 
@@ -35,7 +36,7 @@ def clean(text: str, allow_links: bool) -> str:
 
 
 def show(p: dict, me: dict | None) -> dict:
-    out = {"id": p["_id"], **{k: p.get(k) for k in ("by", "byName", "byRole", "kind", "text", "place", "city", "community", "status", "likes", "saves", "comments", "at", "biz")}}
+    out = {"id": p["_id"], **{k: p.get(k) for k in ("by", "byName", "byRole", "kind", "text", "place", "city", "community", "status", "likes", "saves", "comments", "at", "biz")}, "media": p.get("media") or []}
     out["byRole"] = out["byRole"] or ("business" if p.get("biz") else "saarthi")
     if me:
         db = get_db()
@@ -58,6 +59,7 @@ class PostIn(BaseModel):
     city: str = "gwalior"
     community: str | None = None  # gwalior, indore, mp (state) or india (national); defaults to the city
     as_: str = Field(default="raahi", alias="as")  # the account type the person is using the app as
+    media: list[str] = Field(default=[], max_length=4)  # photos from POST /posts/media, shown with the post
 
 
 @router.post("/posts")
@@ -75,12 +77,35 @@ def make_post(body: PostIn, me: dict | None = Depends(current)):
         raise HTTPException(422, "unknown community")
     limit(me, "post", 10, 24 * 60)
     shop = get_db().business.find_one({"owner": me["_id"], "status": "live"}) if role == "business" else None
-    p = {"_id": uuid.uuid4().hex[:12], "by": me["_id"], "byName": shop["name"] if shop else me.get("name", "Raahi"), "byRole": role,
+    db = get_db()
+    media = [m for m in body.media if db.media.find_one({"_id": m, "by": me["_id"], "post": None}, {"_id": 1})]  # only your own, unused photos
+    p = {"_id": uuid.uuid4().hex[:12], "media": media, "by": me["_id"], "byName": shop["name"] if shop else me.get("name", "Raahi"), "byRole": role,
          "biz": shop["_id"] if shop else None, "kind": kind,
          "text": clean(body.text, allow_links=kind == "video"), "place": body.placeId, "city": body.city, "community": community,
          "status": "live", "likes": 0, "saves": 0, "comments": 0, "reports": 0, "at": now()}
-    get_db().posts.insert_one(p)
+    db.posts.insert_one(p)
+    if media:
+        db.media.update_many({"_id": {"$in": media}}, {"$set": {"post": p["_id"]}})
     return show(p, me)
+
+
+POST_PHOTO_TYPES = {"image/jpeg", "image/png", "image/webp"}
+POST_PHOTO_MAX = 2_000_000
+
+
+@router.post("/posts/media")
+async def post_photo(file: UploadFile = File(...), me: dict | None = Depends(current)):
+    """A photo for a post. Public once posted (GET /media/{id}); shrunk on the phone before upload."""
+    me = need(me)
+    limit(me, "post-photo", 20, 24 * 60)
+    if file.content_type not in POST_PHOTO_TYPES:
+        raise HTTPException(415, "send a JPEG, PNG or WebP photo")
+    data = await file.read(POST_PHOTO_MAX + 1)
+    if len(data) > POST_PHOTO_MAX:
+        raise HTTPException(413, "photo is over 2 MB")
+    mid = uuid.uuid4().hex[:12]
+    get_db().media.insert_one({"_id": mid, "by": me["_id"], "post": None, "type": file.content_type, "data": Binary(data), "at": now()})
+    return {"id": mid}
 
 
 @router.get("/feed")

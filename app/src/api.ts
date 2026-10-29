@@ -90,6 +90,7 @@ export async function proofUrl(id: string): Promise<{ url: string; type: string 
 /** Shop photos are public. */
 export const mediaUrl = (id: string) => `${BASE}/media/${id}`;
 export const uploadShopPhoto = (file: Blob) => upload<Shop>('/business/me/photos', file, 'shop.jpg');
+export const uploadPostPhoto = (file: Blob) => upload<{ id: string }>('/posts/media', file, 'post.jpg');
 
 export type Me = { id: string; name: string; roles: string[]; email?: string; avatar?: string; frame?: string; banner?: string; points?: number; kind?: string };
 export type Health = { ok: boolean; ai: boolean; tts: boolean; today: string; dwellSeconds: number; google: string | null; demoLogin: boolean; db: boolean };
@@ -101,7 +102,7 @@ export type SavedChat = { id: string; title: string; city?: string; count: numbe
 export type EventEntry = { name: string; start: string; end?: string; recurring: 'yearly' | 'yearly-lunar' | 'once' | 'moving'; where?: string; watch?: string };
 export type ChatRes = { ai: boolean; text: string | null; engine?: string; note?: string; emergency?: boolean; placeIds?: string[]; followUps?: string[] };
 export type Ticket = { id: string; place: string; from: string; text: string; status: 'open' | 'answered' | 'escalated'; proof?: string; answer?: string };
-export type ServerPost = { id: string; by: string; byName: string; byRole?: string; community?: string; biz?: string | null; kind: string; text: string; place?: string; city?: string; likes: number; saves: number; comments: number; at: string; liked?: boolean; saved?: boolean; mine?: boolean };
+export type ServerPost = { id: string; by: string; byName: string; byRole?: string; community?: string; biz?: string | null; kind: string; text: string; place?: string; city?: string; likes: number; saves: number; comments: number; at: string; liked?: boolean; saved?: boolean; mine?: boolean; media?: string[] };
 export type LeaderRow = { rank: number; id: string; name: string; avatar?: string | null; frame?: string | null; points: number; level: number; stamps: number; me: boolean };
 export type ServerComment = { id: string; by: string; byName: string; text: string; at: string };
 export type Shop = { commentCount?: number; visits?: number; id: string; owner: string; ownerName?: string; name: string; kind: 'food' | 'craft' | 'stay' | 'guide' | 'shop' | 'activity'; city: string; near?: string; details?: string; phone?: string; lat?: number | null; lng?: number | null; tags?: string[]; sponsored?: boolean; status: string; followers?: number; following?: boolean; visitedToday?: boolean; photos?: string[] };
@@ -143,7 +144,7 @@ export const api = {
   // social
   feed: (q: { tab?: 'all' | 'following' | 'saved'; city?: string; place?: string; by?: string; community?: string; sort?: 'new' | 'top' } = {}) =>
     call<ServerPost[]>('GET', `/feed?${new URLSearchParams(Object.entries(q).filter(([, v]) => v) as [string, string][])}`),
-  post: (b: { kind: 'post' | 'question' | 'fact' | 'photo' | 'blog' | 'video' | 'offer'; text: string; placeId?: string; city?: string; community?: string; as?: string }) => call<ServerPost>('POST', '/posts', b),
+  post: (b: { kind: 'post' | 'question' | 'fact' | 'photo' | 'blog' | 'video' | 'offer'; text: string; placeId?: string; city?: string; community?: string; as?: string; media?: string[] }) => call<ServerPost>('POST', '/posts', b),
   like: (id: string, on: boolean) => call<ServerPost>('POST', `/posts/${id}/like`, { on }),
   save: (id: string, on: boolean) => call<ServerPost>('POST', `/posts/${id}/save`, { on }),
   comments: (id: string) => call<ServerComment[]>('GET', `/posts/${id}/comments`),
