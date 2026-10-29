@@ -4,7 +4,7 @@
 import { checkUnit, confirmItems, feeFor, fmt, guardrail, parseTrip, promotable, rankedPlaces, windowFor, type Data, type Place, type Plan } from '../core';
 import type { Lang } from '../theme/ThemeProvider';
 
-export type Card = { kind: 'place'; id: string } | { kind: 'places'; ids: string[] } | { kind: 'quick'; hours?: number } | { kind: 'bazaar' } | { kind: 'sos' } | { kind: 'roadmap' } | { kind: 'city'; city: 'gwalior' | 'indore'; ask: string };
+export type Card = { kind: 'place'; id: string } | { kind: 'places'; ids: string[] } | { kind: 'quick'; hours?: number } | { kind: 'bazaar' } | { kind: 'sos' } | { kind: 'roadmap' } | { kind: 'city'; city: 'gwalior' | 'indore'; ask: string } | { kind: 'map'; id: string };
 export type Reply = { text: string; cards: Card[]; chips: string[] };
 
 // Shared with the server (main.py EMERGENCY_Q). Not plain 'help me': that is usually 'help me plan'.
@@ -207,4 +207,11 @@ export function cardsFor(text: string, cards: Card[], named: boolean): Card[] {
   if (EMERGENCY.test(text)) return cards.filter((c) => c.kind === 'sos');
   if (CAPAB.test(text) && !named) return [];
   return cards.filter((c) => (c.kind === 'quick' ? PLAN.test(text) && !named && !FEE.test(text) : c.kind === 'bazaar' ? FOOD.test(text) : true));
+}
+
+const NEAR = /\bnear|nearby|close to|around\b|पास|aas ?paas|paas/i;
+/** "What is near Rajwada?": a button to the map around that place, which shows everything nearby. */
+export function mapCard(text: string, data: Data): Card[] {
+  const id = rankedPlaces(data, text)[0];
+  return NEAR.test(text) && id ? [{ kind: 'map', id }] : [];
 }

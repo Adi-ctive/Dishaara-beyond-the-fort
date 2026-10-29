@@ -2,6 +2,7 @@ import { MotionConfig, MotionGlobalConfig } from 'motion/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { reloadForNewVersion } from './ui/Boundary';
 import { NavProvider, type Layer, type Tab } from './nav';
 import { StoreProvider } from './store';
 import { ThemeProvider } from './theme/ThemeProvider';
@@ -9,6 +10,11 @@ import './styles.css';
 import './screens.css';
 import './story.css';
 import './desktop.css';
+
+// A deploy while this tab was open removed a file the page asks for: load the new version instead of failing.
+addEventListener('vite:preloadError', (e) => {
+  if (reloadForNewVersion()) e.preventDefault();
+});
 
 const initial = (location.hash.slice(1) || 'chat') as Tab;
 // ?instant skips all animations (used for automated testing in a background tab).

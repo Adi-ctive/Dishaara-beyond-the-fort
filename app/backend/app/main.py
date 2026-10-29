@@ -1299,13 +1299,19 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
     if HOW_KNOW_Q.search(body.text):
         pack["howWeKnow"] = HOW_WE_KNOW[lang]
     if ids and NEAR_Q.search(body.text):
-        # Decision 28: Yatra never names an unflagged place the raahi did not name, so "nearby" holds Level 2 places only.
+        # Decision 25: alternates come from Level 2, or Level 1 with a current custodian publication (guard_ok), within
+        # about 6 km by road. Unflagged places are never named unasked (Decision 28): the Map tab shows everything around.
         base = rules.get_place(d, ids[0])
-        flagged = [q for q in d["places"] if q["id"] != base["id"] and (q.get("guardrail") or {}).get("status") == "level2"]
-        pack["nearby"] = [{"name": q["name"][lang], "kmAway": round(km(base["units"][0]["coord"], q["units"][0]["coord"]) * ROAD_FACTOR, 1),
-                           "hours": fact(q["units"][0]["hours"], lang, d).get("value")}
-                          for q in sorted(flagged, key=lambda q: km(base["units"][0]["coord"], q["units"][0]["coord"]))[:3]]
-        pack["nearbyNote"] = "Only places whose custodians asked for more visitors are suggested nearby." if lang == "en" else "पास में सिर्फ़ वे जगहें सुझाई जाती हैं जिनके संरक्षकों ने ज़्यादा आगंतुक चाहे हैं।"
+        dist = lambda q: km(base["units"][0]["coord"], q["units"][0]["coord"]) * ROAD_FACTOR
+        ok = sorted([q for q in d["places"] if q["id"] != base["id"] and guard_ok(q) and dist(q) <= 6], key=dist)[:3]
+        pack["nearby"] = [{"name": q["name"][lang], "kmAway": round(dist(q), 1), "hours": fact(q["units"][0]["hours"], lang, d).get("value")} for q in ok]
+        if ok:
+            pack["nearbyNote"] = ("Nearby places are ones their custodians publish as open and ticketed." if lang == "en"
+                                  else "पास की वे जगहें बताई गई हैं जिन्हें उनके संरक्षक खुला और टिकट वाला बताते हैं।")
+        else:
+            pack["nearbyNote"] = (f"No place near {base['name'][lang]} is published open by its custodian, so none is suggested. Say so in one line and "
+                                  "tell them the Map tab shows everything around it." if lang == "en" else
+                                  f"{base['name'][lang]} के पास किसी जगह को उसके संरक्षक ने खुला नहीं बताया, इसलिए कोई सुझाव नहीं। एक पंक्ति में यह कहें और बताएँ कि नक्शा टैब में आसपास सब दिखता है।")
     if body.roadmap:
         pack["todaysRoadmap"] = body.roadmap
     if body.earlier:
@@ -1566,7 +1572,11 @@ def adaption(messages: list[dict]) -> str:
     if sets or ADAPTION_MODEL.startswith("stack:"):
         req["tools"] = [{"type": "file_search", **({"dataset_ids": sets} if sets else {})}]
         req["max_tool_calls"] = 2
-    r = httpx.post(ADAPTION_URL, headers={"Authorization": f"Bearer {os.environ['ADAPTION_API_KEY']}"}, json=req, timeout=25)
+    for wait in (1.5, 3.0, None):
+        r = httpx.post(ADAPTION_URL, headers={"Authorization": f"Bearer {os.environ['ADAPTION_API_KEY']}"}, json=req, timeout=25)
+        if r.status_code != 429 or wait is None:
+            break
+        time.sleep(wait)  # busy for a moment (seen at 24 calls at once, 29 Oct): a short wait beats falling back to Groq
     r.raise_for_status()
     text = "\n".join(c.get("text", "") for o in r.json().get("output", []) if o.get("type") == "message" for c in o.get("content") or [])
     if not text.strip():

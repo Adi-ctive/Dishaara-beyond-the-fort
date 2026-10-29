@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getKey, respondAI } from '../../chat/ai';
 import { api, apiOn } from '../../api';
 import { feeFor, fmt, people, rankedPlaces, SEEDS, startCoord, startName } from '../../core';
-import { cardsFor, respond, starterChips, type Card, type Reply } from '../../chat/local';
+import { cardsFor, mapCard, respond, starterChips, type Card, type Reply } from '../../chat/local';
 import { useNav } from '../../nav';
 import { useStore } from '../../store';
 import { t } from '../../i18n';
@@ -82,7 +82,7 @@ const otherCity = (text: string, here: string) => (Object.keys(CITY_NAMES) as (k
   && (CITY_NAMES[c].test(text) || (rankedPlaces(SEEDS[c], text).length > 0 && rankedPlaces(SEEDS[here as keyof typeof CITY_NAMES], text).length === 0)));
 
 function Cards({ cards, onCity }: { cards: Card[]; onCity: (c: 'gwalior' | 'indore', ask: string) => void }) {
-  const { data } = useStore();
+  const { data, set } = useStore();
   const { open, go } = useNav();
   const { lang } = useTheme();
   const hi = lang === 'hi';
@@ -119,6 +119,14 @@ function Cards({ cards, onCity }: { cards: Card[]; onCity: (c: 'gwalior' | 'indo
               <span><b>{hi ? `${c.city === 'indore' ? 'इंदौर' : 'ग्वालियर'} पर जाएँ` : `Switch to ${c.city === 'indore' ? 'Indore' : 'Gwalior'}`}</b><small>{hi ? 'और यही सवाल वहाँ पूछें' : 'and ask this again there'}</small></span>
             </button>
           );
+        if (c.kind === 'map') {
+          const p = here(c.id);
+          return p ? (
+            <button key={i} className="card row" onClick={() => { set({ mapFocus: p.id }); go('map'); }}>
+              <Icon name="map" size={22} /> <span className="grow"><b>{hi ? `${p.name.hi} के आसपास नक्शे पर देखें` : `See around ${p.name.en} on the map`}</b></span> <Icon name="arrow" size={16} />
+            </button>
+          ) : null;
+        }
         if (c.kind === 'sos')
           return (
             <a key={i} className="sos-row primary" href="tel:112">
@@ -254,7 +262,7 @@ export function ChatTab() {
       const ids = (res?.placeIds ?? []).filter((id) => data.places.some((p) => p.id === id));
       const keep = local.cards.filter((c) => c.kind !== 'place' && c.kind !== 'places');
       // Only the cards this kind of question needs: none for "what can you do", the plan card only for plan requests.
-      const cards: Card[] = cardsFor(query, res ? (ids.length ? [...keep, { kind: 'places', ids: ids.slice(0, 3) }] : keep) : local.cards, rankedPlaces(data, query).length > 0);
+      const cards: Card[] = [...mapCard(query, data), ...cardsFor(query, res ? (ids.length ? [...keep, { kind: 'places', ids: ids.slice(0, 3) }] : keep) : local.cards, rankedPlaces(data, query).length > 0)];
       const chips = res?.followUps?.length ? res.followUps : local.chips;
       if (res?.ai && res.text) r = { ...local, text: res.text, ai: true, engine: res.engine, cards, chips };
       else if (res && res.note !== 'no-key') r = { ...local, cards, chips, note: res.note === 'grounding' ? 'grounding' : undefined };
