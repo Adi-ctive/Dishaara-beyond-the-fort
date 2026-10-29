@@ -12,7 +12,7 @@ type Post = { id: string; by: string; kind: string; place: string; en: string; h
 export type Role = 'raahi' | 'saarthi' | 'business' | 'moderator';
 export type Stamp = { at: string; status: 'confirmed' | 'pending'; quiet: boolean; rare: boolean };
 export type Prefs = {
-  pace: Profile['pace']; walking: Profile['walking']; budget: Profile['budget']; maxPerPlace: number; worship: boolean; autoVoice: boolean; location: boolean; // autoVoice: read every reply aloud (off unless they turn it on)
+  pace: Profile['pace']; walking: Profile['walking']; budget: Profile['budget']; maxPerPlace: number; worship: boolean; autoVoice: boolean; location: boolean; betaLang?: string | null; // autoVoice: read every reply aloud (off unless they turn it on)
   // Who is coming: counts drive ticket prices (children and visitors from abroad pay differently).
   who: 'solo' | 'couple' | 'family' | 'friends'; group: { indian: number; foreign: number; child: number }; elders: boolean;
   modes: Mode[]; // how they get around

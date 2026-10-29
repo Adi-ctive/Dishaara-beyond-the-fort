@@ -91,6 +91,7 @@ export function MapTab() {
     const b = (listed ?? []).find((x) => x.id === s.mapFocus);
     if (p) setFocus(p.units[0].coord);
     else if (b && b.lat != null && b.lng != null) setFocus([b.lat, b.lng]);
+    else if (s.mapFocus.startsWith('geo:')) setFocus(s.mapFocus.slice(4).split(',').map(Number) as [number, number]);  // a spot from chat
     set({ mapFocus: null });
   }, [s.mapFocus, data, set, listed]);
 

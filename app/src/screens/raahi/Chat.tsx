@@ -13,7 +13,7 @@ import { Md, plain } from '../../ui/Md';
 import { PlaceCard } from '../../ui/PlaceCard';
 import { canListen, listen, speak, warmVoice } from '../../voice';
 
-type Msg = { id: number; role: 'user' | 'bot'; text: string; cards: Card[]; chips: string[]; at?: number; ai?: boolean; engine?: string; note?: 'grounding' | 'error'; status?: 'failed' | 'working' | 'done'; alt?: Partial<Record<'en' | 'hi', { text: string; chips: string[] }>> };
+type Msg = { id: number; role: 'user' | 'bot'; text: string; cards: Card[]; chips: string[]; at?: number; ai?: boolean; engine?: string; note?: 'grounding' | 'error'; status?: 'failed' | 'working' | 'done'; alt?: Partial<Record<string, { text: string; chips: string[] }>> };
 type Saved = { id: string; title: string; updated: string; count: number };
 
 // The open chat stays on the phone, so a refresh does not wipe it. Signed-in raahis also keep it on their account.
@@ -120,7 +120,7 @@ function Cards({ cards, onCity }: { cards: Card[]; onCity: (c: 'gwalior' | 'indo
             </button>
           );
         if (c.kind === 'map') {
-          const p = here(c.id);
+          const p = here(c.id) ?? (c.id.startsWith('geo:') ? { id: c.id, name: { en: c.name ?? 'this spot', hi: c.name ?? 'इस जगह' } } : null);
           return p ? (
             <button key={i} className="card row" onClick={() => { set({ mapFocus: p.id }); go('map'); }}>
               <Icon name="map" size={22} /> <span className="grow"><b>{hi ? `${p.name.hi} के आसपास नक्शे पर देखें` : `See around ${p.name.en} on the map`}</b></span> <Icon name="arrow" size={16} />
@@ -153,20 +153,23 @@ export function ChatTab() {
   // The language button: replies already on screen in the other language are translated (numbers checked on the
   // server), newest first. A reply that cannot be translated stays as it was.
   const tried = useRef(new Set<string>());
+  // The language replies show in: the app language, or a moderator's beta language (Settings).
+  const to: string = s.user?.roles.includes('moderator') && s.prefs.betaLang ? s.prefs.betaLang : lang;
   useEffect(() => {
     if (!apiOn()) return;
-    const todo = msgs.filter((m) => m.role === 'bot' && m.text && langOf(m.text) !== lang && !m.alt?.[lang] && !tried.current.has(`${m.id}:${lang}`)).slice(-6).reverse();
+    const tgt = to;
+    const todo = msgs.filter((m) => m.role === 'bot' && m.text && (tgt.length > 2 || tgt !== langOf(m.text)) && tgt !== langOf(m.text) && !m.alt?.[tgt] && !tried.current.has(`${m.id}:${tgt}`)).slice(-6).reverse();
     let stop = false;
     (async () => {
       for (const m of todo) {
         if (stop) return;
-        tried.current.add(`${m.id}:${lang}`);
-        const r = await api.translate([m.text, ...m.chips], lang);
-        if (r && !stop) setMsgs((all) => all.map((x) => (x.id === m.id ? { ...x, alt: { ...x.alt, [lang]: { text: r.texts[0], chips: r.texts.slice(1) } } } : x)));
+        tried.current.add(`${m.id}:${tgt}`);
+        const r = await api.translate([m.text, ...m.chips], tgt);
+        if (r && !stop) setMsgs((all) => all.map((x) => (x.id === m.id ? { ...x, alt: { ...x.alt, [tgt]: { text: r.texts[0], chips: r.texts.slice(1) } } } : x)));
       }
     })();
     return () => { stop = true; };
-  }, [lang, msgs.length]);
+  }, [to, msgs.length]);
   // Keep the open chat on the phone, and on the account when signed in (a short pause so typing is not sent each time).
   useEffect(() => {
     write(CUR, cur);
@@ -262,7 +265,9 @@ export function ChatTab() {
       const ids = (res?.placeIds ?? []).filter((id) => data.places.some((p) => p.id === id));
       const keep = local.cards.filter((c) => c.kind !== 'place' && c.kind !== 'places');
       // Only the cards this kind of question needs: none for "what can you do", the plan card only for plan requests.
-      const cards: Card[] = [...mapCard(query, data), ...cardsFor(query, res ? (ids.length ? [...keep, { kind: 'places', ids: ids.slice(0, 3) }] : keep) : local.cards, rankedPlaces(data, query).length > 0)];
+      // The server found the spot (a place, landmark, area or the raahi's location): the map opens there.
+      const spot: Card[] = res?.anchor ? [{ kind: 'map', id: res.anchor.id || `geo:${res.anchor.lat},${res.anchor.lng}`, name: res.anchor.name }] : mapCard(query, data);
+      const cards: Card[] = [...spot, ...cardsFor(query, res ? (ids.length ? [...keep, { kind: 'places', ids: ids.slice(0, 3) }] : keep) : local.cards, rankedPlaces(data, query).length > 0)];
       const chips = res?.followUps?.length ? res.followUps : local.chips;
       if (res?.ai && res.text) r = { ...local, text: res.text, ai: true, engine: res.engine, cards, chips };
       else if (res && res.note !== 'no-key') r = { ...local, cards, chips, note: res.note === 'grounding' ? 'grounding' : undefined };
@@ -363,7 +368,7 @@ export function ChatTab() {
 
       <div className="thread" aria-live="polite">
         <AnimatePresence initial={false}>
-          {msgs.map((m) => { const v = (m.role === 'bot' && m.alt?.[lang]) || { text: m.text, chips: m.chips }; return (
+          {msgs.map((m) => { const v = (m.role === 'bot' && m.alt?.[to]) || { text: m.text, chips: m.chips }; return (
             <motion.div key={m.id} className={`msg ${m.role}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               {m.role === 'bot' ? (
                 <>

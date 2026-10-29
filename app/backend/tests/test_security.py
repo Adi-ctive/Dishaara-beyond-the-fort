@@ -182,3 +182,11 @@ def test_plan_readable_only_by_its_owner():
     assert c.get(f"/plans/{p['id']}", headers=a).status_code == 200
     assert c.get(f"/plans/{p['id']}", headers=b).status_code == 404
     assert c.get(f"/plans/{p['id']}").status_code == 404
+
+
+def test_beta_languages_are_moderators_only(monkeypatch):
+    monkeypatch.setenv("GROQ_KEY", "x")
+    monkeypatch.setattr(main, "write", lambda m: "டிக்கெட் ₹25")
+    a, _ = signin("Alice")
+    assert c.post("/translate", json={"texts": ["ticket ₹25"], "to": "ta"}, headers=a).status_code == 403
+    assert c.post("/translate", json={"texts": ["ticket ₹25"], "to": "xx"}, headers=a).status_code == 422

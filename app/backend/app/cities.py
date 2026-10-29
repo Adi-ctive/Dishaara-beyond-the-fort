@@ -82,6 +82,29 @@ def _value(field: str, text: str):
     return None
 
 
+# How strong each label is. A weaker new fact never silently replaces a stronger one (29 Oct).
+STRENGTH = {"officially confirmed": 6, "locally verified": 5, "recently reported": 4, "estimated": 3, "historical pattern": 2,
+            "unverified": 1, "potentially outdated": 0, "conflicting": 0}
+
+
+def supersede(old: dict | None, new: dict) -> dict:
+    """The fact that takes the old one's place, with the old one kept as history (alt, newest first, at most 6).
+    If the old fact was stronger and says something else, both stand: the fact becomes "conflicting" (never one number
+    when sources disagree), keeping the old structured value for the planner, which then asks to confirm first."""
+    if not old or old.get("v") is None:
+        return new
+    was = {k: old[k] for k in ("t", "s", "src", "ver", "by") if old.get(k) is not None}
+    hist = [was] + list(old.get("alt") or [])
+    same = (old.get("t") or {}).get("en", "").strip().lower() == new["t"]["en"].strip().lower()
+    if not same and STRENGTH.get(old.get("s"), 0) > STRENGTH.get(new["s"], 0):
+        o, n = (old.get("t") or {}), new["t"]
+        both = lambda lang: f"{o.get(lang) or o.get('en')} ({old.get('s')}, {old.get('ver')}); a saarthi reported: {n[lang]} ({new['s']}, {new.get('ver')})"
+        return {**old, "s": "conflicting", "was": old.get("s"), "t": {"en": both("en"), "hi": both("hi")},
+                "why": {"en": "Sources disagree: confirm at the place.", "hi": "स्रोत अलग-अलग: जगह पर पुष्टि करें।"},
+                "alt": [{k: new[k] for k in ("t", "s", "src", "ver", "by") if new.get(k) is not None}] + hist[:5]}
+    return {**new, "alt": hist[:6]}
+
+
 def apply_entry(v: dict, rebuild: bool = True) -> bool:
     """Writes an approved saarthi entry into the place record: dated, labelled, credited to the saarthi."""
     db = get_db()
@@ -116,7 +139,7 @@ def apply_entry(v: dict, rebuild: bool = True) -> bool:
         fact["v"] = _value(key, v["value"])
         for u in doc["units"]:
             if not v.get("unit") or u["id"] == v["unit"]:  # only the part the saarthi named
-                u[key] = fact
+                u[key] = supersede(u.get(key), fact)
     elif kind == "place":
         fact["v"] = True
         doc[key] = fact

@@ -523,10 +523,11 @@ def test_verified_saarthi_entry_updates_the_place():
     assert c.post(f"/verify/{vid}", json={"ok": True}, headers=b).json()["status"] == "approved"
     sb = next(p for p in c.get("/cities/gwalior/data").json()["places"] if p["id"] == "sas-bahu")
     h = sb["units"][0]["hours"]
-    assert h["s"] == "locally verified" and h["v"] == {"kind": "fixed", "open": "08:00", "close": "18:00"} and h["by"] == "Aditya"
+    # The official "sunrise to sunset" is stronger and disagrees: both stand as conflicting (29 Oct), the saarthi's is in alt.
+    assert h["s"] == "conflicting" and "8 am to 6 pm" in h["t"]["en"] and h["alt"][0]["by"] == "Aditya" and h["alt"][0]["s"] == "locally verified"
     cities.import_city("gwalior")  # a redeploy re-imports the file: the saarthi's entry stays
     sb = next(p for p in c.get("/cities/gwalior/data").json()["places"] if p["id"] == "sas-bahu")
-    assert sb["units"][0]["hours"]["s"] == "locally verified"
+    assert sb["units"][0]["hours"]["s"] == "conflicting"
 
 
 def test_city_numbers_reach_yatra():
@@ -887,3 +888,29 @@ def test_app_question_gets_the_fixed_answer():
     r = c.post("/chat", json={"text": "What can you do?", "city": "gwalior"}).json()
     assert r["text"].startswith("**I'm Yatra") and r["placeIds"] == []
     assert "does not sell tickets" in c.post("/chat", json={"text": "Can you book tickets for me?", "city": "indore"}).json()["text"]
+
+
+def test_near_finds_the_spot(monkeypatch):
+    from app import near
+    d = main.data("gwalior")
+    assert near.anchor("what is near Sas-Bahu temple", d, None)["id"] == "sas-bahu"
+    assert near.anchor("रेलवे स्टेशन के पास क्या है?", d, None)["kind"] == "landmark"
+    assert near.anchor("what is near me", d, {"name": "Hotel", "lat": 26.2, "lng": 78.18})["kind"] == "me"
+    assert near.anchor("what is near me", d, None)["missing"]
+    assert near.anchor("places in north Gwalior", d, None)["kind"] == "direction"
+    monkeypatch.setattr(near, "lookup", lambda name, city: [26.21, 78.17] if name.lower() == "thatipur" else None)
+    assert near.anchor("what is around Thatipur?", d, None)["coord"] == [26.21, 78.17]
+    assert near.anchor("places around Gole ka Mandir", d, None)["missing"]  # not found: said so, never guessed
+    assert near.same_name("Gole ka Mandir", "Gole Ka Mandir Chauraha") and not near.same_name("Gole ka Mandir", "Teli-ka-Mandir")
+
+
+def test_approved_fact_keeps_history_and_never_hides_a_stronger_fact():
+    from app import cities
+    official = {"v": {"kind": "sun"}, "t": {"en": "Sunrise to sunset", "hi": "सूर्योदय से सूर्यास्त"}, "s": "officially confirmed", "src": "board", "ver": "2026-10-28"}
+    saarthi = {"v": {"kind": "fixed", "open": "10:00", "close": "17:00"}, "t": {"en": "10:00 to 17:00", "hi": "10:00 to 17:00"}, "s": "locally verified", "src": "saarthi", "ver": "2026-10-29"}
+    both = cities.supersede(official, saarthi)
+    assert both["s"] == "conflicting" and both["v"] == {"kind": "sun"} and "10:00 to 17:00" in both["t"]["en"] and both["alt"][0]["t"]["en"] == "10:00 to 17:00"
+    weak = {**official, "s": "unverified"}
+    newer = cities.supersede(weak, saarthi)
+    assert newer["s"] == "locally verified" and newer["alt"][0]["s"] == "unverified"  # the old value stays as history
+    assert cities.supersede({"v": None}, saarthi) == saarthi

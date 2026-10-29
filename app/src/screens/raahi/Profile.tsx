@@ -288,6 +288,10 @@ export function History() {
   );
 }
 
+// Languages tested on 29 Oct (07_round2/adaption/LEARNINGS.md), best first.
+const BETA_LANGS: [string, string][] = [['ur', 'اردو Urdu'], ['mr', 'मराठी Marathi'], ['ta', 'தமிழ் Tamil'], ['ml', 'മലയാളം Malayalam'], ['bn', 'বাংলা Bengali'], ['kn', 'ಕನ್ನಡ Kannada'],
+  ['pa', 'ਪੰਜਾਬੀ Punjabi'], ['as', 'অসমীয়া Assamese'], ['te', 'తెలుగు Telugu'], ['gu', 'ગુજરાતી Gujarati'], ['or', 'ଓଡ଼ିଆ Odia']];
+
 export function Settings() {
   const { s, set } = useStore();
   const { lang, setLang, mode, toggleMode, theme } = useTheme();
@@ -323,6 +327,15 @@ export function Settings() {
         {theme.dark && <Toggle on={mode === 'dark'} onChange={() => toggleMode()} label={hi ? 'डार्क मोड' : 'Dark mode'} />}
       </Section>
       {/* The ElevenLabs free plan asks for this credit. */}
+      {s.user?.roles.includes('moderator') && (
+        <Section title={hi ? 'भाषाएँ (बीटा, सिर्फ़ मॉडरेटर)' : 'Languages (beta, moderators only)'}
+          note={hi ? 'जाँच के लिए: यात्रा के जवाब इस भाषा में अनुवाद होते हैं, अंक मूल जैसे। 29 अक्टूबर की जाँच: हिंदी, उर्दू अच्छे; मराठी, तमिल ठीक; बाकी अभी तैयार नहीं।' : 'For testing: Yatra replies are translated into this language, numbers kept as in the original. 29 Oct test: Hindi and Urdu good, Marathi and Tamil close, the rest not ready yet.'}>
+          <select value={s.prefs.betaLang ?? ''} aria-label={hi ? 'बीटा भाषा' : 'Beta language'} onChange={(e) => set((c) => ({ prefs: { ...c.prefs, betaLang: e.target.value || null } }))}>
+            <option value="">{hi ? 'बंद' : 'Off'}</option>
+            {BETA_LANGS.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+          </select>
+        </Section>
+      )}
       <Section title={hi ? 'आवाज़' : 'Voice'} note={hi ? 'आवाज़: ElevenLabs. सर्वर बंद हो तो ब्राउज़र की आवाज़।' : 'Voice by ElevenLabs. Falls back to your browser voice when offline.'}>
         <Toggle on={s.prefs.autoVoice} onChange={(v) => set((c) => ({ prefs: { ...c.prefs, autoVoice: v } }))} label={hi ? 'जवाब पढ़कर सुनाएँ' : 'Read replies aloud'} />
       </Section>

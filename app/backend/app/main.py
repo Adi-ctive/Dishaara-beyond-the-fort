@@ -26,7 +26,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from pymongo.errors import DuplicateKeyError
 
-from . import auth, cities, grounding, rag, rules, social
+from . import auth, cities, grounding, near, rag, rules, social
 from .auth import current, limit, need
 from .db import get_db, now
 
@@ -1298,20 +1298,28 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
             pack["cityEvents"] = events_for(d, [x for x in ([today()] + [f"{int(today()[:4]) + (1 if m < int(today()[5:7]) else 0)}-{m:02d}-15" for m in range(1, 13)])], lang)
     if HOW_KNOW_Q.search(body.text):
         pack["howWeKnow"] = HOW_WE_KNOW[lang]
-    if ids and NEAR_Q.search(body.text):
-        # Decision 25: alternates come from Level 2, or Level 1 with a current custodian publication (guard_ok), within
-        # about 6 km by road. Unflagged places are never named unasked (Decision 28): the Map tab shows everything around.
-        base = rules.get_place(d, ids[0])
-        dist = lambda q: km(base["units"][0]["coord"], q["units"][0]["coord"]) * ROAD_FACTOR
-        ok = sorted([q for q in d["places"] if q["id"] != base["id"] and guard_ok(q) and dist(q) <= 6], key=dist)[:3]
-        pack["nearby"] = [{"name": q["name"][lang], "kmAway": round(dist(q), 1), "hours": fact(q["units"][0]["hours"], lang, d).get("value")} for q in ok]
-        if ok:
-            pack["nearbyNote"] = ("Nearby places are ones their custodians publish as open and ticketed." if lang == "en"
-                                  else "पास की वे जगहें बताई गई हैं जिन्हें उनके संरक्षक खुला और टिकट वाला बताते हैं।")
-        else:
-            pack["nearbyNote"] = (f"No place near {base['name'][lang]} is published open by its custodian, so none is suggested. Say so in one line and "
-                                  "tell them the Map tab shows everything around it." if lang == "en" else
-                                  f"{base['name'][lang]} के पास किसी जगह को उसके संरक्षक ने खुला नहीं बताया, इसलिए कोई सुझाव नहीं। एक पंक्ति में यह कहें और बताएँ कि नक्शा टैब में आसपास सब दिखता है।")
+    spot = near.anchor(body.text, d, body.origin)
+    if spot and spot.get("missing"):
+        pack["spotMissing"] = spot["name"]
+        pack["nearbyNote"] = (f"We could not find \"{spot['name']}\" on the map of {d['city']['name'][lang]}. Say so in one line and ask them to name "
+                              "a nearby place or landmark, or to use the Map tab." if lang == "en" else
+                              f"\"{spot['name']}\" {d['city']['name'][lang]} के नक्शे पर नहीं मिला। एक पंक्ति में यह कहें और पास की कोई जगह या पहचान का नाम पूछें, या नक्शा टैब देखने को कहें।")
+    elif spot:
+        # Decision 25: suggestions come from Level 2, or Level 1 with a current custodian publication (guard_ok), within
+        # about 6 km by road. Other places are never named unasked (Decision 28): the Map tab shows everything around.
+        dist = lambda q: near.km(spot["coord"], q["units"][0]["coord"]) * ROAD_FACTOR
+        around = [q for q in d["places"] if q["id"] != spot.get("id") and dist(q) <= 6]
+        ok = sorted([q for q in around if guard_ok(q)], key=dist)[:3]
+        pack["near"] = {"from": spot["name"], "places": [{"name": q["name"][lang], "kmAway": round(dist(q), 1),
+                        "hours": fact(q["units"][0]["hours"], lang, d).get("value"), "ticket": fact(q["units"][0]["fees"], lang, d).get("value")} for q in ok],
+                        "moreOnTheMap": len(around) - len(ok)}
+        pack["nearbyNote"] = ("Places near that spot whose custodians publish them as open and ticketed, nearest first. Mention moreOnTheMap: the Map tab shows the others."
+                              if ok else f"No place within 6 km of {spot['name']} is published open by its custodian, so none is suggested. Say so in one line; the Map tab shows the {len(around)} places around it.")             if lang == "en" else ("उस जगह के पास वे जगहें जिन्हें उनके संरक्षक खुला और टिकट वाला बताते हैं, नज़दीक वाली पहले। बाकी नक्शा टैब में हैं।" if ok
+                                  else f"{spot['name']} के 6 किमी में किसी जगह को संरक्षक ने खुला नहीं बताया, इसलिए सुझाव नहीं। एक पंक्ति में कहें; नक्शा टैब में आसपास की {len(around)} जगहें हैं।")
+        pack["anchor"] = {"name": spot["name"], "lat": spot["coord"][0], "lng": spot["coord"][1], "id": spot.get("id")}
+        if spot["kind"] != "place":
+            pack["places"] = [place_pack(d, q, lang, day, body.origin, tw) for q in ok]  # their full checked facts
+            ids[:] = [q["id"] for q in ok]
     if body.roadmap:
         pack["todaysRoadmap"] = body.roadmap
     if body.earlier:
@@ -1348,7 +1356,7 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
         if t.role == "user":
             allowed |= {h["id"] for h in rules.search_places(d, t.text)}
     allowed |= {p["id"] for p in d["places"] if p["guardrail"]["status"] == "level2"}
-    names = {x["name"] for pp in pack["places"] for x in pp.get("tryInstead", [])} | {x["name"] for x in pack.get("nearby", [])} | {x["place"] for x in alerts}
+    names = {x["name"] for pp in pack["places"] for x in pp.get("tryInstead", [])} | {x["name"] for x in pack.get("near", {}).get("places", [])} | {x["place"] for x in alerts}
     allowed |= {p["id"] for p in d["places"] if p["name"][lang] in names}
     return pack, allowed
 
@@ -1527,7 +1535,7 @@ def system_prompt(body: ChatIn, city: str) -> str:
         "6l. If FACTS has suggestedBecause, reply with a bold first line, then one bullet per place \"- **Name**: hours, today's verdict\", then one line with suggestedBecause in your own words, then offer Plan my day to fit them into their time. Never say there are no places.",
         "6m. If FACTS has no places, no openToday and no cityNumbers, do not use the labelled bullets: answer in one or two plain lines and ask what they want to see.",
         "6j. If FACTS has weatherToday and it has a tip (heat, rain, strong sun), you may give that tip as Good to know.",
-        "6i. If FACTS has nearby, name two or three of them with distance.",
+        "6i. If FACTS has near, start with a bold line naming the spot (near.from), then one bullet per place: \"- **Name** (X km): hours, ticket\", nearest first; then say how many more are on the Map tab (moreOnTheMap). If near.places is empty, follow nearbyNote.",
         "6a. If FACTS has openToday, the reply is only: a bold first line; then up to 5 bullets \"- **Name**: hours\", adding \"(very crowded now)\" or the alert when that place has liveAlert, and listing places without an alert first; one line saying how many more are open and that the Map tab shows them all; the italic question. No other labels, no nested lists, never list a place twice. Places without hours on record are not listed. Do not say how sure each one is.",
         "6o. If FACTS has planAhead, say plainly that they can plan a future day: Plan my day, then Pick a date. If FACTS has eventsThen, name each event with its when and howSure; for a guess say it was last held then and is likely around the same time, and give howToWatch. If eventsThen has no events, say no fair or festival is on our calendar then. If FACTS has cityEvents, name the ones that fit the question. Never invent an event or a date.",
         "6c. If FACTS has cityNumbers, give the one or two numbers that answer the question, with the name and how sure they are. Never make up a number.",
@@ -1636,6 +1644,16 @@ def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
     else:
         limit(by_ip(request), "chat", 20, 60)
     pack, allowed = retrieve(body)
+    if pack.get("spotMissing"):
+        # A spot we could not place on the map: a plain answer, never a guess (29 Oct test set: "near Lashkar").
+        sm, city_name, hi = pack["spotMissing"], pack["city"], body.lang == "hi"
+        if sm == "your location":
+            text = ("**आपकी जगह अभी पता नहीं है।** प्रोफ़ाइल में लोकेशन चालू करें, या पास की किसी जगह का नाम लिखें, जैसे \"रेलवे स्टेशन के पास\"।" if hi else
+                    "**I don't know where you are yet.** Turn on location in Profile, or name a place near you, like \"near the railway station\".")
+        else:
+            text = (f"**\"{sm}\" {city_name} के नक्शे पर नहीं मिला।** पास की किसी जानी-मानी जगह का नाम लिखें, या नक्शा टैब में खोजें।" if hi else
+                    f"**I couldn't find \"{sm}\" on the map of {city_name}.** Name a well-known place or landmark near it, or search for it on the Map tab.")
+        return {"ai": False, "text": text, "placeIds": []}
     if me:
         past = [f"{r['updated']:%d %b}: {r.get('summary') or r['title']}" for r in get_db().chats.find({"user": me["_id"], "_id": {"$ne": body.chatId}}, {"msgs": 0}).sort("updated", -1).limit(CHAT_CONTEXT)]
         if past:
@@ -1655,13 +1673,13 @@ def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
             # A travel time or fare with no fromYou in the pack is invented, even when the numbers happen to appear elsewhere.
             travel = not any("fromYou" in p for p in pack["places"]) and "todaysRoadmap" not in pack                 and bool(re.search(r"getting there|by auto|by cab|on foot|कैसे पहुँचें|ऑटो से", answer or "", re.I))
             if answer and ok and not extra and not over and not wrong and not travel:
-                return {"ai": True, "text": answer, "engine": ENGINE["last"], "placeIds": shown_ids(answer, pack, body), "followUps": follow_ups(pack, body, "hi" if body.lang == "hi" else "en")}
+                return {"ai": True, "text": answer, "engine": ENGINE["last"], "placeIds": shown_ids(answer, pack, body), **({"anchor": pack["anchor"]} if pack.get("anchor") else {}), "followUps": follow_ups(pack, body, "hi" if body.lang == "hi" else "en")}
             print(f"chat check failed: missing={missing} extra={extra} over={over} renamed={wrong} travel={travel}", flush=True)
             fix = ([f"values not in FACTS: {', '.join(missing)}"] if missing else []) + ([f"places not in FACTS: {', '.join(extra)}"] if extra else []) \
                 + (["\"officially confirmed\" for a fact whose howSure is different"] if over else []) \
                 + (["a travel time or fare, but FACTS has no fromYou: leave Getting there out"] if travel else [])                 + ([f"place names that are not in FACTS ({', '.join(wrong)}): write every place name exactly as FACTS spells it"] if wrong else [])
             messages += [{"role": "assistant", "content": answer}, {"role": "user", "content": f"Your reply used {' and '.join(fix) or 'nothing'}. Rewrite it using only FACTS."}]
-        return {"ai": False, "note": "grounding", "text": None, "placeIds": [] if CAPAB_Q.search(body.text) and not rules.search_places(data(body.city if body.city in cities.available() else "gwalior"), body.text) else [p["id"] for p in pack["places"]][:1]}
+        return {"ai": False, "note": "grounding", "text": None, **({"anchor": pack["anchor"]} if pack.get("anchor") else {}), "placeIds": [] if CAPAB_Q.search(body.text) and not rules.search_places(data(body.city if body.city in cities.available() else "gwalior"), body.text) else [p["id"] for p in pack["places"]][:1]}
     except Exception as e:
         print(f"chat error: {type(e).__name__}: {str(e)[:300]}", flush=True)  # shows in the Vercel logs
         return {"ai": False, "note": "error", "text": None}
@@ -2049,10 +2067,12 @@ def business_photo_delete(mid: str, me: dict | None = Depends(current)):
 
 class TranslateIn(BaseModel):
     texts: list[str] = Field(min_length=1, max_length=12)
-    to: str = Field(pattern="^(en|hi)$")
+    to: str = Field(pattern="^[a-z]{2}$")
 
 
 SEP = "\n@@@\n"
+BETA_LANGS = {"en": "English", "hi": "Hindi (Devanagari script)", "ur": "Urdu (Urdu script)", "mr": "Marathi", "ta": "Tamil", "ml": "Malayalam",
+              "bn": "Bengali", "kn": "Kannada", "pa": "Punjabi (Gurmukhi script)", "as": "Assamese", "te": "Telugu", "gu": "Gujarati", "or": "Odia"}
 DIGITS = re.compile(r"\d+")
 
 
@@ -2062,10 +2082,14 @@ def translate(body: TranslateIn, request: Request, me: dict | None = Depends(cur
     answer must come back unchanged, or the original stays."""
     if not (os.getenv("GROQ_KEY") or os.getenv("ADAPTION_API_KEY")):
         raise HTTPException(503, "translation needs the AI service")
+    if body.to not in BETA_LANGS:
+        raise HTTPException(422, "language not supported")
+    if body.to not in ("en", "hi"):
+        need(me, "moderator")  # the other Indian languages are a moderators-only beta until a translator passes the test
     limit(me or by_ip(request), "translate", 60, 60)
     limit(EVERYONE, "translate", 2000, 24 * 60)
     texts = [t[:3000] for t in body.texts]
-    lang = "Hindi (Devanagari script)" if body.to == "hi" else "English"
+    lang = BETA_LANGS[body.to]
     out = write([{"role": "system", "content": f"Translate each part into {lang}. Parts are separated by a line with only @@@; keep "
                   "that separator and the same number of parts. Keep every number, time, price, date, place name in its usual "
                   "spelling, markdown (** and - bullets) and line breaks. Write numbers with 0-9 digits. Do not add or drop "

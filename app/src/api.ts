@@ -102,7 +102,7 @@ export type StampRes = { status: 'confirmed' | 'pending' | 'rejected'; rarity: s
 export type SavedChat = { id: string; title: string; city?: string; count: number; updated: string };
 /** A saarthi's event entry (field "Event"): dates may be an earlier year's for a yearly event. */
 export type EventEntry = { name: string; start: string; end?: string; recurring: 'yearly' | 'yearly-lunar' | 'once' | 'moving'; where?: string; watch?: string };
-export type ChatRes = { ai: boolean; text: string | null; engine?: string; note?: string; emergency?: boolean; placeIds?: string[]; followUps?: string[] };
+export type ChatRes = { ai: boolean; text: string | null; engine?: string; note?: string; emergency?: boolean; placeIds?: string[]; followUps?: string[]; anchor?: { name: string; lat: number; lng: number; id?: string | null } };
 export type Ticket = { id: string; place: string; from: string; text: string; status: 'open' | 'answered' | 'escalated'; proof?: string; answer?: string };
 export type ServerPost = { id: string; by: string; byName: string; byRole?: string; community?: string; biz?: string | null; kind: string; text: string; place?: string; city?: string; likes: number; saves: number; comments: number; at: string; liked?: boolean; saved?: boolean; mine?: boolean; media?: string[]; videos?: string[] };
 export type LeaderRow = { rank: number; id: string; name: string; avatar?: string | null; frame?: string | null; points: number; level: number; stamps: number; me: boolean };
@@ -194,6 +194,6 @@ export const api = {
     account: { id: string; name?: string; email?: string; signIn: string; roles: string[]; joined?: string | null; city?: string; points: number; group: Record<string, unknown>; lastStamp: { place: string; date?: string; time: string } | null; lastPlan: { date?: string; stops: string[]; done: string[] } | null; earlierPresses: number } | null }[]>('GET', '/mod/sos'),
   sosHandled: (id: string, note: string) => call<{ status: string; handledBy: string; handledAt: string; handledNote: string }>('POST', `/mod/sos/${id}`, { note }),
   modUsers: (q = '') => call<{ id: string; name: string; roles: string[]; kind: string; banned: boolean; points: number }[]>('GET', `/mod/users?q=${encodeURIComponent(q)}`),
-  translate: (texts: string[], to: 'en' | 'hi') => call<{ texts: string[] }>('POST', '/translate', { texts, to }, 20000),
+  translate: (texts: string[], to: string) => call<{ texts: string[] }>('POST', '/translate', { texts, to }, 20000),
   ban: (id: string, banned: boolean) => call('POST', `/mod/users/${id}/ban`, { banned }),
 };

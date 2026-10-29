@@ -62,6 +62,7 @@ def uncovered_city(text: str) -> str | None:
 # "सराफ़ा बाज़ार, ग्वालियर" matched Gwalior Fort through "ग्वालियर", "Gohad Fort" matched Gwalior Fort through "fort").
 GENERIC = {"tomb", "temple", "temples", "palace", "mahal", "gwalior", "indore", "mandir", "bagh", "fort", "garden", "gardens", "lake", "museum",
            "market", "bazaar", "bazar", "park", "the", "and", "with", "dam", "zoo", "hall", "group", "falls", "waterfall", "memorial", "city",
+           "palaces", "places", "place", "monuments", "monument", "visit", "things", "around", "nearby", "about", "timings",
            "ग्वालियर", "इंदौर", "मंदिर", "महल", "किला", "क़िला", "बाग", "बाज़ार", "बाजार", "मकबरा", "संग्रहालय", "उद्यान", "झील", "माता", "समूह", "मेला"}
 
 

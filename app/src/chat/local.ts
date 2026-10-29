@@ -4,7 +4,7 @@
 import { checkUnit, confirmItems, feeFor, fmt, guardrail, parseTrip, promotable, rankedPlaces, windowFor, type Data, type Place, type Plan } from '../core';
 import type { Lang } from '../theme/ThemeProvider';
 
-export type Card = { kind: 'place'; id: string } | { kind: 'places'; ids: string[] } | { kind: 'quick'; hours?: number } | { kind: 'bazaar' } | { kind: 'sos' } | { kind: 'roadmap' } | { kind: 'city'; city: 'gwalior' | 'indore'; ask: string } | { kind: 'map'; id: string };
+export type Card = { kind: 'place'; id: string } | { kind: 'places'; ids: string[] } | { kind: 'quick'; hours?: number } | { kind: 'bazaar' } | { kind: 'sos' } | { kind: 'roadmap' } | { kind: 'city'; city: 'gwalior' | 'indore'; ask: string } | { kind: 'map'; id: string; name?: string };
 export type Reply = { text: string; cards: Card[]; chips: string[] };
 
 // Shared with the server (main.py EMERGENCY_Q). Not plain 'help me': that is usually 'help me plan'.
