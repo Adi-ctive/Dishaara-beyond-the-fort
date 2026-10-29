@@ -173,3 +173,12 @@ def test_translate_keeps_numbers(monkeypatch):
     assert c.post("/translate", json={"texts": ["ticket ₹25", "today"], "to": "hi"}).status_code == 502  # a changed price is refused
     monkeypatch.delenv("GROQ_KEY")
     assert c.post("/translate", json={"texts": ["x"], "to": "hi"}).status_code == 503
+
+
+def test_plan_readable_only_by_its_owner():
+    a, _ = signin("Alice")
+    b, _ = signin("Bob")
+    p = c.post("/plans", json={"input": {"hours": 4}}, headers=a).json()
+    assert c.get(f"/plans/{p['id']}", headers=a).status_code == 200
+    assert c.get(f"/plans/{p['id']}", headers=b).status_code == 404
+    assert c.get(f"/plans/{p['id']}").status_code == 404

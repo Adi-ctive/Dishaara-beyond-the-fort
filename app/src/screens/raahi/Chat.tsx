@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { getKey, respondAI } from '../../chat/ai';
 import { api, apiOn } from '../../api';
-import { feeFor, fmt, people, startCoord, startName } from '../../core';
+import { feeFor, fmt, people, rankedPlaces, SEEDS, startCoord, startName } from '../../core';
 import { respond, starterChips, type Card, type Reply } from '../../chat/local';
 import { useNav } from '../../nav';
 import { useStore } from '../../store';
@@ -77,7 +77,9 @@ const lastPlaceIds = (msgs: Msg[]) => {
 
 // Covered cities by name. A question about the other one offers a one-tap switch instead of a Gwalior-only answer.
 const CITY_NAMES = { gwalior: /gwalior|ग्वालियर/i, indore: /indore|इंदौर|इन्दौर/i } as const;
-const otherCity = (text: string, here: string) => (Object.keys(CITY_NAMES) as (keyof typeof CITY_NAMES)[]).find((c) => c !== here && CITY_NAMES[c].test(text) && !CITY_NAMES[here as keyof typeof CITY_NAMES]?.test(text));
+// A place name of the other city counts too ("What else is near Rajwada?" while the app is on Gwalior).
+const otherCity = (text: string, here: string) => (Object.keys(CITY_NAMES) as (keyof typeof CITY_NAMES)[]).find((c) => c !== here && !CITY_NAMES[here as keyof typeof CITY_NAMES]?.test(text)
+  && (CITY_NAMES[c].test(text) || (rankedPlaces(SEEDS[c], text).length > 0 && rankedPlaces(SEEDS[here as keyof typeof CITY_NAMES], text).length === 0)));
 
 function Cards({ cards, onCity }: { cards: Card[]; onCity: (c: 'gwalior' | 'indore', ask: string) => void }) {
   const { data } = useStore();

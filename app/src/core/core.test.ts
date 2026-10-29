@@ -284,3 +284,12 @@ describe('events for planning ahead', () => {
     expect(eventsOn(g, '2027-12-15').map((e) => [e.id, e.guess?.from])).toEqual([['tansen-samaroh-2026', '2026-12-14']]);
   });
 });
+
+describe('a question about the other city', () => {
+  it('names an Indore place only in Indore data', async () => {
+    const { SEEDS, rankedPlaces } = await import('./index');
+    expect(rankedPlaces(SEEDS.indore, 'What else is near Rajwada?').length).toBeGreaterThan(0);
+    expect(rankedPlaces(SEEDS.gwalior, 'What else is near Rajwada?')).toEqual([]);
+    for (const q of ['What is open today?', 'Hidden places', 'Food nearby', 'Plan my day', 'ticket price']) expect(rankedPlaces(SEEDS.indore, q)).toEqual([]);
+  });
+});

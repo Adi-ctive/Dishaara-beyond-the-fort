@@ -191,7 +191,7 @@ def health():
 def reset(me: dict | None = Depends(current)):
     """Back to the seed state. Only on the laptop's in-memory database, never on Atlas."""
     if os.getenv("MONGODB_URI"):
-        raise HTTPException(403, "reset is off on a real database")
+        raise HTTPException(404, "Not Found")  # does not exist on the public site
     db = get_db()
     for name in db.list_collection_names():
         db.drop_collection(name)
@@ -368,10 +368,11 @@ def update_plan(pid: str, body: PlanIn, me: dict | None = Depends(current)):
 
 
 @app.get("/plans/{pid}")
-def get_plan(pid: str):
-    """Shared plans are readable by link."""
+def get_plan(pid: str, me: dict | None = Depends(current)):
+    """A saved plan, for its owner only (a plan made as a guest has no owner). Found by a Pro-style scan, 29 Oct:
+    any signed-in raahi could read another's plan by id."""
     p = get_db().plans.find_one({"_id": pid})
-    if not p:
+    if not p or (p.get("user") and (not me or me["_id"] != p["user"])):
         raise HTTPException(404, "no such plan")
     return strip(p)
 
