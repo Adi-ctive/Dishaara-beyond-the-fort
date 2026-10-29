@@ -845,3 +845,26 @@ def test_open_question_about_a_named_place_keeps_its_facts():
     assert [p["id"] for p in pack["places"]][:1] == ["gwalior-fort"] and "openToday" not in pack
     pack, _ = main.retrieve(main.ChatIn(text="What is open today?", city="gwalior", lang="en"))
     assert pack.get("openToday")
+
+
+def test_plan_ahead_questions_get_the_event_calendar():
+    pack, _ = main.retrieve(main.ChatIn(text="Can I plan ahead for next month?", city="gwalior", lang="en"))
+    assert "planAhead" in pack and "eventsThen" in pack
+    pack, _ = main.retrieve(main.ChatIn(text="I am coming on 15 January, anything special?", city="gwalior", lang="en"))
+    fair = pack["eventsThen"]["events"][0]
+    assert fair["howSure"] == "a past pattern" and fair["when"].startswith("last held")
+    assert "planAhead" not in main.retrieve(main.ChatIn(text="When does Gujari Mahal open?", city="gwalior", lang="en"))[0]
+
+
+def test_saarthi_event_goes_to_the_city_calendar_after_approval():
+    a, p = staff("aditya", "Aditya"), staff("priyangi", "Priyangi")
+    veteran("aditya", "priyangi")
+    ev = {"name": "Kite festival", "start": "2025-01-14", "end": "2025-01-14", "recurring": "yearly", "where": "Phool Bagh", "watch": "Municipal notice board"}
+    assert c.post("/facts", json={"placeId": "city", "city": "gwalior", "field": "Event", "value": "Kites over Phool Bagh", "label": "locally verified"}, headers=a).status_code == 422
+    e = c.post("/facts", json={"placeId": "city", "city": "gwalior", "field": "Event", "value": "Kites over Phool Bagh", "label": "locally verified", "event": ev}, headers=a).json()
+    assert c.post(f"/verify/{e['id']}", json={"ok": True}, headers=p).status_code == 200
+    d = main.data("gwalior")
+    kite = next(x for x in d["events"] if x["name"]["en"] == "Kite festival")
+    assert kite["from"] == "2025-01-14" and kite["src"] == "saarthi"
+    hits = main.events_on(d, "2027-01-14")
+    assert any(h["name"]["en"] == "Kite festival" and h["s"] == "historical pattern" for h in hits)

@@ -97,6 +97,8 @@ export type Twists = { closed: string[]; crowded?: string[]; budgetHalf: boolean
 export type Reading = { lat: number; lng: number; accuracy: number; t: number };
 export type StampRes = { status: 'confirmed' | 'pending' | 'rejected'; rarity: string; points: number; checks: { check: string; ok: boolean; soft?: boolean }[]; testMode: boolean };
 export type SavedChat = { id: string; title: string; city?: string; count: number; updated: string };
+/** A saarthi's event entry (field "Event"): dates may be an earlier year's for a yearly event. */
+export type EventEntry = { name: string; start: string; end?: string; recurring: 'yearly' | 'yearly-lunar' | 'once' | 'moving'; where?: string; watch?: string };
 export type ChatRes = { ai: boolean; text: string | null; engine?: string; note?: string; emergency?: boolean; placeIds?: string[]; followUps?: string[] };
 export type Ticket = { id: string; place: string; from: string; text: string; status: 'open' | 'answered' | 'escalated'; proof?: string; answer?: string };
 export type ServerPost = { id: string; by: string; byName: string; byRole?: string; community?: string; biz?: string | null; kind: string; text: string; place?: string; city?: string; likes: number; saves: number; comments: number; at: string; liked?: boolean; saved?: boolean; mine?: boolean };
@@ -175,7 +177,7 @@ export const api = {
   saarthiMe: () => call<{ id: string; name: string; region: string; checks: number; approved: number; toVerify: number; openTickets: number; followers: number }>('GET', '/saarthi/me'),
   verifyQueue: () => call<{ id: string; place: string; field: string; value: string; by: string; risk: string }[]>('GET', '/verify-queue'),
   verify: (id: string, ok: boolean) => call('POST', `/verify/${id}`, { ok }),
-  addFact: (b: { placeId: string; city?: string; unitId?: string | null; field: string; value: string; label: string; proof?: string[] }) => call<{ id: string; risk: string; route: 'moderator' | 'saarthi' }>('POST', '/facts', b),
+  addFact: (b: { placeId: string; city?: string; unitId?: string | null; field: string; value: string; label: string; proof?: string[]; event?: EventEntry }) => call<{ id: string; risk: string; route: 'moderator' | 'saarthi' }>('POST', '/facts', b),
   saarthiTodo: (city: string) => call<{ place: string; name: string; items: { field: string; unit: string | null; unitName: string | null; state: string; now?: string; waiting: boolean }[] }[]>('GET', `/saarthi/todo?city=${city}`),
   // moderator
   getTwists: () => call<Twists>('GET', '/mod/twists', undefined, 3000),

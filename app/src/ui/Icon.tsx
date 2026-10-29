@@ -24,6 +24,7 @@ const PATHS: Record<string, string> = {
   plus: 'M12 5v14M5 12h14',
   x: 'M6 6l12 12M18 6L6 18',
   clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
+  calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
   wallet: 'M4 7h15a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4zM4 7l11-3v3M16 13h2',
   share: 'M12 4v11M8 8l4-4 4 4M5 13v6h14v-6',
   grip: 'M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01',

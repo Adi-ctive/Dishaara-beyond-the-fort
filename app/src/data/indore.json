@@ -5,7 +5,7 @@
       "en": "Indore",
       "hi": "इंदौर"
     },
-    "dataVersion": "2026-10-28T22:18",
+    "dataVersion": "2026-10-29T10:02",
     "readAt": "2026-10-25",
     "tz": 5.5,
     "center": [
@@ -1952,6 +1952,30 @@
       "type": "visitor report",
       "evidence": "Rs 14 first km, Rs 12 per km after, from 1 Jul 2019. https://www.freepressjournal.in/indore/taxi-auto-fares-hiked-in-the-city",
       "date": "2019-06-01"
+    },
+    "ii-rangpanchami-2027": {
+      "name": "Incredible India, Rangpanchami Ger Mahotsav",
+      "type": "official page",
+      "evidence": "27 March 2027 at Rajwada, Indore: the Ger procession of the Holkar era, five days after Holi. Read 29 Oct 2026",
+      "date": "2026-10-29"
+    },
+    "indore-nic-festivals": {
+      "name": "Indore district (indore.nic.in), Festivals",
+      "type": "official page",
+      "evidence": "Rangpanchami in March, five days after Holi; Anant Chaturdashi in September, the last day of Ganesh Chaturthi. Page updated 24 May 2019",
+      "date": "2019-05-24"
+    },
+    "ind24-jhanki-2026": {
+      "name": "Ind24, Indore Anant Chaturdashi 2026 jhanki",
+      "type": "news report",
+      "evidence": "The jhanki procession on 25 September 2026",
+      "date": "2026-09"
+    },
+    "travel-gulawat-season": {
+      "name": "TravelTriangle and Veena World, Gulawat Lotus Valley",
+      "type": "travel sites",
+      "evidence": "Lotus bloom given as September to November by most, some say to February. No official source. Read 25 Oct 2026",
+      "date": "2026-10-25"
     }
   },
   "landmarks": [
@@ -11110,5 +11134,99 @@
       "en": "News and media",
       "hi": "समाचार और मीडिया"
     }
-  }
+  },
+  "events": [
+    {
+      "id": "rangpanchami-2027",
+      "name": {
+        "en": "Rangpanchami Ger",
+        "hi": "रंगपंचमी गेर"
+      },
+      "about": {
+        "en": "The Holkar-era colour procession through the old city, five days after Holi.",
+        "hi": "होलकर काल से चली आ रही रंगों की गेर, होली के पाँच दिन बाद पुराने शहर में।"
+      },
+      "where": {
+        "en": "Rajwada and the old city",
+        "hi": "राजवाड़ा और पुराना शहर"
+      },
+      "place": "rajwada",
+      "from": "2027-03-27",
+      "to": "2027-03-27",
+      "recurring": "yearly-lunar",
+      "series": "rangpanchami",
+      "s": "officially confirmed",
+      "src": "ii-rangpanchami-2027",
+      "ver": "2026-10-29",
+      "crowd": true,
+      "watch": {
+        "en": "Always five days after Holi, so the date moves each year with the Hindu calendar.",
+        "hi": "हमेशा होली के पाँच दिन बाद, इसलिए तारीख़ हर साल हिंदू पंचांग से बदलती है।"
+      },
+      "tip": {
+        "en": "The old city around Rajwada is packed and soaked in colour: wear clothes you do not mind ruining.",
+        "hi": "राजवाड़ा के आसपास भारी भीड़ और रंग: ऐसे कपड़े पहनें जो ख़राब होने से फ़र्क़ न पड़े।"
+      }
+    },
+    {
+      "id": "anant-chaturdashi",
+      "name": {
+        "en": "Anant Chaturdashi jhanki procession",
+        "hi": "अनंत चतुर्दशी झाँकी"
+      },
+      "about": {
+        "en": "Night procession of lit tableaux on the last day of Ganesh Chaturthi, a 100-year tradition.",
+        "hi": "गणेश चतुर्थी के आख़िरी दिन रोशन झाँकियों का रात का जुलूस, सौ साल पुरानी परंपरा।"
+      },
+      "where": {
+        "en": "Old city route, Rajwada area",
+        "hi": "पुराने शहर का रास्ता, राजवाड़ा क्षेत्र"
+      },
+      "from": "2026-09-25",
+      "to": "2026-09-25",
+      "recurring": "yearly-lunar",
+      "series": "anant-chaturdashi",
+      "s": "recently reported",
+      "src": "ind24-jhanki-2026",
+      "ver": "2026-09",
+      "crowd": true,
+      "watch": {
+        "en": "The last day of Ganesh Chaturthi, in September (Indore district site). The date follows the Hindu calendar.",
+        "hi": "गणेश चतुर्थी का आख़िरी दिन, सितंबर में (इंदौर ज़िला साइट)। तारीख़ हिंदू पंचांग से तय होती है।"
+      },
+      "tip": {
+        "en": "Roads in the old city close for the night.",
+        "hi": "रात को पुराने शहर की सड़कें बंद रहती हैं।"
+      }
+    },
+    {
+      "id": "gulawat-bloom",
+      "name": {
+        "en": "Lotus bloom at Gulawat",
+        "hi": "गुलावट में कमल खिलना"
+      },
+      "about": {
+        "en": "The lotus ponds of Gulawat are at their best.",
+        "hi": "गुलावट के कमल तालाब सबसे सुंदर रहते हैं।"
+      },
+      "where": {
+        "en": "Gulawat Lotus Valley",
+        "hi": "गुलावट लोटस वैली"
+      },
+      "place": "gulawat-lotus-valley",
+      "window": {
+        "start": "09-01",
+        "end": "11-30"
+      },
+      "recurring": "yearly",
+      "s": "unverified",
+      "src": "travel-gulawat-season",
+      "ver": "2026-10-25",
+      "crowd": false,
+      "tip": {
+        "en": "Travel sites disagree on how long the bloom lasts. No official source.",
+        "hi": "फूल कब तक रहते हैं, इस पर यात्रा साइटें अलग बताती हैं। कोई आधिकारिक स्रोत नहीं।"
+      }
+    }
+  ]
 }

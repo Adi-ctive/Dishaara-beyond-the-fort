@@ -1,9 +1,10 @@
 import { lazy, Suspense, useState } from 'react';
-import { cityNear, pointStart, startCoord, startName, type Mode } from '../../core';
+import { cityNear, eventsOn, pointStart, startCoord, startName, type Mode } from '../../core';
 import { INTERESTS } from '../../data/demo';
 import { useNav } from '../../nav';
 import { nowMinIST, promptFrom, useStore, type Prefs } from '../../store';
 import { useTheme } from '../../theme/ThemeProvider';
+import { EventNote } from '../../ui/EventNote';
 import { Icon } from '../../ui/Icon';
 import { LayerPage, Toggle } from '../../ui/Layer';
 import { Chips, Counter } from '../../ui/Pickers';
@@ -37,7 +38,7 @@ const GROUP: Record<Who, Prefs['group']> = {
 // "Plan my day": time, start point, who is coming, mood. Trip details change every time, so they are
 // asked here (filled from the last trip), not in the one-time setup. The roadmap appears at once.
 export function QuickPlan({ hours: asked }: { hours?: number }) {
-  const { s, set, data } = useStore();
+  const { s, set, data, today } = useStore();
   const { lang } = useTheme();
   const { closeAll, go } = useNav();
   const hi = lang === 'hi';
@@ -45,6 +46,12 @@ export function QuickPlan({ hours: asked }: { hours?: number }) {
   const [hours, setHours] = useState(asked ?? s.quick?.hours ?? 4);
   const [startPoint, setStart] = useState(s.quick?.startPoint ?? 'station');
   const [startTime, setStartTime] = useState(() => startFor(s.prefs.startAt));
+  // Plan ahead: any day in the next six months. Past or missing means today.
+  const [date, setDate] = useState(() => (s.quick?.date && s.quick.date > today ? s.quick.date : today));
+  const plusDays = (n: number) => new Date(Date.parse(today + 'T00:00:00Z') + n * 86400000).toISOString().slice(0, 10);
+  const tomorrow = plusDays(1);
+  const onDay = eventsOn(data, date);
+  const dayLabel = (d: string) => new Date(d + 'T00:00:00Z').toLocaleDateString(hi ? 'hi-IN' : 'en-IN', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
   const [picking, setPicking] = useState(false);
   const [where, setWhere] = useState('');
   const { tokens } = useTheme();
@@ -73,7 +80,7 @@ export function QuickPlan({ hours: asked }: { hours?: number }) {
 
   const make = () => {
     const prefs: Prefs = { ...s.prefs, ...trip, modes: trip.modes.length ? trip.modes : ['walk', 'auto'] };
-    set({ quick: { hours, startPoint, start }, prefs, prompt: promptFrom(picked, prefs), order: null, done: [], skip: [], interests: picked });
+    set({ quick: { hours, startPoint, start, date: date === today ? undefined : date }, prefs, prompt: promptFrom(picked, prefs), order: null, done: [], skip: [], interests: picked });
     closeAll();
     go('roadmap');
   };
@@ -83,11 +90,20 @@ export function QuickPlan({ hours: asked }: { hours?: number }) {
       <div className="tap-step">
         <span className="tap-n">1</span>
         <b>{t('When, and for how long?', 'कब, और कितनी देर?')}</b>
+        <div className="chips" role="group" aria-label={t('Day', 'दिन')}>
+          <button className={`chip${date === today ? ' on' : ''}`} onClick={() => setDate(today)}>{t('Today', 'आज')}</button>
+          <button className={`chip${date === tomorrow ? ' on' : ''}`} onClick={() => setDate(tomorrow)}>{t('Tomorrow', 'कल')}</button>
+          <label className={`chip date-chip${date > tomorrow ? ' on' : ''}`}>
+            <Icon name="calendar" size={14} /> {date > tomorrow ? dayLabel(date) : t('Pick a date', 'तारीख़ चुनें')}
+            <input type="date" min={today} max={plusDays(183)} value={date} onChange={(e) => e.target.value && setDate(e.target.value < today ? today : e.target.value)} aria-label={t('Date of your visit', 'घूमने की तारीख़')} />
+          </label>
+        </div>
+        <EventNote events={onDay} />
         <label className="slider">
           <span>{t('Start at', 'शुरुआत')} <b>{startTime}</b></span>
           <input type="range" min={360} max={1200} step={15} value={toMin(startTime)} onChange={(e) => setStartTime(toHM(Number(e.target.value)))} aria-label={t('Start time', 'शुरू होने का समय')} />
         </label>
-        <button className="link small" onClick={() => setStartTime(roundedStart())}>{t('Start now', 'अभी शुरू करें')} · {roundedStart()}</button>
+        {date === today && <button className="link small" onClick={() => setStartTime(roundedStart())}>{t('Start now', 'अभी शुरू करें')} · {roundedStart()}</button>}
         <label className="slider">
           <span>{t('For', 'कुल')} <b>{hours} {t(hours === 1 ? 'hour' : 'hours', 'घंटे')}</b> · {t('until', 'तक')} {toHM(Math.min(toMin(startTime) + hours * 60, 23 * 60 + 45))}</span>
           <input type="range" min={1} max={12} step={0.5} value={hours} onChange={(e) => setHours(Number(e.target.value))} aria-label={t('Hours', 'घंटे')} />

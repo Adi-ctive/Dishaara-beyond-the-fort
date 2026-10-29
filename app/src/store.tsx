@@ -24,7 +24,8 @@ export type Prefs = {
   note: string; // anything else, in their words (sent to the chat model, religion lines are dropped)
 };
 export type Twists = { closed: string[]; crowded?: string[]; budgetHalf: boolean; rain: boolean; festival: boolean };
-export type QuickInput = { hours: number; startPoint: string; start: string };
+// date: a day to plan ahead for (YYYY-MM-DD); missing or past means today.
+export type QuickInput = { hours: number; startPoint: string; start: string; date?: string };
 
 export type State = {
   city: CityId; // plans, map and chat follow this city
@@ -273,20 +274,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const plan = useMemo(() => {
     if (!s.quick) return null;
+    const date = s.quick.date && s.quick.date > today ? s.quick.date : today;
+    // Moderator alerts and twists describe today: a plan for another day ignores them.
+    const live = date === today;
     const input: PlanInput = {
-      date: today,
+      date,
       start: s.quick.start,
       hours: s.quick.hours,
       startPoint: s.quick.startPoint,
       returnToStart: true,
       // Rain twist: nobody walks between places.
-      modes: s.twists.rain ? ['auto', 'cab'] : s.prefs.modes.length ? s.prefs.modes : ['walk', 'auto'],
+      modes: live && s.twists.rain ? ['auto', 'cab'] : s.prefs.modes.length ? s.prefs.modes : ['walk', 'auto'],
       group: s.prefs.group,
       payment: s.prefs.payment,
       profile,
       counts,
       // Crowded (moderator alert): the planner does not pick it today; a place the raahi added stays.
-      exclude: [...s.twists.closed, ...s.skip, ...(s.removed ?? []), ...(s.twists.crowded ?? []).filter((id) => !s.added.includes(data.places.find((p) => p.units.some((u) => u.id === id))?.id ?? ''))],
+      exclude: [...(live ? s.twists.closed : []), ...s.skip, ...(s.removed ?? []), ...(live ? s.twists.crowded ?? [] : []).filter((id) => !s.added.includes(data.places.find((p) => p.units.some((u) => u.id === id))?.id ?? ''))],
       added: s.added,
       maxVisit: s.prefs.maxPerPlace,
     };

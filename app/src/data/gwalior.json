@@ -5,7 +5,7 @@
       "en": "Gwalior",
       "hi": "ग्वालियर"
     },
-    "dataVersion": "2026-10-28T22:18",
+    "dataVersion": "2026-10-29T10:02",
     "readAt": "2026-10-25",
     "tz": 5.5,
     "center": [
@@ -1568,6 +1568,30 @@
       "type": "official page",
       "evidence": "State Protected Monument board, photographed by Team Argus on 28 Oct 2026: Indian Rs 20, foreigner Rs 400, timing sunrise to sunset",
       "date": "2026-10-28"
+    },
+    "zee-tradefair-2024": {
+      "name": "Zee News (Hindi), Gwalior trade fair will run from 25 December to 25 February",
+      "type": "news report",
+      "evidence": "Published 4 Nov 2024 for the 2024-25 fair: 25 Dec to 25 Feb, about 104 acres near Sagar Taal ground, 50% road tax rebate on vehicles bought at the fair",
+      "date": "2024-11-04"
+    },
+    "wiki-tradefair": {
+      "name": "Wikipedia, Gwalior trade fair",
+      "type": "encyclopedia",
+      "evidence": "Mela Ground, Race Course Road, 104 acres, run by the Gwalior Trade Fair Authority, started 1905. Read 29 Oct 2026",
+      "date": "2026-10-29"
+    },
+    "mpt-tansen-2026": {
+      "name": "MP Tourism, 102nd Tansen Sangeet Samaroh 2026",
+      "type": "official page",
+      "evidence": "14 to 19 December 2026 at Tansen Samadhi Sthal, Gwalior, no entry fee. Organised by Ustad Alauddin Khan Sangeet Evam Kala Akademi (MP Department of Culture). Read 29 Oct 2026",
+      "date": "2026-10-29"
+    },
+    "ii-tansen-2026": {
+      "name": "Incredible India, Tansen Music Festival",
+      "type": "official page",
+      "evidence": "14-19 Dec 2026. Read 29 Oct 2026",
+      "date": "2026-10-29"
     }
   },
   "landmarks": [
@@ -15270,5 +15294,70 @@
       "en": "News and media",
       "hi": "समाचार और मीडिया"
     }
-  }
+  },
+  "events": [
+    {
+      "id": "trade-fair",
+      "name": {
+        "en": "Gwalior Trade Fair (Vyapar Mela)",
+        "hi": "ग्वालियर व्यापार मेला"
+      },
+      "about": {
+        "en": "One of India's biggest trade fairs, running since 1905: hundreds of stalls, rides and food. Vehicles bought here have had a 50% road tax rebate.",
+        "hi": "1905 से लगने वाला देश के सबसे बड़े व्यापार मेलों में से एक: सैकड़ों दुकानें, झूले और खाना। यहाँ ख़रीदी गाड़ियों पर रोड टैक्स में 50% छूट मिलती रही है।"
+      },
+      "where": {
+        "en": "Mela Ground, Race Course Road",
+        "hi": "मेला मैदान, रेस कोर्स रोड"
+      },
+      "from": "2024-12-25",
+      "to": "2025-02-25",
+      "recurring": "yearly",
+      "series": "trade-fair",
+      "s": "recently reported",
+      "src": "zee-tradefair-2024",
+      "ver": "2024-11-04",
+      "crowd": true,
+      "watch": {
+        "en": "Each season's dates are fixed by the Gwalior Trade Fair Authority; stall tenders open in early November, so local papers carry the dates then.",
+        "hi": "हर साल की तारीख़ें ग्वालियर व्यापार मेला प्राधिकरण तय करता है; नवंबर की शुरुआत में दुकानों के टेंडर खुलते हैं, तब स्थानीय अख़बारों में तारीख़ें आती हैं।"
+      },
+      "tip": {
+        "en": "Evenings are very crowded and Race Course Road traffic slows.",
+        "hi": "शाम को बहुत भीड़ रहती है और रेस कोर्स रोड पर ट्रैफ़िक धीमा रहता है।"
+      }
+    },
+    {
+      "id": "tansen-samaroh-2026",
+      "name": {
+        "en": "Tansen Sangeet Samaroh (102nd)",
+        "hi": "तानसेन संगीत समारोह (102वाँ)"
+      },
+      "about": {
+        "en": "India's oldest classical music festival, held at Tansen's tomb. No entry fee.",
+        "hi": "देश का सबसे पुराना शास्त्रीय संगीत समारोह, तानसेन के मक़बरे पर। प्रवेश मुफ़्त।"
+      },
+      "where": {
+        "en": "Tansen Samadhi Sthal (Tomb of Tansen)",
+        "hi": "तानसेन समाधि स्थल"
+      },
+      "place": "tansen-tomb",
+      "from": "2026-12-14",
+      "to": "2026-12-19",
+      "recurring": "yearly",
+      "series": "tansen-samaroh",
+      "s": "officially confirmed",
+      "src": "mpt-tansen-2026",
+      "ver": "2026-10-29",
+      "crowd": true,
+      "watch": {
+        "en": "Held every December. MP Tourism and the MP Department of Culture publish the dates and the line-up.",
+        "hi": "हर दिसंबर होता है। एमपी टूरिज़्म और संस्कृति विभाग तारीख़ें और कलाकारों की सूची जारी करते हैं।"
+      },
+      "tip": {
+        "en": "Daily concert times are not published yet. Visiting the tomb itself may be busier those days.",
+        "hi": "रोज़ के कार्यक्रम का समय अभी प्रकाशित नहीं है। उन दिनों मक़बरे पर भीड़ ज़्यादा हो सकती है।"
+      }
+    }
+  ]
 }

@@ -14,6 +14,7 @@ export * from './alternates';
 export * from './parse';
 export * from './grounding';
 export * from './names';
+export * from './events';
 
 export const SEED = seed as unknown as Data;
 

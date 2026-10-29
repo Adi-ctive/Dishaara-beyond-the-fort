@@ -4,6 +4,7 @@
 2. apply_research.py    the web research ledger, then FAQs from the facts (build_faqs.py)
 3. build_directory.py   helplines, hospitals, police, transport, hotels
 4. build_media.py       Commons photos and official links
+5. build_events.py      fairs, festivals and seasons for planning ahead
 Then bump nothing by hand: apply_research sets city.dataVersion, so the next deploy re-imports into Atlas.
 """
 import subprocess
@@ -11,7 +12,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
-for s in ("build_extras.py", "apply_research.py", "build_directory.py", "build_media.py"):
+for s in ("build_extras.py", "apply_research.py", "build_directory.py", "build_media.py", "build_events.py"):
     print(f"== {s}", flush=True)
     r = subprocess.run([sys.executable, str(HERE / s)], capture_output=True, text=True, encoding="utf-8")
     print("\n".join(r.stdout.strip().splitlines()[-3:]))

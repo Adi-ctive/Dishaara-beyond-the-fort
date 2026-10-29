@@ -1,11 +1,12 @@
 import { animate, motion, Reorder, useDragControls } from 'motion/react';
 import { useEffect, useState } from 'react';
-import { feeFor, fmt, haversineKm, isUnavailable, ROAD_FACTOR, SPEED_KMH, startCoord, startName, windowFor, type Data, type Leg, type Plan, type Stop } from '../../core';
+import { eventsOn, feeFor, fmt, haversineKm, isUnavailable, ROAD_FACTOR, SPEED_KMH, startCoord, startName, windowFor, type Data, type Leg, type Plan, type Stop } from '../../core';
 import { useNav } from '../../nav';
 import { award, nowMinIST, useStore } from '../../store';
 import { useTheme } from '../../theme/ThemeProvider';
 import { LABEL_TEXT, VERDICT_TEXT } from '../../ui/facts';
 import { ART, PlaceCover, artFor } from '../../art/PlaceCover';
+import { EventNote } from '../../ui/EventNote';
 import { Icon } from '../../ui/Icon';
 import { roundedStart } from './QuickPlan';
 
@@ -201,8 +202,11 @@ export function RoadmapTab() {
   const ids = plan.stops.map((x) => x.unit.id);
   const doneCount = ids.filter((id) => s.done.includes(id)).length;
   const next = plan.stops.find((x) => !s.done.includes(x.unit.id));
+  const ahead = plan.input.date > today; // planned for another day: no live countdown, no "running late"
+  const dayName = new Date(plan.input.date + 'T00:00:00Z').toLocaleDateString(hi ? 'hi-IN' : 'en-IN', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+  const onDay = eventsOn(data, plan.input.date);
   const now = nowMinIST();
-  const live = now >= plan.startMin && now <= plan.endMin;
+  const live = !ahead && now >= plan.startMin && now <= plan.endMin;
   const left = live ? plan.endMin - now : plan.endMin - plan.startMin;
   const start = { name: startName(data, plan.input.startPoint) };
   const b = plan.budget;
@@ -214,7 +218,7 @@ export function RoadmapTab() {
   };
 
   const share = async () => {
-    const text = `My Dishaara roadmap (${today}): ` + plan.stops.map((x) => `${fmt(x.arrive)} ${x.unit.name.en}`).join(', ');
+    const text = `My Dishaara roadmap (${plan.input.date}): ` + plan.stops.map((x) => `${fmt(x.arrive)} ${x.unit.name.en}`).join(', ');
     try {
       if (navigator.share) await navigator.share({ title: 'Dishaara roadmap', text });
       else await navigator.clipboard.writeText(text);
@@ -226,6 +230,7 @@ export function RoadmapTab() {
 
   return (
     <div className="screen">
+      {!ahead && (
       <motion.div className="time-strip" initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         <Icon name="clock" size={18} />
         <span>
@@ -240,9 +245,10 @@ export function RoadmapTab() {
           {hi ? 'वापसी' : 'back by'} {fmt(plan.finish)}
         </span>
       </motion.div>
+      )}
 
       <div className="road-head">
-        <h1 className="display small">{hi ? 'आज का रोडमैप' : "Today's roadmap"}</h1>
+        <h1 className="display small">{ahead ? (hi ? `${dayName} का रोडमैप` : `Roadmap for ${dayName}`) : hi ? 'आज का रोडमैप' : "Today's roadmap"}</h1>
         <button className="icon-btn" onClick={share} aria-label={hi ? 'शेयर' : 'Share'}>
           <Icon name={shared ? 'check' : 'share'} size={18} />
         </button>
@@ -251,6 +257,10 @@ export function RoadmapTab() {
         {hi ? 'शुरू' : 'From'} {start?.name[lang]} · {fmt(plan.startMin)} · {plan.stops.length} {hi ? 'जगहें' : 'stops'} · {hi ? 'फ़ोन में सेव, ऑफ़लाइन भी चलेगा' : 'saved on this phone for offline use'}
       </p>
 
+      {ahead && (
+        <p className="small muted">{hi ? 'आगे की तारीख़ का प्लान: समय और फ़ैसले उस दिन के लिए हैं। जाने से पहले दिन की सूचनाएँ फिर देख लें।' : "Planned ahead: hours and verdicts are for that day. Check the day's alerts again before you go."}</p>
+      )}
+      <EventNote events={onDay} />
       <div className="road-progress" aria-hidden="true">
         <motion.span initial={false} animate={{ scaleX: plan.stops.length ? doneCount / plan.stops.length : 0 }} transition={{ type: 'spring', damping: 20 }} />
       </div>
@@ -290,9 +300,9 @@ export function RoadmapTab() {
       )}
 
       <div className="row-actions">
-        <button className="btn ghost" onClick={late}>
+        {!ahead && <button className="btn ghost" onClick={late}>
           <Icon name="clock" size={18} /> {hi ? 'मुझे देर हो रही है' : "I'm running late"}
-        </button>
+        </button>}
         <button className="btn ghost" onClick={() => open({ kind: 'quick' })}>
           <Icon name="edit" size={18} /> {hi ? 'फिर से प्लान' : 'Re-plan'}
         </button>

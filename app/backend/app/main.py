@@ -1101,6 +1101,87 @@ FOLLOW_Q = re.compile(r"\b(this|that|it|there|here|these|those|listed|where is|h
 TIP_TOPIC = {"transport": r"auto|rickshaw|rikshaw|cab|taxi|rapido|ola|uber|fare|ride|travel|get around|getting around|transport|cheap|budget|cost|ऑटो|रिक्शा|किराया|सवारी|कैब",
              "station": r"station|railway|train|arriv|reach|स्टेशन|रेलवे|ट्रेन"}
 RECO_Q = re.compile(r"where (should|can|do) (i|we) go|what should (i|we) (see|visit|do)|where to go|suggest|recommend|what to (see|visit)|best place|must see|kaha(n)? ja(u|un|yen)|कहाँ जाएँ|कहाँ जाऊँ|क्या देखें|सुझाव", re.I)
+# Planning ahead: a month, a date, "next month", "tomorrow", a festival or fair. The answer gets the events then.
+MONTHS = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+          "जनवरी": 1, "फ़रवरी": 2, "फरवरी": 2, "मार्च": 3, "अप्रैल": 4, "मई": 5, "जून": 6, "जुलाई": 7, "अगस्त": 8, "सितंबर": 9, "अक्टूबर": 10, "नवंबर": 11, "दिसंबर": 12}
+AHEAD_Q = re.compile(r"next (month|week|year)|plan ahead|in advance|advance|future|later date|another day|other day|tomorrow|festival|fair|mela|event|season|"
+                     r"\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b|अगले (महीने|हफ़्ते|साल)|कल |पहले से|त्योहार|मेला|आयोजन|मौसम|" + "|".join(k for k in MONTHS if not k.isascii()), re.I)
+
+
+def _md_in(start: str, end: str, md: str) -> bool:
+    return start <= md <= end if start <= end else md >= start or md <= end
+
+
+def events_on(d: dict, date: str) -> list[dict]:
+    """Same three tiers as src/core/events.ts: exact dates, a sourced yearly window, a guess from an earlier year."""
+    from datetime import date as _d, timedelta
+    allv = d.get("events", [])
+    exact = [e for e in allv if e.get("from") and e.get("to") and e["from"] <= date <= e["to"]]
+    pattern = [e for e in allv if not e.get("from") and e.get("window") and _md_in(e["window"]["start"], e["window"]["end"], date[5:])]
+    known = {e.get("series") or e["id"] for e in exact}
+    latest: dict[str, dict] = {}
+    for e in allv:
+        if not e.get("from") or not e.get("to") or e["to"] >= date or e.get("recurring") not in ("yearly", "yearly-lunar"):
+            continue
+        k = e.get("series") or e["id"]
+        if k not in latest or latest[k]["from"] < e["from"]:
+            latest[k] = e
+    guesses = []
+    for k, e in latest.items():
+        later = any((x.get("series") or x["id"]) == k and x.get("from") and x["from"] > e["from"]
+                    and abs((_d.fromisoformat(x["from"]) - _d.fromisoformat(date)).days) < 200 for x in allv)
+        pad = 20 if e.get("recurring") == "yearly-lunar" else 0
+        st = (_d(2001, int(e["from"][5:7]), int(e["from"][8:10])) - timedelta(days=pad)).isoformat()[5:]
+        en = (_d(2001, int(e["to"][5:7]), int(e["to"][8:10])) + timedelta(days=pad)).isoformat()[5:]
+        if k in known or later or not _md_in(st, en, date[5:]):
+            continue
+        guesses.append({**e, "s": "historical pattern", "guess": {"from": e["from"], "to": e["to"]}})
+    return exact + pattern + guesses
+
+
+def when_asked(text: str, day: str) -> tuple[str, list[str]] | None:
+    """The day or month a planning-ahead question is about: (label, list of dates to check)."""
+    from calendar import monthrange
+    from datetime import date as _d, timedelta
+    t = text.lower()
+    today_d = _d.fromisoformat(day)
+    if re.search(r"tomorrow|\bकल\b", t):
+        x = (today_d + timedelta(days=1)).isoformat()
+        return x, [x]
+    month = None
+    if re.search(r"next month|अगले महीने", t):
+        month = today_d.month % 12 + 1
+    for k, m in MONTHS.items():
+        if (re.search(rf"\b{k}[a-z]*\b", t) if k.isascii() else k in t):
+            month = m
+            break
+    if not month:
+        return None
+    year = today_d.year + (1 if month < today_d.month else 0)
+    dm = re.search(r"\b([0-3]?\d)(?:st|nd|rd|th)?\b", t)
+    days = monthrange(year, month)[1]
+    if dm and 1 <= int(dm.group(1)) <= days:
+        x = _d(year, month, int(dm.group(1))).isoformat()
+        return x, [x]
+    return f"{year}-{month:02d}", [_d(year, month, i).isoformat() for i in range(1, days + 1)]
+
+
+def events_for(d: dict, dates: list[str], lang: str) -> list[dict]:
+    seen: dict[str, dict] = {}
+    for x in dates:
+        for e in events_on(d, x):
+            seen.setdefault(e["id"], e)
+    out = []
+    for e in seen.values():
+        when = (f"last held {e['guess']['from']} to {e['guess']['to']}, likely around the same time again" if e.get("guess")
+                else f"{e['from']} to {e['to']}" if e.get("from") else f"usually {e['window']['start']} to {e['window']['end']} (month-day) each year")
+        out.append({"name": e["name"][lang], "where": e["where"][lang], "when": when, "howSure": LABEL_WORDS[lang].get(e["s"], e["s"]), "about": e["about"][lang],
+                    **({"placeId": e["place"]} if e.get("place") else {}),
+                    **({"tip": e["tip"][lang]} if e.get("tip") else {}), **({"howToWatch": e["watch"][lang]} if e.get("watch") else {}),
+                    **({"addedBy": f"saarthi {e['by']}"} if e.get("by") else {}), "crowd": bool(e.get("crowd"))})
+    return out
+
+
 HOW_KNOW_Q = re.compile(r"source|verif|how do you know|where .*(info|data|information)|trust|accurate|reliable|kaha se|kahan se|स्रोत|सत्यापि|कहाँ से|भरोसा", re.I)
 NEAR_Q = re.compile(r"\bnear|nearby|close to|around\b|पास", re.I)
 HOW_WE_KNOW = {
@@ -1203,6 +1284,15 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
     alerts = [{"place": p["name"][lang], "alert": a} for p in d["places"] if (a := live_alert(p, tw, lang))]
     if alerts:
         pack["moderatorAlertsToday"] = alerts
+    if AHEAD_Q.search(body.text):
+        # The app can plan any day up to six months ahead; events then come from the city calendar (exact, pattern or last year's).
+        pack["planAhead"] = ("Plan my day has Today, Tomorrow and Pick a date (up to six months ahead). The roadmap then uses that day's hours and closures and lists fairs and festivals on that day."
+                             if lang == "en" else "प्लान माय डे में आज, कल और तारीख़ चुनें (छह महीने आगे तक) है। रोडमैप उस दिन के समय और बंदी से बनता है और उस दिन के मेले-त्योहार दिखाता है।")
+        w = when_asked(body.text, today())
+        if w:
+            pack["eventsThen"] = {"when": w[0], "events": events_for(d, w[1], lang)}
+        else:
+            pack["cityEvents"] = events_for(d, [x for x in ([today()] + [f"{int(today()[:4]) + (1 if m < int(today()[5:7]) else 0)}-{m:02d}-15" for m in range(1, 13)])], lang)
     if HOW_KNOW_Q.search(body.text):
         pack["howWeKnow"] = HOW_WE_KNOW[lang]
     if ids and NEAR_Q.search(body.text):
@@ -1242,6 +1332,8 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
     if tip and "appGuide" not in pack:
         pack["maybeMention"] = tip
     allowed = set(ids[:3]) | {p["id"] for p in d["places"] if p["name"][lang] in {o["name"] for o in pack.get("openToday", [])}}
+    # Places where a listed fair or festival happens may be named (Rangpanchami at Rajwada).
+    allowed |= {e["placeId"] for e in (pack.get("eventsThen") or {}).get("events", []) + pack.get("cityEvents", []) if e.get("placeId")}
     for t in body.history:
         if t.role == "user":
             allowed |= {h["id"] for h in rules.search_places(d, t.text)}
@@ -1308,6 +1400,9 @@ def overclaims(answer: str, pack: dict) -> bool:
     for o in pack.get("openToday", []):
         if named_in(o["name"], answer) and (o.get("hours") or {}).get("howSure") in strong:
             return False
+    for e in (pack.get("eventsThen") or {}).get("events", []) + pack.get("cityEvents", []):
+        if e["howSure"] in strong and e["name"].split(" (")[0].lower() in answer.lower():
+            return False
     return True
 
 
@@ -1367,7 +1462,8 @@ def shown_ids(answer: str, pack: dict, body: ChatIn, k: int = 3) -> list[str]:
     d = data(body.city if body.city in cities.available() else "gwalior")
     low = answer.lower()
     ids += [p["id"] for p in d["places"] if p["id"] not in ids and (p["name"][lang].lower() in low)]
-    if not ids and pack["places"]:
+    # A first-place card only when the raahi named a place: "can I plan for next month" names none (29 Oct, a Baija Taal card).
+    if not ids and pack["places"] and (rules.search_places(d, body.text) or pack["places"][0]["id"] in (body.lastPlaces or [])):
         ids = [pack["places"][0]["id"]]
     return ids[:k]
 
@@ -1399,6 +1495,7 @@ def system_prompt(body: ChatIn, city: str) -> str:
         "6j. If FACTS has weatherToday and it has a tip (heat, rain, strong sun), you may give that tip as Good to know.",
         "6i. If FACTS has nearby, name two or three of them with distance.",
         "6a. If FACTS has openToday, the reply is only: a bold first line; then up to 5 bullets \"- **Name**: hours\", adding \"(very crowded now)\" or the alert when that place has liveAlert, and listing places without an alert first; one line saying how many more are open and that the Map tab shows them all; the italic question. No other labels, no nested lists, never list a place twice. Places without hours on record are not listed. Do not say how sure each one is.",
+        "6o. If FACTS has planAhead, say plainly that they can plan a future day: Plan my day, then Pick a date. If FACTS has eventsThen, name each event with its when and howSure; for a guess say it was last held then and is likely around the same time, and give howToWatch. If eventsThen has no events, say no fair or festival is on our calendar then. If FACTS has cityEvents, name the ones that fit the question. Never invent an event or a date.",
         "6c. If FACTS has cityNumbers, give the one or two numbers that answer the question, with the name and how sure they are. Never make up a number.",
         "6d. If FACTS has thingsToDo or questionsPeopleAsk for a place, use them for what visitors can do there and for common questions.",
         "7. Format every reply in Markdown as a short card the raahi can scan, in this order:",
@@ -1592,6 +1689,16 @@ def saarthi_me(me: dict | None = Depends(current)):
             "followers": db.follows.count_documents({"target": me["_id"]})}
 
 
+class EventIn(BaseModel):
+    """A fair, festival or season a saarthi knows is coming (or happened): field "Event"."""
+    name: str = Field(min_length=3, max_length=80)
+    start: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    end: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    recurring: str = Field(default="yearly", pattern="^(yearly|yearly-lunar|once|moving)$")
+    where: str = Field(default="", max_length=120)
+    watch: str = Field(default="", max_length=200)  # how to keep an eye out: organiser, notice board, paper
+
+
 class FactIn(BaseModel):
     placeId: str  # a place id, or "city" for an entry about the whole city (with city set)
     city: str | None = None
@@ -1600,6 +1707,7 @@ class FactIn(BaseModel):
     value: str = Field(min_length=1, max_length=500)
     label: str
     proof: list[str] = []
+    event: EventIn | None = None
 
 
 HIGH_RISK = {"Ticket prices", "Weekly closing", "Opening hours", "Last entry", "Safety note"}
@@ -1609,9 +1717,14 @@ HIGH_RISK = {"Ticket prices", "Weekly closing", "Opening hours", "Last entry", "
 def add_fact(body: FactIn, me: dict | None = Depends(current)):
     """Saarthi entries never go live directly. High-risk fields need a second saarthi or an official source."""
     me = need(me, "saarthi")
+    if body.field == "Event":
+        if not body.event or not body.event.start:
+            raise HTTPException(422, "an event needs a name and a start date (an earlier year's date is fine for a yearly event)")
+        if body.event.end and body.event.end < body.event.start:
+            raise HTTPException(422, "the event ends before it starts")
     if body.placeId == "city":
-        if body.city not in cities.CITY_IDS or body.field not in cities.CITY_FIELDS:
-            raise HTTPException(422, "a city entry needs a covered city and the field Getting around or City notice")
+        if body.city not in cities.CITY_IDS or body.field not in {*cities.CITY_FIELDS, "Event"}:
+            raise HTTPException(422, "a city entry needs a covered city and the field Getting around, City notice or Event")
         city = body.city
     else:
         city, _ = place(body.placeId)
@@ -1624,6 +1737,8 @@ def add_fact(body: FactIn, me: dict | None = Depends(current)):
     e = {"_id": f"v{uuid.uuid4().hex[:6]}", "place": body.placeId, "unit": body.unitId, "city": city, "field": body.field, "value": body.value,
          "by": me.get("name", "Saarthi"), "byUser": me["_id"], "risk": "high" if body.field in HIGH_RISK else "low",
          "status": "review" if new else "pending", "date": today(), "label": body.label, "proof": proofs, "at": now()}
+    if body.field == "Event":
+        e["event"] = body.event.model_dump()
     db.verify.insert_one(e)
     if new:
         pl = place(body.placeId)[1] if body.placeId != "city" else {"name": {"en": f"Whole city ({city.title()})"}, "units": []}

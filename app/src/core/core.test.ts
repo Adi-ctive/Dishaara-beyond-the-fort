@@ -267,3 +267,20 @@ describe('the raahi limit on time at one place', () => {
     expect(capped.stops.reduce((n, x) => n + x.visit, 0) / capped.stops.length).toBeLessThanOrEqual(free.stops.reduce((n, x) => n + x.visit, 0) / free.stops.length);
   });
 });
+
+describe('events for planning ahead', () => {
+  it('finds exact dates, and guesses a yearly event from its last dates when this year is not known', async () => {
+    const { eventsOn, eventsInMonth, SEEDS } = await import('./index');
+    const g = SEEDS.gwalior;
+    // Tansen 2026 has official dates; the trade fair's 2026-27 dates are not out, so last season's window is the guess.
+    expect(eventsOn(g, '2026-12-16').map((e) => e.id)).toEqual(['tansen-samaroh-2026']);
+    const fair = eventsOn(g, '2027-01-20');
+    expect(fair.map((e) => [e.id, e.s, e.guess?.from])).toEqual([['trade-fair', 'historical pattern', '2024-12-25']]);
+    expect(eventsOn(g, '2026-11-10')).toEqual([]);
+    // Lunar events: the month is known, the day moves, so the guess allows about three weeks either side.
+    expect(eventsInMonth(SEEDS.indore, '2027-03').map((e) => e.id)).toEqual(['rangpanchami-2027']);
+    expect(eventsOn(SEEDS.indore, '2027-09-20').map((e) => [e.id, e.s])).toEqual([['gulawat-bloom', 'unverified'], ['anant-chaturdashi', 'historical pattern']]);
+    // Next year's Tansen: guessed from 2026's dates.
+    expect(eventsOn(g, '2027-12-15').map((e) => [e.id, e.guess?.from])).toEqual([['tansen-samaroh-2026', '2026-12-14']]);
+  });
+});

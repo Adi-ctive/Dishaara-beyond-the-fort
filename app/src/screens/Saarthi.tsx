@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
-import { api, apiOn, lastError, uploadProof } from '../api';
+import { api, apiOn, lastError, uploadProof, type EventEntry } from '../api';
 import { LABELS, isUnavailable, type Label } from '../core';
 import { useNav } from '../nav';
 import { useStore } from '../store';
@@ -92,11 +92,13 @@ const FIELDS: [string, string][] = [
   ['Safety note', 'सुरक्षा नोट'],
   ['Good to know', 'जानने लायक'],
   ['Things to do', 'क्या करें'],
+  ['Event', 'आयोजन (मेला, त्योहार, मौसम)'],
 ];
 // Entries about the whole city (place "city"): how to get around, and notices that affect many places.
 const CITY_FIELDS: [string, string][] = [
   ['Getting around', 'आना-जाना'],
   ['City notice', 'शहर की सूचना'],
+  ['Event', 'आयोजन (मेला, त्योहार, मौसम)'],
 ];
 
 /** Shrinks a phone photo to at most 1600 px on the long side, as JPEG, so it stays under the 2 MB limit. */
@@ -193,6 +195,8 @@ export function SaarthiForm() {
   const [unit, setUnit] = useState<string | null>(null);
   const [label, setLabel] = useState<Label>('locally verified');
   const [value, setValue] = useState('');
+  // Event entries: a fair, festival or season. Dates can be last year's for a yearly event: the app learns the pattern.
+  const [ev, setEv] = useState<EventEntry>({ name: '', start: '', end: '', recurring: 'yearly', where: '', watch: '' });
   const [proofs, setProofs] = useState<{ id: string; url: string; type: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState('');
@@ -229,7 +233,10 @@ export function SaarthiForm() {
   };
   const send = async () => {
     if (!value.trim()) return setSent(tr('Write what you saw first.', 'पहले लिखें आपने क्या देखा।'));
-    const r = await api.addFact({ placeId: place, city: place === 'city' ? s.city : undefined, unitId: unit, field, value: value.trim(), label, proof: proofs.map((p) => p.id) });
+    const isEvent = field === 'Event';
+    if (isEvent && (ev.name.trim().length < 3 || !ev.start)) return setSent(tr('An event needs a name and a start date.', 'आयोजन का नाम और शुरू होने की तारीख़ ज़रूरी है।'));
+    const event = isEvent ? { ...ev, name: ev.name.trim(), end: ev.end || undefined, where: ev.where?.trim(), watch: ev.watch?.trim() } : undefined;
+    const r = await api.addFact({ placeId: place, city: place === 'city' ? s.city : undefined, unitId: unit, field, value: value.trim(), label, proof: proofs.map((p) => p.id), event });
     if (!r) return setSent(lastError || tr('Could not send. Try again.', 'नहीं भेजा जा सका। फिर कोशिश करें।'));
     setValue('');
     setProofs([]);
@@ -263,7 +270,7 @@ export function SaarthiForm() {
       <div id="saarthi-form" />
       <label className="field"><span>{tr('Place', 'जगह')}</span>
         <select value={place} onChange={(e) => { setPlace(e.target.value); setUnit(null); setField(e.target.value === 'city' ? CITY_FIELDS[0][0] : FIELDS[0][0]); }}>
-          <option value="city">{tr('Whole city: getting around, notices', 'पूरा शहर: आना-जाना, सूचनाएँ')}</option>
+          <option value="city">{tr('Whole city: getting around, notices, events', 'पूरा शहर: आना-जाना, सूचनाएँ, आयोजन')}</option>
           {data.places.map((p) => <option key={p.id} value={p.id}>{p.name[lang]}</option>)}
         </select>
       </label>
@@ -280,7 +287,27 @@ export function SaarthiForm() {
           {(place === 'city' ? CITY_FIELDS : FIELDS).map(([en, hi]) => <option key={en} value={en}>{tr(en, hi)}</option>)}
         </select>
       </label>
-      <label className="field"><span>{tr('What you saw', 'आपने क्या देखा')}</span><textarea rows={3} value={value} maxLength={500} onChange={(e) => setValue(e.target.value)} placeholder={tr('Write exactly what the board or the counter says, for example "9 am to 5 pm, closed Monday"', 'बोर्ड या काउंटर पर जो लिखा है वही लिखें, जैसे "सुबह 9 से शाम 5, सोमवार बंद"')} /></label>
+      {field === 'Event' && (
+        <div className="event-form">
+          <label className="field"><span>{tr('Event name', 'आयोजन का नाम')}</span><input value={ev.name} maxLength={80} onChange={(e) => setEv({ ...ev, name: e.target.value })} placeholder={tr('Gwalior Trade Fair', 'ग्वालियर व्यापार मेला')} /></label>
+          <div className="row2">
+            <label className="field"><span>{tr('Starts', 'शुरू')}</span><input type="date" value={ev.start} onChange={(e) => setEv({ ...ev, start: e.target.value })} /></label>
+            <label className="field"><span>{tr('Ends', 'ख़त्म')}</span><input type="date" value={ev.end} min={ev.start} onChange={(e) => setEv({ ...ev, end: e.target.value })} /></label>
+          </div>
+          <label className="field"><span>{tr('How often', 'कितनी बार')}</span>
+            <select value={ev.recurring} onChange={(e) => setEv({ ...ev, recurring: e.target.value as EventEntry['recurring'] })}>
+              <option value="yearly">{tr('Every year, about the same dates', 'हर साल, लगभग इन्हीं तारीख़ों पर')}</option>
+              <option value="yearly-lunar">{tr('Every year, date follows the Hindu calendar', 'हर साल, तारीख़ हिंदू पंचांग से')}</option>
+              <option value="once">{tr('Only this once', 'सिर्फ़ इस बार')}</option>
+              <option value="moving">{tr('Moves between cities or venues', 'शहर या जगह बदलता है')}</option>
+            </select>
+          </label>
+          <label className="field"><span>{tr('Where', 'कहाँ')}</span><input value={ev.where} maxLength={120} onChange={(e) => setEv({ ...ev, where: e.target.value })} /></label>
+          <label className="field"><span>{tr('How to keep an eye out for the next one', 'अगली बार की ख़बर कैसे मिले')}</span><input value={ev.watch} maxLength={200} onChange={(e) => setEv({ ...ev, watch: e.target.value })} placeholder={tr('Organiser, notice board, newspaper, website', 'आयोजक, सूचना बोर्ड, अख़बार, वेबसाइट')} /></label>
+          <small className="muted">{tr("Past events help too: last year's dates let the app tell raahis when it is likely to happen again.", 'पुराने आयोजन भी काम के हैं: पिछले साल की तारीख़ों से ऐप राहियों को बता पाता है कि यह फिर कब होने की संभावना है।')}</small>
+        </div>
+      )}
+      <label className="field"><span>{field === 'Event' ? tr('What happens there', 'वहाँ क्या होता है') : tr('What you saw', 'आपने क्या देखा')}</span><textarea rows={3} value={value} maxLength={500} onChange={(e) => setValue(e.target.value)} placeholder={tr('Write exactly what the board or the counter says, for example "9 am to 5 pm, closed Monday"', 'बोर्ड या काउंटर पर जो लिखा है वही लिखें, जैसे "सुबह 9 से शाम 5, सोमवार बंद"')} /></label>
       <label className="field"><span>{tr('How do you know?', 'आपको कैसे पता?')}</span>
         <select value={label} onChange={(e) => setLabel(e.target.value as Label)}>
           {LABELS.map((l) => <option key={l} value={l}>{LABEL_TEXT[l][lang]}</option>)}

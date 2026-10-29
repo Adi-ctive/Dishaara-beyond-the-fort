@@ -85,6 +85,18 @@ def _value(field: str, text: str):
 def apply_entry(v: dict, rebuild: bool = True) -> bool:
     """Writes an approved saarthi entry into the place record: dated, labelled, credited to the saarthi."""
     db = get_db()
+    if v.get("field") == "Event" and v.get("event"):
+        # A saarthi's event joins the city calendar; past events stay as history for next year's guess.
+        ev = v["event"]
+        item = {"id": f"saarthi-{v['_id']}", "name": {"en": ev["name"], "hi": ev["name"]}, "about": {"en": v["value"], "hi": v["value"]},
+                "where": {"en": ev.get("where") or "", "hi": ev.get("where") or ""}, "from": ev["start"], "to": ev.get("end") or ev["start"],
+                "recurring": ev.get("recurring", "yearly"), "s": v["label"], "src": "saarthi", "ver": v.get("date"), "by": v.get("by", "Saarthi"),
+                "entry": v.get("_id"), **({"place": v["place"]} if v.get("place") != "city" else {}),
+                **({"watch": {"en": ev["watch"], "hi": ev["watch"]}} if ev.get("watch") else {})}
+        db.cities.update_one({"_id": v["city"]}, {"$pull": {"events": {"entry": v.get("_id")}}})
+        db.cities.update_one({"_id": v["city"]}, {"$push": {"events": item}})
+        _cache.pop(v["city"], None)
+        return True
     if v.get("place") == "city":
         topic = CITY_FIELDS.get(v.get("field"))
         if not topic:

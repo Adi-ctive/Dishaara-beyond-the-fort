@@ -544,3 +544,9 @@ input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px s
 .md-table th { font-weight: 700; color: var(--muted); font-size: 12px; white-space: nowrap; }
 .md-table tr:last-child td { border-bottom: 0; }
 .signin-card button.link { border: 0; background: none; cursor: pointer; }
+.date-chip { position: relative; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.date-chip input[type="date"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.event-note { margin: 8px 0 4px; padding: 8px 12px; border-radius: 14px; background: color-mix(in srgb, var(--accent) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.event-note p { margin: 4px 0; }
+.event-form { display: grid; gap: 8px; padding: 10px 12px; border-radius: 14px; border: 1px dashed var(--line); }
+.event-form .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

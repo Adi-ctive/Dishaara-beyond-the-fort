@@ -100,6 +100,21 @@ export interface Landmark { id: string; name: L10n; coord: [number, number] }
 /** A number in the city directory (helplines, hospitals, police, transport), stamped like a fact. */
 export interface DirEntry { id: string; cat: string; name: L10n; phones: string[]; address?: string; email?: string; website?: string; s: Label; src: string; ver: string }
 
+/** A fair, festival or season (scripts/build_events.py). Exact dates when a source gives them, else a yearly window. */
+export interface CityEvent {
+  id: string; name: L10n; about: L10n; where: L10n; place?: string; tip?: L10n;
+  from?: string; to?: string; window?: { start: string; end: string };
+  s: Label; src: string; ver: string; crowd?: boolean;
+  /** yearly: same dates each year; yearly-lunar: follows the Hindu calendar, month is known; once; moving: changes city or venue. */
+  recurring?: 'yearly' | 'yearly-lunar' | 'once' | 'moving';
+  series?: string; // occurrences of the same event share it, so a known date this year stops the guess
+  watch?: L10n; // how to keep an eye out for the next one
+  by?: string; // the saarthi who added it
+}
+
+/** An event on a day. guess: no dates for that year, so the window comes from an earlier year's dates. */
+export type EventHit = CityEvent & { guess?: { from: string; to: string } };
+
 export interface Data {
   city: { id: string; name: L10n; dataVersion: string; readAt: string; tz: number; center: [number, number] };
   emergency: string;
@@ -110,6 +125,7 @@ export interface Data {
   places: Place[];
   directory?: DirEntry[];
   directoryCats?: Record<string, L10n>;
+  events?: CityEvent[];
 }
 
 export type Mode = 'walk' | 'auto' | 'cab';
