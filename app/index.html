@@ -20,13 +20,32 @@
     <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Tiro+Devanagari+Hindi&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts are added by src/main.tsx so they never hold back the first paint (the CSP allows no inline handlers). -->
   </head>
   <body>
-    <div id="root"></div>
+    <!-- The home page as plain HTML, shown the moment the page arrives on a slow phone; the app replaces it when its code
+         has loaded (30 Oct: phone Lighthouse 74, nothing drawn for 4.1 s). Other addresses (#chat, /login) skip it. -->
+    <style>
+      #boot { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px 20px; background: #fff7ea; color: #1d2340; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+      #boot .bt { width: 100%; max-width: 480px; display: flex; align-items: center; gap: 8px; font: 600 20px 'Fraunces', Georgia, serif; }
+      #boot .bt i { width: 30px; height: 30px; border-radius: 10px; background: #26346b; }
+      #boot .hi { margin: 64px 0 0; color: #b86a12; font: 22px 'Tiro Devanagari Hindi', serif; }
+      #boot h1 { margin: 0; font: 600 clamp(44px, 13vw, 60px)/1 'Fraunces', Georgia, serif; letter-spacing: -0.5px; }
+      #boot .tg { margin: 12px 0 4px; font: 21px 'Fraunces', Georgia, serif; }
+      #boot .sb { margin: 0; max-width: 320px; color: #4e5372; line-height: 1.55; font-size: 15px; }
+      #boot .cta { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; margin-top: 22px; }
+      #boot .cta span { display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 999px; font-weight: 600; font-size: 17px; background: #26346b; color: #fff7ea; }
+      #boot .cta span + span { height: 48px; font-size: 16px; background: #fff; color: #1d2340; border: 1px solid #ebdcc0; }
+    </style>
+    <div id="root"><div id="boot" aria-busy="true">
+      <div class="bt"><i></i>Dishaara</div>
+      <p class="hi" lang="hi">दिशारा</p>
+      <h1>Dishaara</h1>
+      <p class="tg">Know before you go.</p>
+      <p class="sb">Checked, dated facts from local saarthis. A day plan that fits your time.</p>
+      <div class="cta"><span>Plan my day</span><span>Sign in</span></div>
+    </div></div>
+    <script src="/boot.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

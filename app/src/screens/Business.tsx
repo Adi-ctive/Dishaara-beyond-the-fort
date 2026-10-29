@@ -2,7 +2,7 @@
 // then the shop shows in the Bazaar and these screens show its real counts and comments.
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { api, lastError, mediaUrl, uploadShopPhoto, type ServerComment, type Shop } from '../api';
-import { shrink } from './Saarthi';
+import { shrink } from '../ui/shrink';
 import { useNav } from '../nav';
 import { useStore } from '../store';
 import { useTheme } from '../theme/ThemeProvider';

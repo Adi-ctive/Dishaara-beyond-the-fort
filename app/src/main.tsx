@@ -16,6 +16,12 @@ addEventListener('vite:preloadError', (e) => {
   if (reloadForNewVersion()) e.preventDefault();
 });
 
+// Fonts load after the first paint; text shows at once in a system font, then swaps (font-display: swap).
+const fonts = document.createElement('link');
+fonts.rel = 'stylesheet';
+fonts.href = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600&family=Tiro+Devanagari+Hindi&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap';
+document.head.appendChild(fonts);
+
 const initial = (location.hash.slice(1) || 'chat') as Tab;
 // ?instant skips all animations (used for automated testing in a background tab).
 // Automated browsers (security scanners, test robots) get no animations, so every screen is complete the moment it shows.

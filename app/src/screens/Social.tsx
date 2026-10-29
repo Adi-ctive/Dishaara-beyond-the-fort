@@ -14,7 +14,7 @@ import { Icon } from '../ui/Icon';
 import { LayerPage, Section, Seg } from '../ui/Layer';
 import { useTr } from '../ui/tr';
 import { useGate } from '../ui/SignIn';
-import { shrink } from './Saarthi';
+import { shrink } from '../ui/shrink';
 
 const KIND_LABEL: Record<string, [string, string]> = {
   post: ['Post', 'पोस्ट'],

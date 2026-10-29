@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
+import { lazy, Suspense, useState, type ComponentType } from 'react';
 import { Particles } from './art/Particles';
 import { OrnamentTop } from './art/Ornaments';
 import { t } from './i18n';
@@ -11,18 +11,12 @@ import { MapTab } from './screens/raahi/MapTab';
 import { Onboarding } from './screens/raahi/Onboarding';
 import { PlaceView } from './screens/raahi/PlaceView';
 import { Apply, Feedback, History, Look, ProfileTab, PromptEditor, Quests, Rewards, Settings } from './screens/raahi/Profile';
-import { Leaderboard } from './screens/raahi/Leaderboard';
 import { LevelUp } from './ui/LevelUp';
 import { BizView, Community, FeedPage, SaarthiPage } from './screens/Social';
 import { MembersOnly, SignInPage } from './ui/SignIn';
-import { PlaceStory } from './screens/raahi/PlaceStory';
 import { QuickPlan } from './screens/raahi/QuickPlan';
 import { RoadmapTab } from './screens/raahi/Roadmap';
 import { Passport, StampMoment } from './screens/raahi/Stamps';
-import { SaarthiForm, SaarthiHome, SaarthiPosts, SaarthiTickets, SaarthiVerify } from './screens/Saarthi';
-import { ApplyBusiness, BusinessComments, BusinessEdit, BusinessHome } from './screens/Business';
-import { ModAlerts, ModHome, ModNews, ModQueue, ModTwist } from './screens/Moderator';
-import { Diagram, Duel } from './screens/Event';
 import { useStore, type Role } from './store';
 import { useTheme } from './theme/ThemeProvider';
 import { Boundary } from './ui/Boundary';
@@ -31,6 +25,33 @@ import { CityPick } from './ui/CityPick';
 import { Icon } from './ui/Icon';
 import { ThemeSheet } from './ui/ThemeSheet';
 import { Tour } from './ui/Tour';
+
+// Screens most visitors never open load only when first opened, so a phone gets the first screen sooner (30 Oct).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const later = <M,>(load: () => Promise<M>, name: keyof M) => lazy(() => load().then((m) => ({ default: m[name] as unknown as ComponentType<any> })));
+const saarthi = () => import('./screens/Saarthi');
+const business = () => import('./screens/Business');
+const moderator = () => import('./screens/Moderator');
+const event = () => import('./screens/Event');
+const PlaceStory = later(() => import('./screens/raahi/PlaceStory'), 'PlaceStory');
+const Leaderboard = later(() => import('./screens/raahi/Leaderboard'), 'Leaderboard');
+const SaarthiForm = later(saarthi, 'SaarthiForm');
+const SaarthiHome = later(saarthi, 'SaarthiHome');
+const SaarthiPosts = later(saarthi, 'SaarthiPosts');
+const SaarthiTickets = later(saarthi, 'SaarthiTickets');
+const SaarthiVerify = later(saarthi, 'SaarthiVerify');
+const ApplyBusiness = later(business, 'ApplyBusiness');
+const BusinessComments = later(business, 'BusinessComments');
+const BusinessEdit = later(business, 'BusinessEdit');
+const BusinessHome = later(business, 'BusinessHome');
+const ModAlerts = later(moderator, 'ModAlerts');
+const ModHome = later(moderator, 'ModHome');
+const ModNews = later(moderator, 'ModNews');
+const ModQueue = later(moderator, 'ModQueue');
+const ModTwist = later(moderator, 'ModTwist');
+const Diagram = later(event, 'Diagram');
+const Duel = later(event, 'Duel');
+const Wait = () => <div className="screen center muted" aria-busy="true">…</div>;
 
 type TabDef = { id: Tab; icon: string; en: string; hi: string };
 const TABS: Record<Role, TabDef[]> = {
@@ -178,7 +199,9 @@ export function App() {
             {/* Movement only and no exit wait: the next screen shows at once even where animations never run (scanners). */}
             <motion.main key={shown} className="content" initial={{ y: 10 }} animate={{ y: 0 }} transition={{ duration: 0.22 }}>
               <Boundary>
-                <Screen tab={shown} />
+                <Suspense fallback={<Wait />}>
+                  <Screen tab={shown} />
+                </Suspense>
               </Boundary>
             </motion.main>
           </AnimatePresence>
@@ -196,7 +219,9 @@ export function App() {
       <AnimatePresence>
         {layers.map((l, i) => (
           <Boundary key={`${l.kind}-${i}`}>
-            <LayerView l={l} />
+            <Suspense fallback={<Wait />}>
+              <LayerView l={l} />
+            </Suspense>
           </Boundary>
         ))}
       </AnimatePresence>
