@@ -1435,8 +1435,13 @@ def adaption(messages: list[dict]) -> str:
     """Adaption's hosted inference (Responses API). The system prompt goes in as instructions."""
     sys_msg = "\n\n".join(m["content"] for m in messages if m["role"] == "system")
     turns = [{"role": m["role"], "content": m["content"]} for m in messages if m["role"] != "system"]
-    r = httpx.post(ADAPTION_URL, headers={"Authorization": f"Bearer {os.environ['ADAPTION_API_KEY']}"},
-                   json={"model": ADAPTION_MODEL, "instructions": sys_msg, "input": turns, "max_output_tokens": 1200, "temperature": 0.2}, timeout=20)
+    req = {"model": ADAPTION_MODEL, "instructions": sys_msg, "input": turns, "max_output_tokens": 1200, "temperature": 0.2}
+    # Optional retrieval over our own Adaption datasets (ADAPTION_DATASETS, comma separated), or a stack's own datasets.
+    sets = [x for x in os.getenv("ADAPTION_DATASETS", "").split(",") if x]
+    if sets or ADAPTION_MODEL.startswith("stack:"):
+        req["tools"] = [{"type": "file_search", **({"dataset_ids": sets} if sets else {})}]
+        req["max_tool_calls"] = 2
+    r = httpx.post(ADAPTION_URL, headers={"Authorization": f"Bearer {os.environ['ADAPTION_API_KEY']}"}, json=req, timeout=25)
     r.raise_for_status()
     text = "\n".join(c.get("text", "") for o in r.json().get("output", []) if o.get("type") == "message" for c in o.get("content") or [])
     if not text.strip():
