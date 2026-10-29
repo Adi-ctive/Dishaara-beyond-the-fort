@@ -270,6 +270,9 @@ export function ChatTab() {
       const cards: Card[] = [...spot, ...cardsFor(query, res ? (ids.length ? [...keep, { kind: 'places', ids: ids.slice(0, 3) }] : keep) : local.cards, rankedPlaces(data, query).length > 0)];
       const chips = res?.followUps?.length ? res.followUps : local.chips;
       if (res?.ai && res.text) r = { ...local, text: res.text, ai: true, engine: res.engine, cards, chips };
+      // A fixed server answer (app questions, other cities, a spot not on the map) is shown as it is (30 Oct: it was
+      // replaced by the app's own fallback line).
+      else if (res?.text && res.note !== 'no-key') r = { ...local, text: res.text, cards, chips };
       else if (res && res.note !== 'no-key') r = { ...local, cards, chips, note: res.note === 'grounding' ? 'grounding' : undefined };
       // The server has no key but this browser does: ask the model from here instead.
       else if ((!res || res.note === 'no-key') && key) r = await respondAI(query, history, { data, today, lang, plan, added: s.added, prompt: s.prompt }, key);

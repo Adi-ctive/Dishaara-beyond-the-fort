@@ -19,6 +19,10 @@
     {
       "source": "/api/(.*)",
       "destination": "/api/index"
+    },
+    {
+      "source": "/(login|log-in|signin|sign-in|signup|sign-up|auth|account)",
+      "destination": "/index.html"
     }
   ],
   "headers": [

@@ -32,8 +32,10 @@ function Ribbon({ reverse }: { reverse?: boolean }) {
 }
 
 const rise = (d: number) => ({
-  initial: { y: 24, opacity: 0 },
-  animate: { y: 0, opacity: 1 },
+  // Movement only, never hidden: a screenshot or an automated test taken mid-animation still sees every word and button
+  // (30 Oct: the ArgosX Pro scan saw a blank landing page).
+  initial: { y: 16 },
+  animate: { y: 0 },
   transition: { delay: d, duration: 0.7, ease: [0.2, 0.7, 0.2, 1] as const },
 });
 

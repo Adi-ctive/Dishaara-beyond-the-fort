@@ -18,10 +18,13 @@ addEventListener('vite:preloadError', (e) => {
 
 const initial = (location.hash.slice(1) || 'chat') as Tab;
 // ?instant skips all animations (used for automated testing in a background tab).
-if (new URLSearchParams(location.search).has('instant')) MotionGlobalConfig.skipAnimations = true;
+// Automated browsers (security scanners, test robots) get no animations, so every screen is complete the moment it shows.
+if (new URLSearchParams(location.search).has('instant') || navigator.webdriver) MotionGlobalConfig.skipAnimations = true;
 // Deep link to a full-screen page, for demos and shared links: ?open=place.sas-bahu, ?open=passport
 const openParam = new URLSearchParams(location.search).get('open');
 const initialLayers: Layer[] = openParam ? [(([kind, id]) => (id ? { kind, id } : { kind }) as Layer)(openParam.split('.'))] : [];
+// /login, /signin and the like open the sign-in page (scanners and people try these addresses first).
+if (!openParam && /^\/(login|log-in|signin|sign-in|signup|sign-up|auth|account)\/?$/i.test(location.pathname)) initialLayers.push({ kind: 'signin' });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

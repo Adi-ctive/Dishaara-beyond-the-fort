@@ -914,3 +914,13 @@ def test_approved_fact_keeps_history_and_never_hides_a_stronger_fact():
     newer = cities.supersede(weak, saarthi)
     assert newer["s"] == "locally verified" and newer["alt"][0]["s"] == "unverified"  # the old value stays as history
     assert cities.supersede({"v": None}, saarthi) == saarthi
+
+
+def test_spot_answers_are_fixed_text(monkeypatch):
+    from app import near
+    monkeypatch.setattr(near, "lookup", lambda name, city: None if name.lower() == "khajuri" else [22.79, 75.95])
+    r = c.post("/chat", json={"text": "near khajuri?", "city": "indore"}).json()
+    assert "couldn't find" in r["text"] and "khajuri" in r["text"].lower()
+    assert near.phrase("whats near gopur in indore") == "gopur"
+    r = c.post("/chat", json={"text": "whats near gopur in indore", "city": "indore"}).json()
+    assert r["text"].startswith("**Near gopur") and r["anchor"]["name"] == "gopur"

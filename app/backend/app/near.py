@@ -52,7 +52,7 @@ def same_name(asked: str, found: str) -> bool:
 def phrase(text: str) -> str | None:
     for rx in PHRASES:
         for m in rx.finditer(text):
-            p = m.group(1).strip(" .,'-")
+            p = re.sub(r"\s+(in|me|mein|of)\s+(gwalior|indore|ग्वालियर|इंदौर|the city)$", "", m.group(1).strip(" .,'-"), flags=re.I)  # "gopur in indore"
             if p and p.lower() not in STOP and not ME.search(p):
                 return p[:40]
     return None

@@ -1317,6 +1317,8 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
                               if ok else f"No place within 6 km of {spot['name']} is published open by its custodian, so none is suggested. Say so in one line; the Map tab shows the {len(around)} places around it.")             if lang == "en" else ("उस जगह के पास वे जगहें जिन्हें उनके संरक्षक खुला और टिकट वाला बताते हैं, नज़दीक वाली पहले। बाकी नक्शा टैब में हैं।" if ok
                                   else f"{spot['name']} के 6 किमी में किसी जगह को संरक्षक ने खुला नहीं बताया, इसलिए सुझाव नहीं। एक पंक्ति में कहें; नक्शा टैब में आसपास की {len(around)} जगहें हैं।")
         pack["anchor"] = {"name": spot["name"], "lat": spot["coord"][0], "lng": spot["coord"][1], "id": spot.get("id")}
+        if not ok:
+            pack["spotNone"] = {"name": spot["name"], "around": len(around)}
         if spot["kind"] != "place":
             pack["places"] = [place_pack(d, q, lang, day, body.origin, tw) for q in ok]  # their full checked facts
             ids[:] = [q["id"] for q in ok]
@@ -1637,8 +1639,6 @@ def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
         hi = body.lang == "hi"
         return {"ai": False, "text": f"**{name} अभी दिशारा में शामिल नहीं है।** अभी हम ग्वालियर और इंदौर की जगहों की जाँची हुई जानकारी रखते हैं। वहाँ का दिन प्लान करें?" if hi
                 else f"**{name} is not covered by Dishaara yet.** We keep checked facts for Gwalior and Indore for now. Shall I plan a day in one of them?", "placeIds": []}
-    if not os.getenv("GROQ_KEY") and not os.getenv("ADAPTION_API_KEY") and WRITER is write:
-        return {"ai": False, "note": "no-key", "text": None}
     if me:
         limit(me, "chat", 60, 60)
     else:
@@ -1654,6 +1654,15 @@ def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
             text = (f"**\"{sm}\" {city_name} के नक्शे पर नहीं मिला।** पास की किसी जानी-मानी जगह का नाम लिखें, या नक्शा टैब में खोजें।" if hi else
                     f"**I couldn't find \"{sm}\" on the map of {city_name}.** Name a well-known place or landmark near it, or search for it on the Map tab.")
         return {"ai": False, "text": text, "placeIds": []}
+    if pack.get("spotNone"):
+        # Nothing published near the spot: a plain answer and the map there (30 Oct: the model echoed our instruction).
+        sn, hi = pack["spotNone"], body.lang == "hi"
+        text = (f"**{sn['name']} के पास कोई ऐसी जगह नहीं जिसे उसके संरक्षक ने खुला बताया हो।** नक्शे पर आसपास की {sn['around']} जगहें देखें, नीचे बटन है।" if hi else
+                f"**Near {sn['name']}, no place is listed open by its custodian yet.** The map shows the {sn['around']} places around it: tap below.")
+        return {"ai": False, "text": text, "placeIds": [], "anchor": pack["anchor"]}
+    # The rest needs the AI writer (the fixed answers above do not).
+    if not os.getenv("GROQ_KEY") and not os.getenv("ADAPTION_API_KEY") and WRITER is write:
+        return {"ai": False, "note": "no-key", "text": None}
     if me:
         past = [f"{r['updated']:%d %b}: {r.get('summary') or r['title']}" for r in get_db().chats.find({"user": me["_id"], "_id": {"$ne": body.chatId}}, {"msgs": 0}).sort("updated", -1).limit(CHAT_CONTEXT)]
         if past:
