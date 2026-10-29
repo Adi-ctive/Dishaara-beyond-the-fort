@@ -16,9 +16,9 @@ def fresh(monkeypatch):
     db.use(mongomock.MongoClient()["test"])
     cities._cache.clear()
     main._booted = False
-    for k in ("GROQ_KEY", "MONGODB_URI", "GOOGLE_CLIENT_ID", "DEMO_LOGIN", "ELEVENLABS_KEY"):
+    for k in ("GROQ_KEY", "ADAPTION_API_KEY", "MONGODB_URI", "GOOGLE_CLIENT_ID", "DEMO_LOGIN", "ELEVENLABS_KEY"):
         monkeypatch.delenv(k, raising=False)
-    main.WRITER = main.groq
+    main.WRITER = main.write
     main.SPEAKER = main.eleven
     main.LISTENER = main.whisper
     yield
@@ -826,3 +826,15 @@ def test_cors_only_allows_the_app():
     bad = c.options("/chat", headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "POST"})
     assert ok.headers.get("access-control-allow-origin") == "https://dishaara.vercel.app"
     assert "access-control-allow-origin" not in bad.headers
+
+
+def test_writer_uses_adaption_then_falls_back_to_groq(monkeypatch):
+    monkeypatch.setenv("ADAPTION_API_KEY", "x")
+    monkeypatch.setattr(main, "adaption", lambda m: "from adaption")
+    monkeypatch.setattr(main, "groq", lambda m: "from groq")
+    assert main.write([]) == "from adaption" and main.ENGINE["last"].startswith("Adaption")
+
+    def down(m):
+        raise RuntimeError("402 no credits")
+    monkeypatch.setattr(main, "adaption", down)
+    assert main.write([]) == "from groq" and main.ENGINE["last"].startswith("Groq")

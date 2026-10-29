@@ -78,7 +78,7 @@ function Screen({ tab }: { tab: Tab }) {
     case 'b-home': return <BusinessHome />;
     case 'b-edit': return <BusinessEdit />;
     case 'b-comments': return <BusinessComments />;
-    case 'b-feed': return <div className="screen"><Community /></div>;
+    case 'b-feed': return <div className="screen"><h1 className="sr-only">Community</h1><Community /></div>;
     case 'm-home': return <ModHome />;
     case 'm-queue': return <ModQueue />;
     case 'm-twist': return <ModTwist />;

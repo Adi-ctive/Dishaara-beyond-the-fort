@@ -117,6 +117,8 @@ def sync_testers() -> list[dict]:
     bcrypt hash, so no password is stored in plain text anywhere. Removing a row from the setting does not
     delete the account: set its roles to [] to shut it."""
     raw = os.getenv("TEST_LOGINS")
+    if not raw and os.getenv("TEST_LOGINS_FILE"):  # laptop runs: the same list from a local file
+        raw = open(os.environ["TEST_LOGINS_FILE"], encoding="utf-8").read()
     if not raw:
         return []
     out = []

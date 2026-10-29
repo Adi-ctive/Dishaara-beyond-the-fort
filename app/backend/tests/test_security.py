@@ -17,7 +17,7 @@ def fresh(monkeypatch):
     db.use(mongomock.MongoClient()["test"])
     cities._cache.clear()
     main._booted = False
-    for k in ("GROQ_KEY", "MONGODB_URI", "GOOGLE_CLIENT_ID", "DEMO_LOGIN", "ELEVENLABS_KEY", "TEST_LOGINS"):
+    for k in ("GROQ_KEY", "ADAPTION_API_KEY", "MONGODB_URI", "GOOGLE_CLIENT_ID", "DEMO_LOGIN", "ELEVENLABS_KEY", "TEST_LOGINS", "TEST_LOGINS_FILE"):
         monkeypatch.delenv(k, raising=False)
     yield
 
@@ -117,3 +117,12 @@ def test_guest_cannot_write():
                           ("put", "/me/profile", {"name": "x"}), ("post", "/stamps", {}), ("post", "/feedback", {}), ("get", "/chats", None)]:
         r = getattr(c, m)(path, json=body) if body is not None else getattr(c, m)(path)
         assert r.status_code in (401, 422), (path, r.status_code)
+
+
+def test_html_never_stored_and_sos_location_bounded():
+    a, _ = signin("Alice")
+    p = c.post("/posts", json={"kind": "post", "text": '<img src=x onerror="alert(1)">Fort at dusk', "city": "gwalior"}, headers=a).json()
+    assert p["text"] == "Fort at dusk"
+    assert c.put("/me/profile", json={"name": "<b>Ann</b>"}, headers=a).json()["name"] == "Ann"
+    assert c.post("/chat", json={"text": "under <5 km and 3<4", "city": "gwalior"}, headers=a).status_code == 200  # not tags, kept
+    assert c.post("/sos", json={"lat": 999, "lng": 999}, headers=a).status_code == 422

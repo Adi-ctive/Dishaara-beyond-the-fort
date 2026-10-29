@@ -105,6 +105,38 @@ async def seed_first(request, call_next):
     return await call_next(request)
 
 
+TAG = re.compile(r"<\s*/?\s*[a-zA-Z!][^>]*>")
+
+
+def untag(v):
+    """Strings lose anything shaped like an HTML tag; lists and objects are walked."""
+    if isinstance(v, str):
+        return TAG.sub("", v)
+    if isinstance(v, list):
+        return [untag(x) for x in v]
+    if isinstance(v, dict):
+        return {k: untag(x) for k, x in v.items()}
+    return v
+
+
+@app.middleware("http")
+async def no_html_in(request, call_next):
+    """Nothing users type is ever HTML (posts, comments, entries, shop and profile names, chats): tags are removed
+    before any route sees the body, so stored text can never carry markup even where a screen might render it."""
+    if request.method in ("POST", "PUT", "PATCH") and "application/json" in request.headers.get("content-type", ""):
+        raw = await request.body()
+        try:
+            data = json.loads(raw or b"null")
+        except ValueError:
+            data = None
+        if data is not None:
+            fixed = json.dumps(untag(data)).encode()
+            if fixed != json.dumps(data).encode():
+                # Starlette replays the body it cached on this request to the route, so swap the cache.
+                request._body = fixed
+    return await call_next(request)
+
+
 def data(city: str = "gwalior") -> dict:
     try:
         return cities.city(city, today())
@@ -149,7 +181,7 @@ def health():
     except Exception:
         db_ok = False
     return {"ok": True, "db": db_ok, "dbKind": "atlas" if os.getenv("MONGODB_URI") else "memory",
-            "ai": bool(os.getenv("GROQ_KEY")), "tts": bool(os.getenv("ELEVENLABS_KEY")), "stt": bool(os.getenv("GROQ_KEY")),
+            "ai": bool(os.getenv("GROQ_KEY") or os.getenv("ADAPTION_API_KEY")), "aiEngine": f"Adaption · {ADAPTION_MODEL}" if os.getenv("ADAPTION_API_KEY") else "Groq · gpt-oss-120b", "tts": bool(os.getenv("ELEVENLABS_KEY")), "stt": bool(os.getenv("GROQ_KEY")),
             "google": os.getenv("GOOGLE_CLIENT_ID"), "demoLogin": demo_login_on(), "today": today(), "dwellSeconds": DWELL_S}
 
 
@@ -836,9 +868,9 @@ def bazaar_visit(bid: str, me: dict | None = Depends(current)):
 
 
 class SosIn(BaseModel):
-    lat: float | None = None
-    lng: float | None = None
-    accuracy: float | None = None
+    lat: float | None = Field(default=None, ge=-90, le=90)
+    lng: float | None = Field(default=None, ge=-180, le=180)
+    accuracy: float | None = Field(default=None, ge=0, le=100000)
     note: str = Field(default="", max_length=300)
 
 
@@ -1338,6 +1370,9 @@ def shown_ids(answer: str, pack: dict, body: ChatIn, k: int = 3) -> list[str]:
     return ids[:k]
 
 
+MEMORY_Q = re.compile(r"remember|memory|earlier chat|last time|याद|पिछली (चैट|बार)", re.I)
+
+
 def system_prompt(body: ChatIn, city: str) -> str:
     return "\n".join([
         f"You are {ASSISTANT['hi' if body.lang == 'hi' else 'en']}, the assistant inside the Dishaara app: a warm, simple travel helper for {city}, India. Today is {today()}.",
@@ -1371,7 +1406,9 @@ def system_prompt(body: ChatIn, city: str) -> str:
         "   - Several places (open today, nearby, try instead): one bullet per place, \"- **Name**: hours\", at most 5.",
         "   - Last line: one short question in *italics* that helps plan their day.",
         "   At most 6 bullets and 110 words. No headings, tables or emojis. Never write field names.",
-        "9. You see the last few messages of this chat. earlierInThisChat is a short summary of this chat's older messages, and earlierChats lists the raahi's earlier chats (signed-in raahis only). Use them as context. You have only these summaries, not the full old messages: if asked what you remember, say exactly that. Without them, say you remember only this chat. Never claim to remember more.",
+        # Only when they ask about memory: Gemma on Adaption answered Hindi ticket questions with this line (29 Oct).
+        *(["9. You see the last few messages of this chat. earlierInThisChat is a short summary of this chat's older messages, and earlierChats lists the raahi's earlier chats (signed-in raahis only). You have only these summaries, not the full old messages: say exactly that. Without them, say you remember only this chat. Never claim to remember more."]
+          if MEMORY_Q.search(body.text) else ["9. Use earlierInThisChat and earlierChats, when present, only as context. Always answer the question the raahi just asked."]),
         "10. If the raahi asks about their plan, roadmap, timings, schedule, costs or budget and FACTS has todaysRoadmap, answer with a Markdown table instead of bullets: columns Time | Place | Ride there | Ticket each, one row per stop, a last row for the ride back, then one bold line with the totals (tickets, rides, total, for how many people). Copy every time and price exactly from todaysRoadmap. If FACTS has no todaysRoadmap, say they can make one with Plan my day.",
         f"8. Reply in {'Hindi (Devanagari)' if body.lang == 'hi' else 'English'}.",
         f"About this raahi: {'; '.join(body.prompt[:10])}." if body.prompt else "No personal preferences set.",
@@ -1385,7 +1422,41 @@ def groq(messages: list[dict]) -> str:
     return (r.json()["choices"][0]["message"].get("content") or "").strip()
 
 
-WRITER = groq  # tests replace this
+ADAPTION_URL = "https://api.prod.adaptionlabs.ai/api/v1/responses"
+# Picked 29 Oct by 07_round2/adaption/bench.py on held-out Yatra rows: gemma-4-26b-a4b-it kept every number grounded,
+# gave the label and the bold first line most often, and answered in about 3 s. Change with ADAPTION_MODEL.
+ADAPTION_MODEL = os.getenv("ADAPTION_MODEL", "gemma-4-26b-a4b-it")
+ENGINE = {"last": None}  # which service wrote the last reply, shown to the raahi
+
+
+def adaption(messages: list[dict]) -> str:
+    """Adaption's hosted inference (Responses API). The system prompt goes in as instructions."""
+    sys_msg = "\n\n".join(m["content"] for m in messages if m["role"] == "system")
+    turns = [{"role": m["role"], "content": m["content"]} for m in messages if m["role"] != "system"]
+    r = httpx.post(ADAPTION_URL, headers={"Authorization": f"Bearer {os.environ['ADAPTION_API_KEY']}"},
+                   json={"model": ADAPTION_MODEL, "instructions": sys_msg, "input": turns, "max_output_tokens": 1200, "temperature": 0.2}, timeout=20)
+    r.raise_for_status()
+    text = "\n".join(c.get("text", "") for o in r.json().get("output", []) if o.get("type") == "message" for c in o.get("content") or [])
+    if not text.strip():
+        raise ValueError("empty Adaption reply")
+    return text.strip()
+
+
+def write(messages: list[dict]) -> str:
+    """Adaption first, Groq if Adaption is down or out of credits. Both go through the same fact checks."""
+    if os.getenv("ADAPTION_API_KEY"):
+        try:
+            out = adaption(messages)
+            ENGINE["last"] = f"Adaption · {ADAPTION_MODEL}"
+            return out
+        except Exception as e:
+            print(f"adaption error, using groq: {type(e).__name__}: {str(e)[:200]}", flush=True)
+    out = groq(messages)
+    ENGINE["last"] = "Groq · gpt-oss-120b"
+    return out
+
+
+WRITER = write  # tests replace this
 
 
 @app.post("/chat")
@@ -1393,7 +1464,7 @@ def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
     """Returns {ai: false} when there is no key or the reply fails the checks; the app then shows its rule answer."""
     if re.search(r"emergency|ambulance|police|hospital|injur|accident|आपात|एम्बुलेंस|पुलिस|अस्पताल", body.text, re.I):
         return {"ai": False, "emergency": True, "text": None}
-    if not os.getenv("GROQ_KEY") and WRITER is groq:
+    if not os.getenv("GROQ_KEY") and not os.getenv("ADAPTION_API_KEY") and WRITER is write:
         return {"ai": False, "note": "no-key", "text": None}
     if me:
         limit(me, "chat", 60, 60)
@@ -1419,7 +1490,7 @@ def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
             # A travel time or fare with no fromYou in the pack is invented, even when the numbers happen to appear elsewhere.
             travel = not any("fromYou" in p for p in pack["places"]) and "todaysRoadmap" not in pack                 and bool(re.search(r"getting there|by auto|by cab|on foot|कैसे पहुँचें|ऑटो से", answer or "", re.I))
             if answer and ok and not extra and not over and not wrong and not travel:
-                return {"ai": True, "text": answer, "placeIds": shown_ids(answer, pack, body), "followUps": follow_ups(pack, body, "hi" if body.lang == "hi" else "en")}
+                return {"ai": True, "text": answer, "engine": ENGINE["last"], "placeIds": shown_ids(answer, pack, body), "followUps": follow_ups(pack, body, "hi" if body.lang == "hi" else "en")}
             print(f"chat check failed: missing={missing} extra={extra} over={over} renamed={wrong} travel={travel}", flush=True)
             fix = ([f"values not in FACTS: {', '.join(missing)}"] if missing else []) + ([f"places not in FACTS: {', '.join(extra)}"] if extra else []) \
                 + (["\"officially confirmed\" for a fact whose howSure is different"] if over else []) \
@@ -1441,6 +1512,7 @@ class ChatMsg(BaseModel):
     cards: list[dict] = []
     chips: list[str] = []
     ai: bool | None = None
+    engine: str | None = Field(default=None, max_length=60)
     note: str | None = None
 
 

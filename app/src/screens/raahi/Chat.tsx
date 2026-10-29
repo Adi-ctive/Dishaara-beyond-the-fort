@@ -13,7 +13,7 @@ import { Md, plain } from '../../ui/Md';
 import { PlaceCard } from '../../ui/PlaceCard';
 import { canListen, listen, speak, warmVoice } from '../../voice';
 
-type Msg = { id: number; role: 'user' | 'bot'; text: string; cards: Card[]; chips: string[]; at?: number; ai?: boolean; note?: 'grounding' | 'error'; status?: 'failed' | 'working' | 'done' };
+type Msg = { id: number; role: 'user' | 'bot'; text: string; cards: Card[]; chips: string[]; at?: number; ai?: boolean; engine?: string; note?: 'grounding' | 'error'; status?: 'failed' | 'working' | 'done' };
 type Saved = { id: string; title: string; updated: string; count: number };
 
 // The open chat stays on the phone, so a refresh does not wipe it. Signed-in raahis also keep it on their account.
@@ -184,7 +184,7 @@ export function ChatTab() {
     setMsgs((m) => [...m, { id: n, role: 'user', text: query, cards: [], chips: [], at: n, status: apiOn() && !navigator.onLine ? 'failed' : 'working' }]);
     setText('');
     const key = getKey();
-    let r: Reply & { ai?: boolean; note?: Msg['note'] };
+    let r: Reply & { ai?: boolean; engine?: string; note?: Msg['note'] };
     const last = lastPlaceIds(msgs);
     const local = respond(query, data, today, lang, last, plan, s.prefs.payment, s.twists);
     if (apiOn()) {
@@ -211,7 +211,7 @@ export function ChatTab() {
       const keep = local.cards.filter((c) => c.kind !== 'place' && c.kind !== 'places');
       const cards: Card[] = res ? (ids.length ? [...keep, { kind: 'places', ids: ids.slice(0, 3) }] : keep) : local.cards;
       const chips = res?.followUps?.length ? res.followUps : local.chips;
-      if (res?.ai && res.text) r = { ...local, text: res.text, ai: true, cards, chips };
+      if (res?.ai && res.text) r = { ...local, text: res.text, ai: true, engine: res.engine, cards, chips };
       else if (res && res.note !== 'no-key') r = { ...local, cards, chips, note: res.note === 'grounding' ? 'grounding' : undefined };
       // The server has no key but this browser does: ask the model from here instead.
       else if ((!res || res.note === 'no-key') && key) r = await respondAI(query, history, { data, today, lang, plan, added: s.added, prompt: s.prompt }, key);
@@ -311,7 +311,7 @@ export function ChatTab() {
                   <div className="bubble bot">
                     <span className="bot-name">{hi ? 'यात्रा' : 'Yatra'}</span>
                     <Md text={m.text} animate={Date.now() - (m.at ?? 0) < 5000} />
-                    {m.ai && <span className="ai-tag">{hi ? 'AI · हमारे डेटा से जाँचा' : 'AI · checked against our data'}</span>}
+                    {m.ai && <span className="ai-tag">{hi ? 'AI · हमारे डेटा से जाँचा' : 'AI · checked against our data'}{m.engine ? ` · ${m.engine}` : ''}</span>}
                     {m.note && <span className="ai-tag warn">{m.note === 'grounding' ? (hi ? 'AI का जवाब जाँच में फ़ेल, सीधा जवाब दिखाया' : 'AI reply failed the fact check, plain answer shown') : hi ? 'AI से जुड़ नहीं सका, सीधा जवाब दिखाया' : 'Could not reach the AI, plain answer shown'}</span>}
                     <button className={`say${saying?.id === m.id ? ` ${saying.st}` : ''}`} onClick={() => speak(plain(m.text), lang, (st) => setSaying(st === 'idle' ? null : { id: m.id, st }))} aria-label={hi ? 'सुनें' : 'Read aloud'}>
                       <Icon name="speaker" size={16} />
