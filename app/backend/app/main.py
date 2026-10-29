@@ -1174,6 +1174,7 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
     lang = "hi" if body.lang == "hi" else "en"
     tw = twists()
     ids = [h["id"] for h in rules.search_places(d, body.text)]
+    named = list(ids)  # places the raahi named, before any search widens the list
     # "Where should I go?": the places the planner itself may use today (Level 1 or 2, open, no alert), Level 2 first.
     # Never a search hit: that could name an unflagged place (Decision 28).
     reco = not ids and bool(RECO_Q.search(body.text))
@@ -1221,7 +1222,8 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
         w = weather_alert(city)
         if w:
             pack["weatherToday"] = w[lang]
-    if re.search(r"\bopen\b|open (today|now)|what.*open|खुल", body.text, re.I):
+    # "When does Gujari Mahal open?" is about that place: the open-today list only answers when no place is named.
+    if not named and re.search(r"\bopen\b|open (today|now)|what.*open|खुल", body.text, re.I):
         pack["openToday"] = open_today(d, lang, day, tw)
         pack["places"] = []  # the compact list answers it; full records would overflow the free tier's per-minute limit
         ids += [p["id"] for p in d["places"] if p["name"][lang] in {o["name"] for o in pack["openToday"]} and p["id"] not in ids]
@@ -1383,7 +1385,7 @@ def system_prompt(body: ChatIn, city: str) -> str:
         "2. If a fact is unavailable, say plainly that we do not know it yet. Never guess.",
         "3. todaysVerdict is decided by rules. Say it in your own words but keep its meaning exactly. Never soften it. Never write the field names (todaysVerdict, howSure, FACTS) in your reply.",
         "4. If a value is \"not confirmed\", say so and pass on the advisory. Never give a price or time for it.",
-        "5. Say how sure a key fact is with its howSure words and date, for example: officially confirmed on 13 Oct. Each fact has its own howSure: never give one fact's howSure to another (hours, fees and summary are separate). If unsure which applies, leave the howSure out.",
+        "5. Say how sure a key fact is with its howSure words and date, for example: officially confirmed on 13 Oct. Each fact has its own howSure: never give one fact's howSure to another (hours, fees and summary are separate). If unsure which applies, leave the howSure out. The date is that fact's own checked date from FACTS, never today's date: if a fact has no date, give no date.",
         "6b. If something is unavailable, name what we do not know, in one short sentence.",
         "6. Only talk about places in the pack. Under your reply the app shows a card for up to three places your reply names. Never promise a card or a map: say \"tap a card below\" only when you name a place.",
         "6e. If a place has liveAlert, the first bullet is **Right now:** the alert. For crowded: long queues at the ticket counter and gate, the visit takes longer than usual, keep phone and wallet close; go later or see a nearby place first. Then suggest one or two of its tryInstead places with their hours. If FACTS has moderatorAlertsToday and the raahi asks what to do or where to go, avoid those places.",

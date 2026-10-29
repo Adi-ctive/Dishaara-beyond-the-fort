@@ -838,3 +838,10 @@ def test_writer_uses_adaption_then_falls_back_to_groq(monkeypatch):
         raise RuntimeError("402 no credits")
     monkeypatch.setattr(main, "adaption", down)
     assert main.write([]) == "from groq" and main.ENGINE["last"].startswith("Groq")
+
+
+def test_open_question_about_a_named_place_keeps_its_facts():
+    pack, _ = main.retrieve(main.ChatIn(text="When does Gujari Mahal open?", city="gwalior", lang="en"))
+    assert [p["id"] for p in pack["places"]][:1] == ["gwalior-fort"] and "openToday" not in pack
+    pack, _ = main.retrieve(main.ChatIn(text="What is open today?", city="gwalior", lang="en"))
+    assert pack.get("openToday")
