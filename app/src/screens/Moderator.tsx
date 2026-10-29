@@ -167,7 +167,7 @@ export function ModAlerts() {
   useEffect(() => {
     const pull = () => api.sosFeed().then((f) => f && setFeed(f));
     pull();
-    const id = setInterval(pull, 5000);
+    const id = setInterval(() => !document.hidden && pull(), 5000);  // the SOS feed, only while the moderator is looking
     return () => clearInterval(id);
   }, []);
   const name = (id: string) => data.places.find((p) => p.id === id || p.units.some((u) => u.id === id))?.name[lang] ?? id;

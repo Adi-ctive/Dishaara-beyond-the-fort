@@ -186,8 +186,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!apiOn()) return;
     let alive = true;
     let timer: ReturnType<typeof setTimeout>;
-    // Every 5 s while the server answers; every 30 s after a failure (weak signal at a fort).
+    // Every 30 s while the tab is in view, none while it is hidden, 60 s after a failure (weak signal at a fort).
+    // Was every 5 s in every open tab: 16,400 calls a day tripped Vercel's flood protection for scanners (30 Oct).
     const pull = async () => {
+      if (document.hidden) {
+        timer = setTimeout(pull, 30000);
+        return;
+      }
       const t = await api.getTwists();
       if (!alive) return;
       if (t)
@@ -196,12 +201,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (JSON.stringify(tw) === JSON.stringify(cur.twists) && testMode === cur.testMode) return cur;
           return { ...cur, twists: tw, testMode, order: null };
         });
-      timer = setTimeout(pull, t ? 5000 : 30000);
+      timer = setTimeout(pull, t ? 30000 : 60000);
     };
     pull();
+    // Back in view: check at once instead of waiting for the next turn.
+    const onShow = () => {
+      if (document.hidden) return;
+      clearTimeout(timer);
+      pull();
+    };
+    document.addEventListener('visibilitychange', onShow);
     return () => {
       alive = false;
       clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onShow);
     };
   }, []);
   // The chosen look belongs to the account, so others see it (saarthi pages, leaderboard).
