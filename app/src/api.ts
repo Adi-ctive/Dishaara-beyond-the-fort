@@ -194,5 +194,6 @@ export const api = {
     account: { id: string; name?: string; email?: string; signIn: string; roles: string[]; joined?: string | null; city?: string; points: number; group: Record<string, unknown>; lastStamp: { place: string; date?: string; time: string } | null; lastPlan: { date?: string; stops: string[]; done: string[] } | null; earlierPresses: number } | null }[]>('GET', '/mod/sos'),
   sosHandled: (id: string, note: string) => call<{ status: string; handledBy: string; handledAt: string; handledNote: string }>('POST', `/mod/sos/${id}`, { note }),
   modUsers: (q = '') => call<{ id: string; name: string; roles: string[]; kind: string; banned: boolean; points: number }[]>('GET', `/mod/users?q=${encodeURIComponent(q)}`),
+  translate: (texts: string[], to: 'en' | 'hi') => call<{ texts: string[] }>('POST', '/translate', { texts, to }, 20000),
   ban: (id: string, banned: boolean) => call('POST', `/mod/users/${id}/ban`, { banned }),
 };

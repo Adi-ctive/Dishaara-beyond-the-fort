@@ -13,11 +13,13 @@ import { Md, plain } from '../../ui/Md';
 import { PlaceCard } from '../../ui/PlaceCard';
 import { canListen, listen, speak, warmVoice } from '../../voice';
 
-type Msg = { id: number; role: 'user' | 'bot'; text: string; cards: Card[]; chips: string[]; at?: number; ai?: boolean; engine?: string; note?: 'grounding' | 'error'; status?: 'failed' | 'working' | 'done' };
+type Msg = { id: number; role: 'user' | 'bot'; text: string; cards: Card[]; chips: string[]; at?: number; ai?: boolean; engine?: string; note?: 'grounding' | 'error'; status?: 'failed' | 'working' | 'done'; alt?: Partial<Record<'en' | 'hi', { text: string; chips: string[] }>> };
 type Saved = { id: string; title: string; updated: string; count: number };
 
 // The open chat stays on the phone, so a refresh does not wipe it. Signed-in raahis also keep it on their account.
 const CUR = 'dishaara.chat.current';
+/** The language a reply is written in: Hindi when a good part of its letters are Devanagari. */
+const langOf = (text: string): 'en' | 'hi' => ((text.match(/[ऀ-ॿ]/g)?.length ?? 0) > (text.match(/[A-Za-z]/g)?.length ?? 0) / 2 ? 'hi' : 'en');
 const LIST = 'dishaara.chats';
 const read = <T,>(k: string, d: T): T => {
   try {
@@ -81,8 +83,10 @@ function Cards({ cards }: { cards: Card[] }) {
   return (
     <div className="msg-cards">
       {cards.map((c, i) => {
-        if (c.kind === 'place') return <PlaceCard key={i} place={data.places.find((p) => p.id === c.id)!} />;
-        if (c.kind === 'places') return c.ids.slice(0, 3).map((id, j) => <PlaceCard key={id} i={j} place={data.places.find((p) => p.id === id)!} />);
+        // A saved chat can name places of another city: those cards are skipped, not crashed on.
+        const here = (id: string) => data.places.find((p) => p.id === id);
+        if (c.kind === 'place') { const p = here(c.id); return p ? <PlaceCard key={i} place={p} /> : null; }
+        if (c.kind === 'places') return c.ids.map(here).filter((p) => !!p).slice(0, 3).map((p, j) => <PlaceCard key={p!.id} i={j} place={p!} />);
         if (c.kind === 'quick')
           return (
             <button key={i} className="card quick" onClick={() => open({ kind: 'quick', hours: c.hours })}>
@@ -123,6 +127,23 @@ export function ChatTab() {
   const msgs = cur.msgs;
   const setMsgs = (f: (m: Msg[]) => Msg[]) => setCur((c) => ({ ...c, msgs: f(c.msgs) }));
   const [past, setPast] = useState<Saved[] | null>(null);
+  // The language button: replies already on screen in the other language are translated (numbers checked on the
+  // server), newest first. A reply that cannot be translated stays as it was.
+  const tried = useRef(new Set<string>());
+  useEffect(() => {
+    if (!apiOn()) return;
+    const todo = msgs.filter((m) => m.role === 'bot' && m.text && langOf(m.text) !== lang && !m.alt?.[lang] && !tried.current.has(`${m.id}:${lang}`)).slice(-6).reverse();
+    let stop = false;
+    (async () => {
+      for (const m of todo) {
+        if (stop) return;
+        tried.current.add(`${m.id}:${lang}`);
+        const r = await api.translate([m.text, ...m.chips], lang);
+        if (r && !stop) setMsgs((all) => all.map((x) => (x.id === m.id ? { ...x, alt: { ...x.alt, [lang]: { text: r.texts[0], chips: r.texts.slice(1) } } } : x)));
+      }
+    })();
+    return () => { stop = true; };
+  }, [lang, msgs.length]);
   // Keep the open chat on the phone, and on the account when signed in (a short pause so typing is not sent each time).
   useEffect(() => {
     write(CUR, cur);
@@ -304,24 +325,25 @@ export function ChatTab() {
 
       <div className="thread" aria-live="polite">
         <AnimatePresence initial={false}>
-          {msgs.map((m) => (
+          {msgs.map((m) => { const v = (m.role === 'bot' && m.alt?.[lang]) || { text: m.text, chips: m.chips }; return (
             <motion.div key={m.id} className={`msg ${m.role}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
               {m.role === 'bot' ? (
                 <>
                   <div className="bubble bot">
                     <span className="bot-name">{hi ? 'यात्रा' : 'Yatra'}</span>
-                    <Md text={m.text} animate={Date.now() - (m.at ?? 0) < 5000} />
+                    <Md text={v.text} animate={Date.now() - (m.at ?? 0) < 5000} />
+                    {v.text !== m.text && <span className="ai-tag">{hi ? 'अनुवाद · अंक मूल जवाब जैसे' : 'Translated · numbers same as the original'}</span>}
                     {m.ai && <span className="ai-tag">{hi ? 'AI · हमारे डेटा से जाँचा' : 'AI · checked against our data'}{m.engine ? ` · ${m.engine}` : ''}</span>}
                     {m.note && <span className="ai-tag warn">{m.note === 'grounding' ? (hi ? 'AI का जवाब जाँच में फ़ेल, सीधा जवाब दिखाया' : 'AI reply failed the fact check, plain answer shown') : hi ? 'AI से जुड़ नहीं सका, सीधा जवाब दिखाया' : 'Could not reach the AI, plain answer shown'}</span>}
-                    <button className={`say${saying?.id === m.id ? ` ${saying.st}` : ''}`} onClick={() => speak(plain(m.text), lang, (st) => setSaying(st === 'idle' ? null : { id: m.id, st }))} aria-label={hi ? 'सुनें' : 'Read aloud'}>
+                    <button className={`say${saying?.id === m.id ? ` ${saying.st}` : ''}`} onClick={() => speak(plain(v.text), lang, (st) => setSaying(st === 'idle' ? null : { id: m.id, st }))} aria-label={hi ? 'सुनें' : 'Read aloud'}>
                       <Icon name="speaker" size={16} />
                     </button>
                   </div>
                   {m.at && <span className="msg-meta">{clock(m.at)}</span>}
                   <Cards cards={m.cards} />
-                  {m.chips.length > 0 && (
+                  {v.chips.length > 0 && (
                     <div className="chips">
-                      {m.chips.map((c) => (
+                      {v.chips.map((c) => (
                         <button key={c} className="chip" onClick={() => send(c)}>{c}</button>
                       ))}
                     </div>
@@ -334,7 +356,7 @@ export function ChatTab() {
                 </>
               )}
             </motion.div>
-          ))}
+          ); })}
         </AnimatePresence>
         {thinking && (
           <div className="msg bot">

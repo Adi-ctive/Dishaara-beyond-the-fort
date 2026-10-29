@@ -88,6 +88,9 @@ function Screen({ tab }: { tab: Tab }) {
 }
 
 function LayerView({ l }: { l: Layer }) {
+  const { data } = useStore();
+  // A page for a place of another city (old chat, link, city switch) shows nothing instead of crashing.
+  if ((l.kind === 'place' || l.kind === 'stamp' || l.kind === 'story' || l.kind === 'feedback') && !data.places.some((p) => p.id === l.id)) return null;
   switch (l.kind) {
     case 'place': return <PlaceView id={l.id} />;
     case 'stamp': return <MembersOnly title="Stamp"><StampMoment id={l.id} /></MembersOnly>;

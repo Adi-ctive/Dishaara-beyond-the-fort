@@ -162,3 +162,14 @@ def test_api_map_hidden_on_the_public_site(monkeypatch):
     finally:
         monkeypatch.delenv("MONGODB_URI")
         importlib.reload(main)
+
+
+def test_translate_keeps_numbers(monkeypatch):
+    monkeypatch.setenv("GROQ_KEY", "x")
+    monkeypatch.setattr(main, "write", lambda m: "**ग्वालियर किला** टिकट ₹25\n@@@\nआज क्या खुला है?")
+    r = c.post("/translate", json={"texts": ["**Gwalior Fort** ticket ₹25", "What is open today?"], "to": "hi"})
+    assert r.status_code == 200 and r.json()["texts"][1] == "आज क्या खुला है?"
+    monkeypatch.setattr(main, "write", lambda m: "टिकट ₹30\n@@@\nआज")
+    assert c.post("/translate", json={"texts": ["ticket ₹25", "today"], "to": "hi"}).status_code == 502  # a changed price is refused
+    monkeypatch.delenv("GROQ_KEY")
+    assert c.post("/translate", json={"texts": ["x"], "to": "hi"}).status_code == 503

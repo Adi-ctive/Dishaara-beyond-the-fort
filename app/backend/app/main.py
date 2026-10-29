@@ -1988,6 +1988,39 @@ def business_photo_delete(mid: str, me: dict | None = Depends(current)):
     return strip(db.business.find_one({"_id": b["_id"]}))
 
 
+class TranslateIn(BaseModel):
+    texts: list[str] = Field(min_length=1, max_length=12)
+    to: str = Field(pattern="^(en|hi)$")
+
+
+SEP = "\n@@@\n"
+DIGITS = re.compile(r"\d+")
+
+
+@app.post("/translate")
+def translate(body: TranslateIn, request: Request, me: dict | None = Depends(current)):
+    """An answer already on screen, in the other language (the language button). Same facts: every number in the
+    answer must come back unchanged, or the original stays."""
+    if not (os.getenv("GROQ_KEY") or os.getenv("ADAPTION_API_KEY")):
+        raise HTTPException(503, "translation needs the AI service")
+    limit(me or by_ip(request), "translate", 60, 60)
+    limit(EVERYONE, "translate", 2000, 24 * 60)
+    texts = [t[:3000] for t in body.texts]
+    lang = "Hindi (Devanagari script)" if body.to == "hi" else "English"
+    out = write([{"role": "system", "content": f"Translate each part into {lang}. Parts are separated by a line with only @@@; keep "
+                  "that separator and the same number of parts. Keep every number, time, price, date, place name in its usual "
+                  "spelling, markdown (** and - bullets) and line breaks. Write numbers with 0-9 digits. Do not add or drop "
+                  "anything. Reply with the translation only."},
+                 {"role": "user", "content": SEP.join(texts)}])
+    parts = [x.strip() for x in re.split(r"\n?@@@\n?", out)]
+    if len(parts) != len(texts):
+        raise HTTPException(502, "translation came back incomplete")
+    for a, b in zip(texts, parts):
+        if sorted(DIGITS.findall(a)) != sorted(DIGITS.findall(b)) or not b:
+            raise HTTPException(502, "translation changed a number, original kept")
+    return {"texts": parts}
+
+
 @app.get("/media/{mid}")
 def media(mid: str, request: Request):
     doc = get_db().media.find_one({"_id": mid})
