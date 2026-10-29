@@ -75,7 +75,11 @@ const lastPlaceIds = (msgs: Msg[]) => {
   return (m?.cards ?? []).flatMap((c) => (c.kind === 'place' ? [c.id] : c.kind === 'places' ? c.ids : [])).slice(0, 3);
 };
 
-function Cards({ cards }: { cards: Card[] }) {
+// Covered cities by name. A question about the other one offers a one-tap switch instead of a Gwalior-only answer.
+const CITY_NAMES = { gwalior: /gwalior|ग्वालियर/i, indore: /indore|इंदौर|इन्दौर/i } as const;
+const otherCity = (text: string, here: string) => (Object.keys(CITY_NAMES) as (keyof typeof CITY_NAMES)[]).find((c) => c !== here && CITY_NAMES[c].test(text) && !CITY_NAMES[here as keyof typeof CITY_NAMES]?.test(text));
+
+function Cards({ cards, onCity }: { cards: Card[]; onCity: (c: 'gwalior' | 'indore', ask: string) => void }) {
   const { data } = useStore();
   const { open, go } = useNav();
   const { lang } = useTheme();
@@ -106,6 +110,13 @@ function Cards({ cards }: { cards: Card[] }) {
               <Icon name="store" size={22} /> <span className="grow"><b>{hi ? 'बाज़ार खोलें' : 'Open the Bazaar'}</b></span> <Icon name="arrow" size={16} />
             </button>
           );
+        if (c.kind === 'city')
+          return (
+            <button key={i} className="card quick" onClick={() => onCity(c.city, c.ask)}>
+              <span className="quick-icon"><Icon name="pin" size={22} /></span>
+              <span><b>{hi ? `${c.city === 'indore' ? 'इंदौर' : 'ग्वालियर'} पर जाएँ` : `Switch to ${c.city === 'indore' ? 'Indore' : 'Gwalior'}`}</b><small>{hi ? 'और यही सवाल वहाँ पूछें' : 'and ask this again there'}</small></span>
+            </button>
+          );
         if (c.kind === 'sos')
           return (
             <a key={i} className="sos-row primary" href="tel:112">
@@ -119,9 +130,11 @@ function Cards({ cards }: { cards: Card[] }) {
 }
 
 export function ChatTab() {
-  const { data, today, s, plan } = useStore();
+  const { data, today, s, plan, setCity } = useStore();
   const { lang } = useTheme();
   const { open, go } = useNav();
+  // After a city switch from a chat card, the question is asked again once the new city's data is in.
+  const [askAfter, setAskAfter] = useState<string | null>(null);
   const hi = lang === 'hi';
   const [cur, setCur] = useState<{ id: string; msgs: Msg[] }>(() => read(CUR, { id: newId(), msgs: [] as Msg[] }));
   const msgs = cur.msgs;
@@ -200,6 +213,14 @@ export function ChatTab() {
   const send = async (q: string) => {
     const query = q.trim();
     if (!query || thinking) return;
+    const other = otherCity(query, s.city);
+    if (other) {
+      const name = other === 'indore' ? (hi ? 'इंदौर' : 'Indore') : hi ? 'ग्वालियर' : 'Gwalior';
+      const n = Date.now();
+      setText('');
+      setMsgs((m) => [...m, { id: n, role: 'user', text: query, cards: [], chips: [], at: n }, { id: n + 1, role: 'bot', at: n + 1, text: hi ? `दिशारा में ${name} भी है। अभी ऐप ${s.city === 'indore' ? 'इंदौर' : 'ग्वालियर'} पर है, ऊपर शहर बदलें या यहाँ टैप करें।` : `Dishaara covers ${name} too. The app is set to ${s.city === 'indore' ? 'Indore' : 'Gwalior'} right now: switch the city at the top, or tap below.`, cards: [{ kind: 'city', city: other, ask: query }], chips: [] }]);
+      return;
+    }
     const n = Date.now();
     const mark = (st: Msg['status']) => setMsgs((m) => m.map((x) => (x.id === n ? { ...x, status: st } : x)));
     setMsgs((m) => [...m, { id: n, role: 'user', text: query, cards: [], chips: [], at: n, status: apiOn() && !navigator.onLine ? 'failed' : 'working' }]);
@@ -262,6 +283,12 @@ export function ChatTab() {
   };
 
   const starters = starterChips(hi, data);
+
+  useEffect(() => {
+    if (!askAfter || data.city.id !== s.city) return;
+    setAskAfter(null);
+    send(askAfter);
+  }, [askAfter, data]);
 
   return (
     <div className="screen chat">
@@ -340,7 +367,7 @@ export function ChatTab() {
                     </button>
                   </div>
                   {m.at && <span className="msg-meta">{clock(m.at)}</span>}
-                  <Cards cards={m.cards} />
+                  <Cards cards={m.cards} onCity={(c, ask) => { setCity(c); setAskAfter(ask); }} />
                   {v.chips.length > 0 && (
                     <div className="chips">
                       {v.chips.map((c) => (

@@ -4,7 +4,7 @@
 import { checkUnit, confirmItems, feeFor, fmt, guardrail, parseTrip, promotable, rankedPlaces, windowFor, type Data, type Place, type Plan } from '../core';
 import type { Lang } from '../theme/ThemeProvider';
 
-export type Card = { kind: 'place'; id: string } | { kind: 'places'; ids: string[] } | { kind: 'quick'; hours?: number } | { kind: 'bazaar' } | { kind: 'sos' } | { kind: 'roadmap' };
+export type Card = { kind: 'place'; id: string } | { kind: 'places'; ids: string[] } | { kind: 'quick'; hours?: number } | { kind: 'bazaar' } | { kind: 'sos' } | { kind: 'roadmap' } | { kind: 'city'; city: 'gwalior' | 'indore'; ask: string };
 export type Reply = { text: string; cards: Card[]; chips: string[] };
 
 const EMERGENCY = /emergency|ambulance|police|hospital|injur|accident|unsafe|help me|आपात|एम्बुलेंस|पुलिस|अस्पताल|मदद/i;
