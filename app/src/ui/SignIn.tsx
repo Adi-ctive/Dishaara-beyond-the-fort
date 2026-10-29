@@ -66,6 +66,9 @@ export function SignInCard({ compact = false, team = false, email = false, onUse
   const tr = useTr();
   const [google, setGoogle] = useState<string | null>(null);
   const [demo, setDemo] = useState(!apiOn());
+  // Until the server says which sign-ins are on, say nothing about them: a robot or a cold start read the old
+  // "not available" line before the answer came and gave up (ArgosX, 30 Oct).
+  const [ready, setReady] = useState(!apiOn());
   const staff = team;
   const [user, setUser] = useState('');
   const [pw, setPw] = useState('');
@@ -74,6 +77,7 @@ export function SignInCard({ compact = false, team = false, email = false, onUse
 
   useEffect(() => {
     api.health().then((h) => {
+      setReady(true);
       if (!h) return;
       setGoogle(h.google);
       setDemo(h.demoLogin);
@@ -123,7 +127,8 @@ export function SignInCard({ compact = false, team = false, email = false, onUse
           {tr('Continue without Google (test)', 'Google के बिना जारी रखें (टेस्ट)')}
         </button>
       )}
-      {!staff && !google && !demo && <small className="muted">{tr('Sign-in is not available right now.', 'अभी साइन इन उपलब्ध नहीं है।')}</small>}
+      {!staff && !ready && <small className="muted">{tr('Loading sign-in options…', 'साइन इन के विकल्प आ रहे हैं…')}</small>}
+      {!staff && ready && !google && !demo && <small className="muted">{tr('Google sign-in is not available right now. Test accounts can use email below.', 'अभी Google साइन इन उपलब्ध नहीं है। टेस्ट अकाउंट नीचे ईमेल से साइन इन करें।')}</small>}
       {apiOn() && (staff || byEmail) && (
         <form className="staff-form" onSubmit={staffSignIn}>
           <label className="sr-only" htmlFor="signin-user">{staff ? tr('Team username', 'टीम यूज़रनेम') : tr('Email', 'ईमेल')}</label>
