@@ -88,6 +88,8 @@ export function SignInCard({ compact = false, team = false, email = false, onUse
     (u: Me | null) => {
       setBusy(false);
       if (!u) return setErr(lastError || tr('Sign-in failed. Try again.', 'साइन इन नहीं हुआ। फिर कोशिश करें।'));
+      // Leave the /login address once signed in, so a reload (or a scanner checking the page) lands in the app.
+      if (/^\/(login|log-in|signin|sign-in|signup|sign-up|auth|account)\/?$/i.test(location.pathname)) history.replaceState(null, '', '/' + location.search + location.hash);
       set((c) => ({ signedIn: true, user: u, points: Math.max(c.points, u.points ?? 0), look: { avatar: u.avatar ?? c.look.avatar, frame: u.frame ?? c.look.frame, banner: u.banner ?? c.look.banner } }));
       onUser?.(u);
     },

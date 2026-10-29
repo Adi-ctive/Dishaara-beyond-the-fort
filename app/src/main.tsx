@@ -2,6 +2,7 @@ import { MotionConfig, MotionGlobalConfig } from 'motion/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { hasSession } from './api';
 import { reloadForNewVersion } from './ui/Boundary';
 import { NavProvider, type Layer, type Tab } from './nav';
 import { StoreProvider } from './store';
@@ -41,7 +42,13 @@ watchFrames();
 const openParam = new URLSearchParams(location.search).get('open');
 const initialLayers: Layer[] = openParam ? [(([kind, id]) => (id ? { kind, id } : { kind }) as Layer)(openParam.split('.'))] : [];
 // /login, /signin and the like open the sign-in page (scanners and people try these addresses first).
-if (!openParam && /^\/(login|log-in|signin|sign-in|signup|sign-up|auth|account)\/?$/i.test(location.pathname)) initialLayers.push({ kind: 'signin', as: 'raahi', email: true });
+// Already signed in: go straight into the app. Showing the form again made a scanner think its sign-in had failed
+// (ArgosX, 30 Oct: three 200 sign-ins, then "login rejected" because /login reopened the form).
+const LOGIN_PATH = /^\/(login|log-in|signin|sign-in|signup|sign-up|auth|account)\/?$/i;
+if (!openParam && LOGIN_PATH.test(location.pathname)) {
+  if (hasSession()) history.replaceState(null, '', '/' + location.search + (location.hash || '#chat'));
+  else initialLayers.push({ kind: 'signin', as: 'raahi', email: true });
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
