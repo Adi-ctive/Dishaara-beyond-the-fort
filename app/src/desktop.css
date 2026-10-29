@@ -1,0 +1,44 @@
+/* Wide screens (laptops and desktops). Phones and small tablets keep the phone layout untouched:
+   everything here sits behind min-width 1000px. The tab bar becomes a side rail, the content gets
+   room, sheets open as centred dialogs, and pages on top of a tab use a wider column. */
+@media (min-width: 1000px) {
+  :root { --rail: 228px; --wide: 860px; }
+  .app { max-width: 1240px; padding: 0 24px 40px; display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); column-gap: 28px; grid-template-rows: auto 1fr; align-items: start; }
+  .app > .topbar { grid-column: 1 / -1; margin: 0 -24px; padding: 0 24px; }
+  .topbar-row { padding: 8px 4px 12px; }
+  .app > .landing { grid-column: 1 / -1; }
+  .app > .content { grid-column: 2; grid-row: 2; width: 100%; max-width: var(--wide); padding: 8px 0 0; }
+
+  /* Side rail in place of the bottom tab bar */
+  .tabbar { position: sticky; grid-column: 1; grid-row: 2; top: 96px; left: auto; bottom: auto; transform: none; width: auto; height: auto;
+    display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 22px; box-shadow: 0 6px 20px color-mix(in srgb, var(--ink) 8%, transparent); }
+  .tab { flex-direction: row; justify-content: flex-start; gap: 12px; height: 48px; padding: 0 14px; font-size: 15px; font-weight: 600; border-radius: 14px; }
+  .tab:hover:not(.on) { background: color-mix(in srgb, var(--surface2) 55%, transparent); }
+  .tab-glow { border-radius: 14px; }
+
+  /* Floating buttons sit at the page corner, not over a bottom bar */
+  .sos, .role-back { right: max(24px, calc(50% - 596px)); bottom: 28px; }
+  .composer { bottom: 20px; }
+
+  /* Sheets open as dialogs in the middle of the screen */
+  .sheet-layer { align-items: center; padding: 24px; }
+  .sheet { width: min(560px, 100%); max-height: 84dvh; border-radius: 26px; }
+  .sheet-grip { visibility: hidden; height: 0; margin: 0; }
+  .sheet-head { cursor: default; padding-top: 18px; }
+
+  /* Pages on top of a tab (place page, passport, settings...) */
+  .layer-bar, .layer-body { max-width: 780px; }
+  .layer-body { padding-bottom: 56px; }
+
+  /* Lists of cards use two columns where cards stand on their own */
+  .bubble { max-width: 76%; }
+  .msg-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+  .pc-cover { height: 140px; }
+  .feed.community { max-width: 700px; }
+  button.card:hover, a.card:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+  .post-photos img, .post-photos video { max-height: 420px; }
+}
+
+@media (min-width: 1400px) {
+  :root { --rail: 248px; --wide: 920px; }
+}

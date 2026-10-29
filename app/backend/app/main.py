@@ -30,7 +30,9 @@ from . import auth, cities, grounding, rag, rules, social
 from .auth import current, limit, need
 from .db import get_db, now
 
-app = FastAPI(title="Dishaara backend")
+# The API map stays off the public site (a scanner signed out should not get every route and field). Local runs keep /docs.
+PUBLIC = bool(os.getenv("MONGODB_URI"))
+app = FastAPI(title="Dishaara backend", **({"docs_url": None, "redoc_url": None, "openapi_url": None} if PUBLIC else {}))
 # Only the app's own pages call the API from a browser (the phone app and Vercel share one origin).
 ORIGINS = os.getenv("CORS_ORIGINS", "https://dishaara.vercel.app,http://localhost:5174,http://localhost:5175,http://localhost:4174").split(",")
 app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=["GET", "POST", "PUT", "DELETE"], allow_headers=["Authorization", "Content-Type"])
@@ -1987,11 +1989,21 @@ def business_photo_delete(mid: str, me: dict | None = Depends(current)):
 
 
 @app.get("/media/{mid}")
-def media(mid: str):
+def media(mid: str, request: Request):
     doc = get_db().media.find_one({"_id": mid})
     if not doc:
         raise HTTPException(404, "no such photo")
-    return Response(content=bytes(doc["data"]), media_type=doc["type"], headers={"Cache-Control": "public, max-age=604800"})
+    data, head = bytes(doc["data"]), {"Cache-Control": "public, max-age=604800", "Accept-Ranges": "bytes"}
+    rng = re.fullmatch(r"bytes=(\d*)-(\d*)", request.headers.get("range", ""))
+    if rng and doc["type"].startswith("video/") and data:  # phones ask for clips in ranges
+        a, b = rng.groups()
+        start = int(a) if a else max(0, len(data) - int(b or 0))
+        end = min(int(b), len(data) - 1) if a and b else len(data) - 1
+        if start >= len(data) or start > end:
+            return Response(status_code=416, headers={"Content-Range": f"bytes */{len(data)}"})
+        return Response(content=data[start:end + 1], status_code=206, media_type=doc["type"],
+                        headers={**head, "Content-Range": f"bytes {start}-{end}/{len(data)}"})
+    return Response(content=data, media_type=doc["type"], headers=head)
 
 
 @app.get("/business/me/comments")

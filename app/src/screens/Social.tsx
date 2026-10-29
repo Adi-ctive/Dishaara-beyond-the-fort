@@ -3,7 +3,7 @@
 // reporting and check-ins need an account (useGate opens sign-in).
 import { motion } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
-import { api, apiOn, lastError, mediaUrl, uploadPostPhoto, type SaarthiPage as SaarthiData, type ServerComment, type ServerPost, type Shop } from '../api';
+import { api, apiOn, lastError, mediaUrl, uploadPostClip, uploadPostPhoto, type SaarthiPage as SaarthiData, type ServerComment, type ServerPost, type Shop } from '../api';
 import { Avatar, Banner } from '../art/Avatars';
 import { BizCover, BizIcon } from '../art/BizArt';
 import { PlaceCover } from '../art/PlaceCover';
@@ -92,7 +92,9 @@ export function LivePostCard({ post, i = 0, onChange }: { post: ServerPost; i?: 
       <p className="post-text">{p.text}</p>
       {(p.media ?? []).length > 0 && (
         <div className={`post-photos n${Math.min(p.media!.length, 4)}`}>
-          {p.media!.map((m) => <img key={m} src={mediaUrl(m)} alt={tr('Photo with the post', 'पोस्ट की फ़ोटो')} loading="lazy" />)}
+          {p.media!.map((m) => p.videos?.includes(m)
+            ? <video key={m} src={mediaUrl(m)} controls playsInline preload="metadata" aria-label={tr('Clip with the post', 'पोस्ट का वीडियो')} />
+            : <img key={m} src={mediaUrl(m)} alt={tr('Photo with the post', 'पोस्ट की फ़ोटो')} loading="lazy" />)}
         </div>
       )}
       {place && (
@@ -207,17 +209,20 @@ export function Community() {
   const [text, setText] = useState('');
   const [place, setPlace] = useState('');
   const [note, setNote] = useState('');
-  const [photos, setPhotos] = useState<{ id: string; url: string }[]>([]);
+  const [photos, setPhotos] = useState<{ id: string; url: string; video?: boolean }[]>([]);
   const [busy, setBusy] = useState(false);
   const addPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     e.target.value = '';
     if (!f) return;
+    const video = f.type.startsWith('video/');
+    if (video && !['video/mp4', 'video/webm'].includes(f.type)) return setNote(tr('Send the clip as MP4 or WebM', 'वीडियो MP4 या WebM में भेजें'));
+    if (video && f.size > 4_000_000) return setNote(tr('Clips can be up to 4 MB. Trim it to a few seconds.', 'वीडियो 4 MB तक हो सकता है। इसे कुछ सेकंड का करें।'));
     setBusy(true);
-    const r = await uploadPostPhoto(await shrink(f));
+    const r = video ? await uploadPostClip(f) : await uploadPostPhoto(await shrink(f));
     setBusy(false);
     if (!r) return setNote(lastError);
-    setPhotos((x) => [...x, { id: r.id, url: URL.createObjectURL(f) }]);
+    setPhotos((x) => [...x, { id: r.id, url: URL.createObjectURL(f), video }]);
   };
   const [refresh, setRefresh] = useState(0);
   const [posts, setPosts] = useState<ServerPost[] | null>(null);
@@ -255,12 +260,12 @@ export function Community() {
             {data.places.map((p) => <option key={p.id} value={p.id}>{p.name[lang]}</option>)}
           </select>
           <label className="btn ghost">
-            <Icon name="camera" size={18} /> {busy ? tr('Uploading', 'अपलोड हो रहा है') : tr('Photo', 'फ़ोटो')}
-            <input type="file" accept="image/*" hidden onChange={addPhoto} disabled={busy || photos.length >= 4} />
+            <Icon name="camera" size={18} /> {busy ? tr('Uploading', 'अपलोड हो रहा है') : tr('Photo or clip', 'फ़ोटो या वीडियो')}
+            <input type="file" accept="image/*,video/mp4,video/webm" hidden onChange={addPhoto} disabled={busy || photos.length >= 4} />
           </label>
           <button className="btn primary" onClick={post}>{tr('Post', 'पोस्ट')}</button>
         </div>
-        {photos.length > 0 && <div className="post-photos n1">{photos.map((x) => <img key={x.id} src={x.url} alt="" />)}</div>}
+        {photos.length > 0 && <div className="post-photos n1">{photos.map((x) => x.video ? <video key={x.id} src={x.url} muted playsInline controls /> : <img key={x.id} src={x.url} alt="" />)}</div>}
         {note && <small className="err">{note}</small>}
       </div>
       <Seg value={sort} onChange={setSort} options={[{ v: 'new', label: tr('New', 'नई') }, { v: 'top', label: tr('Top', 'टॉप') }]} />

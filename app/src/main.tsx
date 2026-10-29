@@ -8,6 +8,7 @@ import { ThemeProvider } from './theme/ThemeProvider';
 import './styles.css';
 import './screens.css';
 import './story.css';
+import './desktop.css';
 
 const initial = (location.hash.slice(1) || 'chat') as Tab;
 // ?instant skips all animations (used for automated testing in a background tab).

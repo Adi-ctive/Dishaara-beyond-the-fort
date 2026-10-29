@@ -36,7 +36,7 @@ def clean(text: str, allow_links: bool) -> str:
 
 
 def show(p: dict, me: dict | None) -> dict:
-    out = {"id": p["_id"], **{k: p.get(k) for k in ("by", "byName", "byRole", "kind", "text", "place", "city", "community", "status", "likes", "saves", "comments", "at", "biz")}, "media": p.get("media") or []}
+    out = {"id": p["_id"], **{k: p.get(k) for k in ("by", "byName", "byRole", "kind", "text", "place", "city", "community", "status", "likes", "saves", "comments", "at", "biz")}, "media": p.get("media") or [], "videos": p.get("videos") or []}
     out["byRole"] = out["byRole"] or ("business" if p.get("biz") else "saarthi")
     if me:
         db = get_db()
@@ -78,8 +78,10 @@ def make_post(body: PostIn, me: dict | None = Depends(current)):
     limit(me, "post", 10, 24 * 60)
     shop = get_db().business.find_one({"owner": me["_id"], "status": "live"}) if role == "business" else None
     db = get_db()
-    media = [m for m in body.media if db.media.find_one({"_id": m, "by": me["_id"], "post": None}, {"_id": 1})]  # only your own, unused photos
-    p = {"_id": uuid.uuid4().hex[:12], "media": media, "by": me["_id"], "byName": shop["name"] if shop else me.get("name", "Raahi"), "byRole": role,
+    own = [db.media.find_one({"_id": m, "by": me["_id"], "post": None}, {"type": 1}) for m in body.media]
+    media = [d["_id"] for d in own if d]  # only your own, unused photos and clips
+    videos = [d["_id"] for d in own if d and d["type"].startswith("video/")]
+    p = {"_id": uuid.uuid4().hex[:12], "media": media, "videos": videos, "by": me["_id"], "byName": shop["name"] if shop else me.get("name", "Raahi"), "byRole": role,
          "biz": shop["_id"] if shop else None, "kind": kind,
          "text": clean(body.text, allow_links=kind == "video"), "place": body.placeId, "city": body.city, "community": community,
          "status": "live", "likes": 0, "saves": 0, "comments": 0, "reports": 0, "at": now()}
@@ -90,19 +92,37 @@ def make_post(body: PostIn, me: dict | None = Depends(current)):
 
 
 POST_PHOTO_TYPES = {"image/jpeg", "image/png", "image/webp"}
-POST_PHOTO_MAX = 2_000_000
+POST_VIDEO_TYPES = {"video/mp4", "video/webm"}
+POST_PHOTO_MAX, POST_VIDEO_MAX = 2_000_000, 4_000_000  # Vercel takes request bodies up to 4.5 MB
+
+
+def looks_like(kind: str, data: bytes) -> bool:
+    """The file starts the way its type says (a renamed script or page is refused)."""
+    if kind == "image/jpeg":
+        return data[:3] == bytes([0xFF, 0xD8, 0xFF])
+    if kind == "image/png":
+        return data[:8] == bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
+    if kind == "image/webp":
+        return data[:4] == b"RIFF" and data[8:12] == b"WEBP"
+    if kind == "video/mp4":
+        return data[4:8] == b"ftyp"
+    return data[:4] == bytes([0x1A, 0x45, 0xDF, 0xA3])  # webm
 
 
 @router.post("/posts/media")
 async def post_photo(file: UploadFile = File(...), me: dict | None = Depends(current)):
-    """A photo for a post. Public once posted (GET /media/{id}); shrunk on the phone before upload."""
+    """A photo or short clip for a post. Public once posted (GET /media/{id}). Photos are shrunk on the phone before upload."""
     me = need(me)
     limit(me, "post-photo", 20, 24 * 60)
-    if file.content_type not in POST_PHOTO_TYPES:
-        raise HTTPException(415, "send a JPEG, PNG or WebP photo")
-    data = await file.read(POST_PHOTO_MAX + 1)
-    if len(data) > POST_PHOTO_MAX:
-        raise HTTPException(413, "photo is over 2 MB")
+    video = file.content_type in POST_VIDEO_TYPES
+    if file.content_type not in POST_PHOTO_TYPES | POST_VIDEO_TYPES:
+        raise HTTPException(415, "send a JPEG, PNG or WebP photo, or an MP4 or WebM clip")
+    cap = POST_VIDEO_MAX if video else POST_PHOTO_MAX
+    data = await file.read(cap + 1)
+    if len(data) > cap:
+        raise HTTPException(413, "clip is over 4 MB" if video else "photo is over 2 MB")
+    if not looks_like(file.content_type, data):
+        raise HTTPException(415, "the file is not the type it says")
     mid = uuid.uuid4().hex[:12]
     get_db().media.insert_one({"_id": mid, "by": me["_id"], "post": None, "type": file.content_type, "data": Binary(data), "at": now()})
     return {"id": mid}

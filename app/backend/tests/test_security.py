@@ -138,3 +138,27 @@ def test_post_with_photos():
     assert p["media"] == [m]  # someone else's photo is dropped
     assert c.get(f"/media/{m}").status_code == 200
     assert c.post("/posts/media", files={"file": ("x.svg", io.BytesIO(b"<svg/>"), "image/svg+xml")}, headers=a).status_code == 415
+    assert c.post("/posts/media", files={"file": ("x.jpg", io.BytesIO(b"<html>"), "image/jpeg")}, headers=a).status_code == 415  # renamed page
+
+
+def test_post_with_clip():
+    a, _ = signin("Alice")
+    clip = bytes(4) + b"ftypisom" + b"0" * 2000
+    v = c.post("/posts/media", files={"file": ("c.mp4", io.BytesIO(clip), "video/mp4")}, headers=a).json()["id"]
+    p = c.post("/posts", json={"kind": "post", "text": "Gopachal at sunset", "city": "gwalior", "media": [v]}, headers=a).json()
+    assert p["media"] == [v] and p["videos"] == [v]
+    r = c.get(f"/media/{v}", headers={"Range": "bytes=0-99"})
+    assert r.status_code == 206 and len(r.content) == 100 and r.headers["content-range"] == f"bytes 0-99/{len(clip)}"
+    assert c.post("/posts/media", files={"file": ("big.mp4", io.BytesIO(clip + b"0" * 4_000_000), "video/mp4")}, headers=a).status_code == 413
+
+
+def test_api_map_hidden_on_the_public_site(monkeypatch):
+    import importlib
+    monkeypatch.setenv("MONGODB_URI", "mongodb://unused")
+    m = importlib.reload(main)
+    try:
+        t = TestClient(m.app)
+        assert [t.get(x).status_code for x in ("/docs", "/redoc", "/openapi.json")] == [404, 404, 404]
+    finally:
+        monkeypatch.delenv("MONGODB_URI")
+        importlib.reload(main)

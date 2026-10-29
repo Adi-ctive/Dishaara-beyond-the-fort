@@ -154,6 +154,9 @@ export function Tour({ ready }: { ready: boolean }) {
       ? { width: 340, left: Math.min(Math.max(16, box.left), vw - 356), ...(lower ? { bottom: window.innerHeight - box.top + pad + 12 } : { top: box.bottom + pad + 12 }) }
       : { width: 360, left: vw / 2 - 180, top: window.innerHeight / 2 - 90 };
   if (!box && !narrow && step.sel === undefined) tipStyle.top = window.innerHeight / 2 - 90;
+  // On a wide screen the tabs are a side rail: the note sits to the right of the lit tab.
+  const rail = vw >= 1000 ? document.querySelector('.tabbar')?.getBoundingClientRect() : undefined;
+  if (box && rail && box.right <= rail.right + 1) Object.assign(tipStyle, { left: box.right + pad + 14, top: Math.max(16, box.top - 8), bottom: undefined });
   const last = i === steps.length - 1;
   return (
     <div className="tour" role="dialog" aria-modal="true" aria-label={hi ? 'ऐप की सैर' : 'App tour'}>
