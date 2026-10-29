@@ -293,3 +293,27 @@ describe('a question about the other city', () => {
     for (const q of ['What is open today?', 'Hidden places', 'Food nearby', 'Plan my day', 'ticket price']) expect(rankedPlaces(SEEDS.indore, q)).toEqual([]);
   });
 });
+
+describe('cards follow the kind of question', () => {
+  it('no cards for questions about the app, plan card only for plan requests', async () => {
+    const { respond, cardsFor } = await import('../chat/local');
+    const { SEED } = await import('./index');
+    for (const q of ['What can you do?', 'Can you book tickets for me?', 'hello', 'How does the app check its facts?', 'आप क्या कर सकते हैं?']) {
+      const r = respond(q, SEED, TODAY, q.match(/[ऀ-ॿ]/) ? 'hi' : 'en');
+      expect(r.cards, q).toEqual([]);
+      expect(cardsFor(q, [{ kind: 'places', ids: ['gwalior-fort'] }, { kind: 'quick' }], false), q).toEqual([]);
+    }
+    expect(cardsFor('Plan my day', [{ kind: 'quick' }], false)).toEqual([{ kind: 'quick' }]);
+    expect(cardsFor('What is the Gwalior Fort ticket price?', [{ kind: 'quick' }, { kind: 'places', ids: ['gwalior-fort'] }], true)).toEqual([{ kind: 'places', ids: ['gwalior-fort'] }]);
+    expect(cardsFor('I am hurt, call an ambulance', [{ kind: 'sos' }, { kind: 'quick' }], false)).toEqual([{ kind: 'sos' }]);
+  });
+});
+
+describe('emergency words', () => {
+  it('catches real emergencies, not "help me plan"', async () => {
+    const { respond } = await import('../chat/local');
+    const { SEED } = await import('./index');
+    for (const q of ['Help, I lost my child near the fort', 'Someone stole my bag', 'मदद चाहिए, एम्बुलेंस बुलाओ', 'bachao']) expect(respond(q, SEED, TODAY, 'en').cards, q).toEqual([{ kind: 'sos' }]);
+    for (const q of ['Can you help me plan my day?', 'help']) expect(respond(q, SEED, TODAY, 'en').cards, q).not.toContainEqual({ kind: 'sos' });
+  });
+});

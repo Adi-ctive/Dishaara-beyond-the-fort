@@ -1316,7 +1316,8 @@ def retrieve(body: ChatIn) -> tuple[dict, set[str]]:
         if w:
             pack["weatherToday"] = w[lang]
     # "When does Gujari Mahal open?" is about that place: the open-today list only answers when no place is named.
-    if not named and re.search(r"\bopen\b|open (today|now)|what.*open|खुल", body.text, re.I):
+    # A follow-up ("is it open on Monday?" after a place) stays on that place (29 Oct test set).
+    if not named and not follow and re.search(r"\bopen\b|open (today|now)|what.*open|खुल", body.text, re.I):
         pack["openToday"] = open_today(d, lang, day, tw)
         pack["places"] = []  # the compact list answers it; full records would overflow the free tier's per-minute limit
         ids += [p["id"] for p in d["places"] if p["name"][lang] in {o["name"] for o in pack["openToday"]} and p["id"] not in ids]
@@ -1457,10 +1458,34 @@ def mention_extra(answer: str, allowed: set[str], city: str = "gwalior") -> list
     return out
 
 
+# Questions about Dishaara itself; same words as the app's chat/local.ts CAPAB.
+CAPAB_Q = re.compile(r"what can (you|u|this app|dishaara) do|what (do|does) (you|this app|dishaara) do|who (are|made) you|are you (a |an )?(bot|ai|human|robot)|how (do|does) (you|this|the app|dishaara) (work|check|know|get)|can (you|u|i|dishaara) (book|buy|reserve|order|pay|call|hire|get me a)|do you (book|sell|support|speak|work|have|remember|save)|is (this|it|dishaara|the app) (free|safe|offline|official)|which (cities|languages|places do you)|your (features|abilities)|feature|capabilit|^\s*(help|hi|hello|hey|namaste|नमस्ते)\s*[!?.]*\s*$|आप क्या कर सकते|तुम क्या कर सकते|आप कौन|तुम कौन|कैसे काम करता|क्या आप .*बुक", re.I)
+
+
+CAPAB_TEXT = {
+    "en": lambda book: "\n".join([
+        "**Dishaara does not sell tickets or make bookings.** It tells you who sells each place's ticket and where (counter or online), with the fact's label and date." if book else "**I'm Yatra, Dishaara's guide.** Here is what I can do:",
+        "- Hours, tickets and closing days of places, each fact with its label and date",
+        "- A day roadmap that fits your time, budget and interests",
+        "- What is open today, what is nearby, food and the Bazaar",
+        "- Saarthis' fresh local checks, read-aloud and voice questions, and 112 if you need help",
+        "I never guess what is not on record. Cities covered now: Gwalior and Indore."]),
+    "hi": lambda book: "\n".join([
+        "**दिशारा टिकट नहीं बेचता और बुकिंग नहीं करता।** यह बताता है कि किस जगह का टिकट कौन बेचता है और कहाँ (काउंटर या ऑनलाइन), तथ्य के लेबल और तारीख़ के साथ।" if book else "**मैं यात्रा हूँ, दिशारा का गाइड।** मैं ये कर सकता हूँ:",
+        "- जगहों का समय, टिकट, बंद होने के दिन, हर तथ्य उसके लेबल और तारीख़ के साथ",
+        "- आपके समय, बजट और रुचि के हिसाब से दिन का रोडमैप",
+        "- आज क्या खुला है, पास क्या है, खाना और बाज़ार",
+        "- सारथियों की ताज़ा जाँच, आवाज़ में सुनना और बोलकर पूछना, मुश्किल में 112",
+        "जो दर्ज नहीं है, वह मैं अंदाज़े से नहीं बताता। अभी ग्वालियर और इंदौर।"]),
+}
+
+
 def shown_ids(answer: str, pack: dict, body: ChatIn, k: int = 3) -> list[str]:
     """The cards under a reply: the places it actually talks about, at most three. A list answer
     (open today, nearby) shows cards only for the places it names, never every match."""
     lang = "hi" if body.lang == "hi" else "en"
+    if CAPAB_Q.search(body.text) and not rules.search_places(data(body.city if body.city in cities.available() else "gwalior"), body.text):
+        return []  # a question about the app itself: no place cards, even if the reply names places
     ids = [p["id"] for p in pack["places"] if named_in(p["name"], answer)]
     d = data(body.city if body.city in cities.available() else "gwalior")
     low = answer.lower()
@@ -1566,11 +1591,34 @@ def write(messages: list[dict]) -> str:
 WRITER = write  # tests replace this
 
 
+# Same words as the app's chat/local.ts EMERGENCY (29 Oct test set: "help, I lost my child" was missed).
+EMERGENCY_Q = re.compile(r"emergenc|ambulance|police|hospital|injur|accident|unsafe|bleed|faint|unconscious|heart attack|snake ?bite|robbed|stolen|\bstole\b|theft|harass|attacked|lost (my|our) (child|kid|son|daughter|wallet|bag|phone|passport)|missing (child|kid|person)|\bhelp\s*!|\bhelp,|need help|urgent help|bachao|chori|madad|आपात|एम्बुलेंस|पुलिस|अस्पताल|मदद|बचाओ|चोरी|खो गय", re.I)
+
+
+# Same list as the app's core/parse.ts KNOWN_CITIES, plus landmarks that name a city.
+OTHER_CITY = re.compile(r"\b(agra|delhi|jaipur|orchha|bhopal|mumbai|goa|varanasi|udaipur|jhansi|khajuraho|kolkata|chennai|bengaluru|bangalore|hyderabad|pune|lucknow|"
+                        r"taj mahal|hawa mahal|qutub minar|red fort|gateway of india)\b|आगरा|दिल्ली|जयपुर|ओरछा|भोपाल|मुंबई|गोवा|वाराणसी|उदयपुर|झांसी|खजुराहो|ताज महल", re.I)
+COVERED_Q = re.compile(r"gwalior|indore|ग्वालियर|इंदौर", re.I)
+
+
 @app.post("/chat")
 def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
     """Returns {ai: false} when there is no key or the reply fails the checks; the app then shows its rule answer."""
-    if re.search(r"emergency|ambulance|police|hospital|injur|accident|आपात|एम्बुलेंस|पुलिस|अस्पताल", body.text, re.I):
+    if EMERGENCY_Q.search(body.text):
         return {"ai": False, "emergency": True, "text": None}
+    # A question about the app itself ("what can you do?", "can you book tickets?"): the fixed answer, same as the app's.
+    d0 = data(body.city if body.city in cities.available() else "gwalior")
+    if CAPAB_Q.search(body.text) and not rules.search_places(d0, body.text) and len(body.text) < 160:
+        hi = body.lang == "hi"
+        book = re.search(r"book|buy|reserve|order|pay|बुक|ख़रीद", body.text, re.I)
+        return {"ai": False, "text": CAPAB_TEXT["hi" if hi else "en"](bool(book)), "placeIds": []}
+    # A city we do not cover, and nothing of ours named: a plain, fixed answer instead of the model's guess at wording.
+    other = OTHER_CITY.search(body.text)
+    if other and not COVERED_Q.search(body.text) and not rules.search_places(data(body.city if body.city in cities.available() else "gwalior"), body.text):
+        name = other.group(0).strip().title()
+        hi = body.lang == "hi"
+        return {"ai": False, "text": f"**{name} अभी दिशारा में शामिल नहीं है।** अभी हम ग्वालियर और इंदौर की जगहों की जाँची हुई जानकारी रखते हैं। वहाँ का दिन प्लान करें?" if hi
+                else f"**{name} is not covered by Dishaara yet.** We keep checked facts for Gwalior and Indore for now. Shall I plan a day in one of them?", "placeIds": []}
     if not os.getenv("GROQ_KEY") and not os.getenv("ADAPTION_API_KEY") and WRITER is write:
         return {"ai": False, "note": "no-key", "text": None}
     if me:
@@ -1603,7 +1651,7 @@ def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
                 + (["\"officially confirmed\" for a fact whose howSure is different"] if over else []) \
                 + (["a travel time or fare, but FACTS has no fromYou: leave Getting there out"] if travel else [])                 + ([f"place names that are not in FACTS ({', '.join(wrong)}): write every place name exactly as FACTS spells it"] if wrong else [])
             messages += [{"role": "assistant", "content": answer}, {"role": "user", "content": f"Your reply used {' and '.join(fix) or 'nothing'}. Rewrite it using only FACTS."}]
-        return {"ai": False, "note": "grounding", "text": None, "placeIds": [p["id"] for p in pack["places"]][:1]}
+        return {"ai": False, "note": "grounding", "text": None, "placeIds": [] if CAPAB_Q.search(body.text) and not rules.search_places(data(body.city if body.city in cities.available() else "gwalior"), body.text) else [p["id"] for p in pack["places"]][:1]}
     except Exception as e:
         print(f"chat error: {type(e).__name__}: {str(e)[:300]}", flush=True)  # shows in the Vercel logs
         return {"ai": False, "note": "error", "text": None}

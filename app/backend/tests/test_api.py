@@ -478,7 +478,7 @@ def test_chat_knows_the_app_and_tips_only_sometimes():
 
 def test_ordinary_word_facts_is_not_a_leak():
     main.WRITER = lambda m: "I give you checked facts about each place and plan your day."
-    assert c.post("/chat", json={"text": "What can you do?"}).json()["ai"] is True
+    assert c.post("/chat", json={"text": "Tell me something nice about this city."}).json()["ai"] is True
 
 
 def test_v3_feeling_cues():
@@ -868,3 +868,22 @@ def test_saarthi_event_goes_to_the_city_calendar_after_approval():
     assert kite["from"] == "2025-01-14" and kite["src"] == "saarthi"
     hits = main.events_on(d, "2027-01-14")
     assert any(h["name"]["en"] == "Kite festival" and h["s"] == "historical pattern" for h in hits)
+
+
+def test_follow_up_open_question_keeps_the_place():
+    b = main.ChatIn(text="Is it open on Monday?", city="gwalior", lang="en", lastPlaces=["padavali"], history=[])
+    pack, _ = main.retrieve(b)
+    assert [p["id"] for p in pack["places"]] == ["padavali"] and "openToday" not in pack
+
+
+def test_uncovered_city_gets_a_fixed_answer():
+    r = c.post("/chat", json={"text": "Plan 6 hours in Jaipur", "city": "gwalior"}).json()
+    assert "not covered" in (r["text"] or "") and r["placeIds"] == []
+    r = c.post("/chat", json={"text": "What is the Taj Mahal ticket price?", "city": "indore"}).json()
+    assert "Taj Mahal is not covered" in r["text"]
+
+
+def test_app_question_gets_the_fixed_answer():
+    r = c.post("/chat", json={"text": "What can you do?", "city": "gwalior"}).json()
+    assert r["text"].startswith("**I'm Yatra") and r["placeIds"] == []
+    assert "does not sell tickets" in c.post("/chat", json={"text": "Can you book tickets for me?", "city": "indore"}).json()["text"]

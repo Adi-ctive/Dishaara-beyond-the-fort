@@ -58,15 +58,37 @@ def uncovered_city(text: str) -> str | None:
     return None
 
 
+# Words that name a kind of place, not a place: matching on them alone picked the wrong place (29 Oct test set:
+# "सराफ़ा बाज़ार, ग्वालियर" matched Gwalior Fort through "ग्वालियर", "Gohad Fort" matched Gwalior Fort through "fort").
+GENERIC = {"tomb", "temple", "temples", "palace", "mahal", "gwalior", "indore", "mandir", "bagh", "fort", "garden", "gardens", "lake", "museum",
+           "market", "bazaar", "bazar", "park", "the", "and", "with", "dam", "zoo", "hall", "group", "falls", "waterfall", "memorial", "city",
+           "ग्वालियर", "इंदौर", "मंदिर", "महल", "किला", "क़िला", "बाग", "बाज़ार", "बाजार", "मकबरा", "संग्रहालय", "उद्यान", "झील", "माता", "समूह", "मेला"}
+
+
+def _norm(t: str) -> str:
+    return t.lower().replace("़", "").replace("(", " ").replace(")", " ").replace(",", " ")
+
+
 def search_places(data: dict, query: str) -> list[dict]:
-    q = query.lower()
-    out = []
+    """Places named in the question, best match first: a full name beats distinctive words, which beat a close spelling."""
+    import difflib
+    q = _norm(query)
+    qw = [w for w in q.split() if len(w) > 3]
+    scored = []
     for p in data["places"]:
-        names = [p["name"]["en"].lower(), p["name"]["hi"], *(u["name"]["en"].lower() for u in p["units"])]
-        words = [w for n in names for w in n.replace("(", " ").replace(")", " ").split() if len(w) > 3]
-        if any(n in q for n in names) or any(w in q for w in words if w not in {"tomb", "temple", "palace", "mahal", "gwalior", "indore", "mandir", "bagh"}):
-            out.append({"id": p["id"], "name": p["name"], "guardrail": p["guardrail"]["status"]})  # Decision 25
-    return out
+        names = [_norm(p["name"]["en"]), _norm(p["name"]["hi"]), *(_norm(u["name"]["en"]) for u in p["units"])]
+        words = {w for n in names for w in n.split() if len(w) > 3 and w not in GENERIC}
+        score = 10 * sum(1 for n in names if n.strip() and n.strip() in q)
+        score += 3 * sum(1 for w in words if w in q)
+        # Every word of a name present, endings allowed to change ("ग्वालियर किले" for "ग्वालियर किला", "forts" for "fort").
+        stem = lambda w: w[:max(3, len(w) - 1)]
+        score += 8 * sum(1 for n in names if len(n.split()) > 1 and all(any(x.startswith(stem(w)) for x in q.split()) for w in n.split()))
+        if not score:
+            score = 2 * sum(1 for w in words if len(w) >= 5 and difflib.get_close_matches(w, qw, n=1, cutoff=0.8))
+        if score:
+            scored.append((score, p))
+    scored.sort(key=lambda x: -x[0])
+    return [{"id": p["id"], "name": p["name"], "guardrail": p["guardrail"]["status"]} for _, p in scored]  # Decision 25
 
 
 def get_place(data: dict, place_id: str) -> dict | None:

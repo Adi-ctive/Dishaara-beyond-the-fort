@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getKey, respondAI } from '../../chat/ai';
 import { api, apiOn } from '../../api';
 import { feeFor, fmt, people, rankedPlaces, SEEDS, startCoord, startName } from '../../core';
-import { respond, starterChips, type Card, type Reply } from '../../chat/local';
+import { cardsFor, respond, starterChips, type Card, type Reply } from '../../chat/local';
 import { useNav } from '../../nav';
 import { useStore } from '../../store';
 import { t } from '../../i18n';
@@ -253,7 +253,8 @@ export function ChatTab() {
       mark(res ? 'done' : 'failed');
       const ids = (res?.placeIds ?? []).filter((id) => data.places.some((p) => p.id === id));
       const keep = local.cards.filter((c) => c.kind !== 'place' && c.kind !== 'places');
-      const cards: Card[] = res ? (ids.length ? [...keep, { kind: 'places', ids: ids.slice(0, 3) }] : keep) : local.cards;
+      // Only the cards this kind of question needs: none for "what can you do", the plan card only for plan requests.
+      const cards: Card[] = cardsFor(query, res ? (ids.length ? [...keep, { kind: 'places', ids: ids.slice(0, 3) }] : keep) : local.cards, rankedPlaces(data, query).length > 0);
       const chips = res?.followUps?.length ? res.followUps : local.chips;
       if (res?.ai && res.text) r = { ...local, text: res.text, ai: true, engine: res.engine, cards, chips };
       else if (res && res.note !== 'no-key') r = { ...local, cards, chips, note: res.note === 'grounding' ? 'grounding' : undefined };

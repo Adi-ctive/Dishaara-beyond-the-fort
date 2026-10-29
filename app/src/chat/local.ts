@@ -7,7 +7,8 @@ import type { Lang } from '../theme/ThemeProvider';
 export type Card = { kind: 'place'; id: string } | { kind: 'places'; ids: string[] } | { kind: 'quick'; hours?: number } | { kind: 'bazaar' } | { kind: 'sos' } | { kind: 'roadmap' } | { kind: 'city'; city: 'gwalior' | 'indore'; ask: string };
 export type Reply = { text: string; cards: Card[]; chips: string[] };
 
-const EMERGENCY = /emergency|ambulance|police|hospital|injur|accident|unsafe|help me|आपात|एम्बुलेंस|पुलिस|अस्पताल|मदद/i;
+// Shared with the server (main.py EMERGENCY_Q). Not plain 'help me': that is usually 'help me plan'.
+const EMERGENCY = /emergenc|ambulance|police|hospital|injur|accident|unsafe|bleed|faint|unconscious|heart attack|snake ?bite|robbed|stolen|\bstole\b|theft|harass|attacked|lost (my|our) (child|kid|son|daughter|wallet|bag|phone|passport)|missing (child|kid|person)|\bhelp\s*!|\bhelp,|need help|urgent help|bachao|chori|madad|आपात|एम्बुलेंस|पुलिस|अस्पताल|मदद|बचाओ|चोरी|खो गय/i;
 const PLAN = /plan|itinerar|trip|day out|hours?\b|roadmap|घंटे|प्लान|योजना|घूम/i;
 const OPEN = /open|today|खुला|आज/i;
 const FEE = /ticket|fee|price|cost|₹|टिकट|शुल्क|कीमत/i;
@@ -15,6 +16,8 @@ const FOOD = /food|eat|lunch|snack|shop|souvenir|खाना|नाश्ता
 const FOLLOW = /\b(this|that|it|there|these|those|listed|where is|how far|how long|get there)\b|यह|वह|वहाँ|कहाँ/i;
 const MYDAY = /my (plan|day|roadmap|trip)|roadmap|schedule|timeline|budget|total cost|cost of (my|the) day|how much (will|does) (it|my day)|मेरा (प्लान|दिन)|रोडमैप|बजट|कुल खर्च/i;
 const RECO = /where (should|can|do) (i|we) go|what should (i|we) (see|visit|do)|where to go|suggest|recommend|what to (see|visit)|best place|must see|कहाँ जाएँ|कहाँ जाऊँ|क्या देखें|सुझाव/i;
+// Questions about Dishaara itself (what it can do, what it cannot, how it works): an answer about the app, no place cards.
+const CAPAB = /what can (you|u|this app|dishaara) do|what (do|does) (you|this app|dishaara) do|who (are|made) you|are you (a |an )?(bot|ai|human|robot)|how (do|does) (you|this|the app|dishaara) (work|check|know|get)|can (you|u|i|dishaara) (book|buy|reserve|order|pay|call|hire|get me a)|do you (book|sell|support|speak|work|have|remember|save)|is (this|it|dishaara|the app) (free|safe|offline|official)|which (cities|languages|places do you)|your (features|abilities)|feature|capabilit|^\s*(help|hi|hello|hey|namaste|नमस्ते)\s*[!?.]*\s*$|आप क्या कर सकते|तुम क्या कर सकते|आप कौन|तुम कौन|कैसे काम करता|क्या आप .*बुक/i;
 const LESSER = /hidden|lesser|less known|offbeat|quiet|unusual|छुपे|कम भीड़|अनजान/i;
 
 // Starter questions for the city on screen: the ticket chip names its first plannable place (Gwalior Fort, Central Museum...).
@@ -106,6 +109,26 @@ export function respond(text: string, data: Data, today: string, lang: Lang, las
   if (EMERGENCY.test(text)) {
     return { text: hi ? 'तुरंत मदद के लिए 112 पर कॉल करें। नीचे बटन है।' : 'For help right now, call 112. The button is below.', cards: [{ kind: 'sos' }], chips: [] };
   }
+  if (CAPAB.test(text) && !named.length) {
+    const book = /book|buy|reserve|order|pay|बुक|ख़रीद/i.test(text);
+    return {
+      text: (hi
+        ? [book ? '**दिशारा टिकट नहीं बेचता और बुकिंग नहीं करता।** यह बताता है कि किस जगह का टिकट कौन बेचता है और कहाँ (काउंटर या ऑनलाइन), तथ्य के लेबल और तारीख़ के साथ।' : '**मैं यात्रा हूँ, दिशारा का गाइड।** मैं ये कर सकता हूँ:',
+           '- जगहों का समय, टिकट, बंद होने के दिन, हर तथ्य उसके लेबल और तारीख़ के साथ',
+           '- आपके समय, बजट और रुचि के हिसाब से दिन का रोडमैप',
+           '- आज क्या खुला है, पास क्या है, खाना और बाज़ार',
+           '- सारथियों की ताज़ा जाँच, आवाज़ में सुनना और बोलकर पूछना, मुश्किल में 112',
+           'जो दर्ज नहीं है, वह मैं अंदाज़े से नहीं बताता। अभी ग्वालियर और इंदौर।']
+        : [book ? "**Dishaara does not sell tickets or make bookings.** It tells you who sells each place's ticket and where (counter or online), with the fact's label and date." : "**I'm Yatra, Dishaara's guide.** Here is what I can do:",
+           '- Hours, tickets and closing days of places, each fact with its label and date',
+           '- A day roadmap that fits your time, budget and interests',
+           "- What is open today, what is nearby, food and the Bazaar",
+           "- Saarthis' fresh local checks, read-aloud and voice questions, and 112 if you need help",
+           "I never guess what is not on record. Cities covered now: Gwalior and Indore."]).join('\n'),
+      cards: [],
+      chips: starterChips(hi, data),
+    };
+  }
   const trip = parseTrip(text, today);
   if (trip.uncoveredCity) {
     const city = trip.uncoveredCity.replace(/^./, (c) => c.toUpperCase());
@@ -172,8 +195,16 @@ export function respond(text: string, data: Data, today: string, lang: Lang, las
     };
   }
   return {
-    text: hi ? 'मैं जगहों, टिकट, समय और आपके दिन के प्लान में मदद कर सकता हूँ।' : 'I can help with places, tickets, timings and planning your day.',
+    text: hi ? 'यह मैं ठीक से समझ नहीं पाया। किसी जगह का नाम लिखें, या पूछें कि आज क्या खुला है, या अपना दिन प्लान करवाएँ। नीचे कुछ सवाल हैं।' : "I did not quite get that. Name a place, ask what is open today, or have me plan your day. Some questions to try are below.",
     cards: [],
     chips: starterChips(hi, data),
   };
+}
+
+/** Which kind of question this is, so the chat shows only the cards that kind needs (29 Oct: a plan card under a
+ * capability question made the app look careless). */
+export function cardsFor(text: string, cards: Card[], named: boolean): Card[] {
+  if (EMERGENCY.test(text)) return cards.filter((c) => c.kind === 'sos');
+  if (CAPAB.test(text) && !named) return [];
+  return cards.filter((c) => (c.kind === 'quick' ? PLAN.test(text) && !named && !FEE.test(text) : c.kind === 'bazaar' ? FOOD.test(text) : true));
 }
