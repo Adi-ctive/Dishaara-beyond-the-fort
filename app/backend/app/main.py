@@ -35,6 +35,15 @@ PUBLIC = bool(os.getenv("MONGODB_URI"))
 app = FastAPI(title="Dishaara backend", **({"docs_url": None, "redoc_url": None, "openapi_url": None} if PUBLIC else {}))
 # Only the app's own pages call the API from a browser (the phone app and Vercel share one origin).
 ORIGINS = os.getenv("CORS_ORIGINS", "https://dishaara.vercel.app,http://localhost:5174,http://localhost:5175,http://localhost:4174").split(",")
+@app.middleware("http")
+async def json_charset(request: Request, call_next):
+    """Every JSON answer says it is UTF-8 (ASVS 5.0 V4.1.1)."""
+    r = await call_next(request)
+    if r.headers.get("content-type") == "application/json":
+        r.headers["content-type"] = "application/json; charset=utf-8"
+    return r
+
+
 app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=["GET", "POST", "PUT", "DELETE"], allow_headers=["Authorization", "Content-Type"])
 app.include_router(social.router)
 
@@ -264,6 +273,14 @@ def sign_in_email(body: EmailIn):
     if not u.get("roles"):
         raise HTTPException(403, "this test account is closed")
     return {"token": auth.issue(u["_id"]), "user": auth.public(u)}
+
+
+@app.post("/auth/signout")
+def sign_out(authorization: str | None = Header(None)):
+    """Ends this session on the server too: the token stops working at once (ASVS 5.0 V7.4.1)."""
+    if authorization and authorization.startswith("Bearer "):
+        auth.revoke(authorization[7:])
+    return {"ok": True}
 
 
 @app.get("/me")
@@ -1624,8 +1641,14 @@ COVERED_Q = re.compile(r"gwalior|indore|ग्वालियर|इंदौर
 @app.post("/chat")
 def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
     """Returns {ai: false} when there is no key or the reply fails the checks; the app then shows its rule answer."""
+    # An emergency is answered first and never rate-limited.
     if EMERGENCY_Q.search(body.text):
         return {"ai": False, "emergency": True, "text": None}
+    # Every other message counts towards the limit, fixed answers too (OWASP LLM10, 30 Oct: a flood of "hi" was never limited).
+    if me:
+        limit(me, "chat", 60, 60)
+    else:
+        limit(by_ip(request), "chat", 20, 60)
     # A question about the app itself ("what can you do?", "can you book tickets?"): the fixed answer, same as the app's.
     d0 = data(body.city if body.city in cities.available() else "gwalior")
     if CAPAB_Q.search(body.text) and not rules.search_places(d0, body.text) and len(body.text) < 160:
@@ -1639,10 +1662,6 @@ def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
         hi = body.lang == "hi"
         return {"ai": False, "text": f"**{name} अभी दिशारा में शामिल नहीं है।** अभी हम ग्वालियर और इंदौर की जगहों की जाँची हुई जानकारी रखते हैं। वहाँ का दिन प्लान करें?" if hi
                 else f"**{name} is not covered by Dishaara yet.** We keep checked facts for Gwalior and Indore for now. Shall I plan a day in one of them?", "placeIds": []}
-    if me:
-        limit(me, "chat", 60, 60)
-    else:
-        limit(by_ip(request), "chat", 20, 60)
     pack, allowed = retrieve(body)
     if pack.get("spotMissing"):
         # A spot we could not place on the map: a plain answer, never a guess (29 Oct test set: "near Lashkar").
@@ -1899,6 +1918,8 @@ async def upload_proof(file: UploadFile = File(...), me: dict | None = Depends(c
     data = await file.read(cap + 1)
     if len(data) > cap:
         raise HTTPException(413, f"file is over {cap // 1_000_000} MB")
+    if not social.looks_like(kind, data):
+        raise HTTPException(415, "the file is not the type it says")  # ASVS 5.0 V5.2.2
     pid = uuid.uuid4().hex[:12]
     get_db().proofs.insert_one({"_id": pid, "by": me["_id"], "type": kind, "data": Binary(data), "at": now()})
     return {"id": pid, "type": kind}
@@ -2058,6 +2079,8 @@ async def business_photo(file: UploadFile = File(...), me: dict | None = Depends
     data = await file.read(PHOTO_MAX + 1)
     if len(data) > PHOTO_MAX:
         raise HTTPException(413, "photo is over 2 MB")
+    if not social.looks_like(file.content_type, data):
+        raise HTTPException(415, "the file is not the type it says")  # ASVS 5.0 V5.2.2
     mid = uuid.uuid4().hex[:12]
     db = get_db()
     db.media.insert_one({"_id": mid, "by": me["_id"], "biz": b["_id"], "type": file.content_type, "data": Binary(data), "at": now()})

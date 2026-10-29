@@ -36,7 +36,19 @@ def secret() -> str:
 
 def issue(uid: str) -> str:
     t = int(time.time())
-    return jwt.encode({"sub": uid, "iat": t, "exp": t + SESSION_DAYS * 86400}, secret(), algorithm="HS256")
+    # jti: the token's own id, so signing out can end this session on the server (ASVS 5.0 V7.4.1, 30 Oct).
+    return jwt.encode({"sub": uid, "iat": t, "exp": t + SESSION_DAYS * 86400, "jti": uuid.uuid4().hex}, secret(), algorithm="HS256")
+
+
+def revoke(token: str) -> bool:
+    """Ends one session: its id is kept as revoked until the token would have expired anyway."""
+    try:
+        c = jwt.decode(token, secret(), algorithms=["HS256"])
+    except jwt.PyJWTError:
+        return False
+    if c.get("jti"):
+        get_db().revoked.replace_one({"_id": c["jti"]}, {"_id": c["jti"], "exp": c["exp"]}, upsert=True)
+    return True
 
 
 def public(u: dict) -> dict:
@@ -143,9 +155,12 @@ def current(authorization: str | None = Header(None)) -> dict | None:
     if not authorization or not authorization.startswith("Bearer "):
         return None
     try:
-        sub = jwt.decode(authorization[7:], secret(), algorithms=["HS256"])["sub"]
+        claims = jwt.decode(authorization[7:], secret(), algorithms=["HS256"])
     except jwt.PyJWTError:
         return None
+    if claims.get("jti") and get_db().revoked.find_one({"_id": claims["jti"]}, {"_id": 1}):
+        return None  # signed out
+    sub = claims["sub"]
     u = get_db().users.find_one({"_id": sub})
     if not u or u.get("banned"):
         return None

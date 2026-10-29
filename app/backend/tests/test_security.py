@@ -190,3 +190,34 @@ def test_beta_languages_are_moderators_only(monkeypatch):
     a, _ = signin("Alice")
     assert c.post("/translate", json={"texts": ["ticket ₹25"], "to": "ta"}, headers=a).status_code == 403
     assert c.post("/translate", json={"texts": ["ticket ₹25"], "to": "xx"}, headers=a).status_code == 422
+
+
+def test_signout_ends_the_session_on_the_server():
+    a, _ = signin("Alice")
+    assert c.get("/me", headers=a).status_code == 200
+    assert c.post("/auth/signout", headers=a).json()["ok"]
+    assert c.get("/me", headers=a).status_code == 401  # the same token no longer works (ASVS V7.4.1)
+    b, _ = signin("Alice")  # signing in again gives a new, working session
+    assert c.get("/me", headers=b).status_code == 200
+
+
+def test_proof_and_shop_photo_contents_are_checked():
+    a, aid = signin("Alice")
+    give(aid, "saarthi", "business")
+    fake = ("board.jpg", io.BytesIO(b"<script>alert(1)</script>"), "image/jpeg")
+    assert c.post("/proofs", files={"file": fake}, headers=a).status_code == 415
+    clip = ("note.webm", io.BytesIO(b"not really audio"), "audio/webm")
+    assert c.post("/proofs", files={"file": clip}, headers=a).status_code == 415
+    ok = ("note.webm", io.BytesIO(bytes([0x1A, 0x45, 0xDF, 0xA3]) + b"0" * 50), "audio/webm")
+    assert c.post("/proofs", files={"file": ok}, headers=a).status_code == 200
+    c.post("/me/apply-business", json={"name": "Alice Sweets", "kind": "food", "city": "gwalior"}, headers=a)
+    assert c.post("/business/me/photos", files={"file": ("x.png", io.BytesIO(b"GIF89a"), "image/png")}, headers=a).status_code == 415
+    assert c.get("/health").headers["content-type"] == "application/json; charset=utf-8"  # ASVS V4.1.1
+
+
+def test_chat_flood_is_limited_but_emergencies_always_answer(monkeypatch):
+    monkeypatch.setenv("GROQ_KEY", "x")
+    ip = {"x-forwarded-for": "198.51.100.9"}
+    codes = [c.post("/chat", json={"text": "hi", "city": "gwalior"}, headers=ip).status_code for _ in range(22)]
+    assert 429 in codes  # OWASP LLM10: every message counts, fixed answers too
+    assert c.post("/chat", json={"text": "help, I lost my child", "city": "gwalior"}, headers=ip).json()["emergency"]

@@ -104,9 +104,19 @@ def looks_like(kind: str, data: bytes) -> bool:
         return data[:8] == bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
     if kind == "image/webp":
         return data[:4] == b"RIFF" and data[8:12] == b"WEBP"
-    if kind == "video/mp4":
+    if kind in ("video/mp4", "audio/mp4", "audio/x-m4a", "video/quicktime"):
         return data[4:8] == b"ftyp"
-    return data[:4] == bytes([0x1A, 0x45, 0xDF, 0xA3])  # webm
+    if kind in ("video/webm", "audio/webm"):
+        return data[:4] == bytes([0x1A, 0x45, 0xDF, 0xA3])
+    if kind == "audio/ogg":
+        return data[:4] == b"OggS"
+    if kind == "audio/wav":
+        return data[:4] == b"RIFF" and data[8:12] == b"WAVE"
+    if kind == "audio/mpeg":
+        return data[:3] == b"ID3" or (len(data) > 1 and data[0] == 0xFF and data[1] & 0xE0 == 0xE0)
+    if kind == "audio/aac":
+        return len(data) > 1 and data[0] == 0xFF and data[1] & 0xF0 == 0xF0
+    return False  # a type we do not know how to check is refused
 
 
 @router.post("/posts/media")

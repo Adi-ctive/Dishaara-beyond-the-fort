@@ -127,7 +127,18 @@ export const api = {
   signInStaff: async (username: string, password: string) => signedIn(await call<{ token: string; user: Me }>('POST', '/auth/staff', { username, password })),
   signInEmail: async (email: string, password: string) => signedIn(await call<{ token: string; user: Me }>('POST', '/auth/email', { email, password })),
   me: () => (token() ? call<Me>('GET', '/me') : Promise.resolve(null)),
-  signOut: () => keep(null),
+  /** Ends the session on the server too (the token stops working at once), then clears this person's chats and
+   * token from the browser (ASVS 5.0 V7.4.1, V14.3.1). */
+  signOut: () => {
+    const t = token();
+    if (BASE && t) void fetch(`${BASE}/auth/signout`, { method: 'POST', headers: { Authorization: `Bearer ${t}` }, keepalive: true }).catch(() => undefined);
+    keep(null);
+    try {
+      for (const k of ['dishaara.chat.current', 'dishaara.chats']) localStorage.removeItem(k);
+    } catch {
+      /* storage blocked: nothing was kept */
+    }
+  },
   putProfile: (p: { interests?: string[]; prefs?: object; prompt?: string[]; avatar?: string; frame?: string; banner?: string; city?: string }) => call('PUT', '/me/profile', p),
   progress: () => call<{ points: number; level: number; streak: number; stamps: number; rare: number; quiet: number; feedback: number; food: number; night: number; cities: number; indoreStamps: number }>('GET', '/me/progress'),
   myStamps: () => call<Record<string, { status: 'confirmed' | 'pending'; rarity: string; quiet: boolean; t: number; date: string; city: string }>>('GET', '/me/stamps'),
