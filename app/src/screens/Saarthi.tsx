@@ -55,7 +55,7 @@ export function SaarthiHome() {
       {me === null && <p className="small error">{lastError || tr('Could not load your saarthi account.', 'आपका सारथी अकाउंट लोड नहीं हुआ।')}</p>}
       <div className="stat-grid">
         {tiles.map((t, i) => (
-          <motion.button key={t.l} className="stat" onClick={t.go} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+          <motion.button key={t.l} className="stat" onClick={t.go} initial={{ y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
             <b>{t.n}</b>
             <small>{t.l}</small>
           </motion.button>

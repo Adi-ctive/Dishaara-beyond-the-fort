@@ -138,7 +138,7 @@ export function ProfileTab() {
         })}
       </div>
       {rows.map((r, i) => (
-        <motion.button key={r.title} className="card row" onClick={r.go} data-tour={'tour' in r ? 'tutorial' : undefined} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+        <motion.button key={r.title} className="card row" onClick={r.go} data-tour={'tour' in r ? 'tutorial' : undefined} initial={{ y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
           <Icon name={r.icon} size={22} />
           <span className="grow"><b>{r.title}</b><small>{r.sub}</small></span>
           <Icon name="arrow" size={16} />
@@ -241,7 +241,7 @@ export function PromptEditor() {
       <p className="muted small">{hi ? 'चैट इन्हीं बातों से आपके लिए जवाब बनाता है। आपकी फ़ीडबैक से ये बदलती हैं।' : 'The chat shapes answers from these lines. Your feedback updates them. Edit anything.'}</p>
       <ul className="prompt-list">
         {s.prompt.map((l, i) => (
-          <motion.li key={l + i} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <motion.li key={l + i} layout initial={false} animate={{ opacity: 1 }}>
             <span className="grow">{l}</span>
             <button className="icon-btn small" onClick={() => set((c) => ({ prompt: c.prompt.filter((_, j) => j !== i) }))} aria-label="Remove">
               <Icon name="x" size={16} />

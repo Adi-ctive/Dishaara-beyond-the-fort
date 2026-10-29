@@ -211,7 +211,7 @@ export function MapTab() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeDasharray="0.1 9"
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1, strokeDashoffset: [0, -36] }}
               transition={{ opacity: { duration: 0.6 }, strokeDashoffset: { duration: 2.4, repeat: Infinity, ease: 'linear' } }}
             />
@@ -271,7 +271,7 @@ function MapPreview({ id, onClose, shops }: { id: string; onClose: () => void; s
   if (!p && !b) return null;
   const v = p ? VERDICT_TEXT[checkUnit(data, p.units[0], today).verdict] : null;
   return (
-    <motion.div className="map-preview" initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} key={id}>
+    <motion.div className="map-preview" initial={{ y: 30 }} animate={{ y: 0, opacity: 1 }} key={id}>
       <button className="map-preview-close" onClick={onClose} aria-label={hi ? 'बंद करें' : 'Close'}><Icon name="x" size={16} /></button>
       <button className="map-preview-body" onClick={() => (p ? open({ kind: 'story', id }) : open({ kind: 'biz', id }))}>
         <span className="mp-art">{p ? <PlaceCover id={id} height={86} /> : b && <BizCover kind={b.kind} height={86} />}</span>

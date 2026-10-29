@@ -113,7 +113,7 @@ function LayerView({ l }: { l: Layer }) {
     case 'duel': return <Duel />;
     case 'diagram': return <Diagram />;
     case 'look': return <MembersOnly title="Your look"><Look /></MembersOnly>;
-    case 'signin': return <SignInPage as={l.as} />;
+    case 'signin': return <SignInPage as={l.as} email={l.email} />;
     case 'story': return <PlaceStory id={l.id} />;
   }
 }
@@ -122,7 +122,7 @@ export function App() {
   const { theme, lang, setLang } = useTheme();
   const { s, set } = useStore();
   const { tab, go, layers, open } = useNav();
-  const [entered, setEntered] = useState(() => location.hash.length > 1);
+  const [entered, setEntered] = useState(() => location.hash.length > 1 || location.pathname.length > 1); // /login opens straight into the app
   const [themeOpen, setThemeOpen] = useState(false);
   const tabs = TABS[s.role];
   const tripLive = useTripLive();
@@ -174,8 +174,9 @@ export function App() {
         />
       ) : (
         <>
-          <AnimatePresence mode="wait">
-            <motion.main key={shown} className="content" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+          <AnimatePresence initial={false}>
+            {/* Movement only and no exit wait: the next screen shows at once even where animations never run (scanners). */}
+            <motion.main key={shown} className="content" initial={{ y: 10 }} animate={{ y: 0 }} transition={{ duration: 0.22 }}>
               <Boundary>
                 <Screen tab={shown} />
               </Boundary>

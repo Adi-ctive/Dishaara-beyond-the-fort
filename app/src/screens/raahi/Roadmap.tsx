@@ -231,7 +231,7 @@ export function RoadmapTab() {
   return (
     <div className="screen">
       {!ahead && (
-      <motion.div className="time-strip" initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+      <motion.div className="time-strip" initial={{ y: -8 }} animate={{ y: 0, opacity: 1 }}>
         <Icon name="clock" size={18} />
         <span>
           <b>{Math.floor(left / 60)} h {left % 60} m</b> {hi ? 'बाकी' : 'left'}

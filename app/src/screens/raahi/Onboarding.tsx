@@ -43,7 +43,7 @@ export function Onboarding() {
               const on = picked.includes(it.id);
               return (
                 <motion.button key={it.id} className={`interest${on ? ' on' : ''}`} onClick={() => setPicked((p) => (on ? p.filter((x) => x !== it.id) : [...p, it.id]))}
-                  initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.03 }} whileTap={{ scale: 0.95 }} aria-pressed={on}>
+                  initial={{ scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.03 }} whileTap={{ scale: 0.95 }} aria-pressed={on}>
                   <span className="interest-emoji" aria-hidden="true">{it.icon}</span>
                   <span>{it[lang]}</span>
                   {on && <Icon name="check" size={16} className="interest-check" />}

@@ -61,7 +61,7 @@ function GoogleButton({ clientId, onUser }: { clientId: string; onUser: (u: Me |
   return <div ref={box} className="gsi-box" />;
 }
 
-export function SignInCard({ compact = false, team = false, onUser }: { compact?: boolean; team?: boolean; onUser?: (u: Me) => void }) {
+export function SignInCard({ compact = false, team = false, email = false, onUser }: { compact?: boolean; team?: boolean; email?: boolean; onUser?: (u: Me) => void }) {
   const { set } = useStore();
   const tr = useTr();
   const [google, setGoogle] = useState<string | null>(null);
@@ -95,7 +95,7 @@ export function SignInCard({ compact = false, team = false, onUser }: { compact?
     setBusy(true);
     api.signInDemo('Raahi').then(done);
   };
-  const [byEmail, setByEmail] = useState(false);
+  const [byEmail, setByEmail] = useState(email);
   const staffSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -172,7 +172,8 @@ export function useEnterAs() {
   );
 }
 
-export function SignInPage({ as: preset }: { as?: Role }) {
+/** email: open with the email form showing (the /login address: testers and scanners get in with one form). */
+export function SignInPage({ as: preset, email = false }: { as?: Role; email?: boolean }) {
   const { s, set } = useStore();
   const tr = useTr();
   const enter = useEnterAs();
@@ -180,8 +181,8 @@ export function SignInPage({ as: preset }: { as?: Role }) {
   const [err, setErr] = useState('');
   // Already signed in and asked for an account type: go straight there.
   useEffect(() => {
-    if (s.signedIn && as) enter(as, s.user);
-  }, [s.signedIn, as, s.user, enter]);
+    if (s.signedIn && as && !email) enter(as, s.user);  // from /login the sign-in itself picks the account's own role
+  }, [s.signedIn, as, s.user, enter, email]);
   const signedIn = (u: Me | null) => {
     if (!u || !as) return;
     if (as === 'moderator' && !u.roles.includes('moderator')) {
@@ -189,7 +190,8 @@ export function SignInPage({ as: preset }: { as?: Role }) {
       set({ signedIn: false, user: null, role: 'raahi' });
       return setErr(tr('This account is not on the Dishaara team.', 'यह अकाउंट दिशारा टीम में नहीं है।'));
     }
-    enter(as, u);
+    // From /login, a test account opens in its own role (a saarthi or shop login lands on its own screens).
+    enter(email ? (u.roles.includes('business') ? 'business' : u.roles.includes('saarthi') ? 'saarthi' : 'raahi') : as, u);
   };
   if (!as) {
     return (
@@ -211,7 +213,7 @@ export function SignInPage({ as: preset }: { as?: Role }) {
   return (
     <LayerPage title={tr(`Sign in: ${pick.en}`, `साइन इन: ${pick.hi}`)}>
       {!preset && <button className="link" onClick={() => setAs(null)}>{tr('Change account type', 'अकाउंट का प्रकार बदलें')}</button>}
-      <SignInCard team={as === 'moderator'} onUser={signedIn} />
+      <SignInCard team={as === 'moderator'} email={email} onUser={signedIn} />
       {as === 'saarthi' && <p className="small muted">{tr('Not a saarthi yet? Sign in and you can apply. A moderator checks every application.', 'अभी सारथी नहीं? साइन इन करके आवेदन करें। हर आवेदन मॉडरेटर जाँचते हैं।')}</p>}
       {as === 'business' && <p className="small muted">{tr('No shop listed yet? Sign in and register it. A moderator approves it before it shows in the Bazaar.', 'अभी दुकान सूची में नहीं? साइन इन करके जोड़ें। बाज़ार में दिखने से पहले मॉडरेटर मंज़ूर करते हैं।')}</p>}
       {err && <small className="err">{err}</small>}

@@ -335,7 +335,7 @@ export function PlaceStory({ id }: { id: string }) {
     <motion.div
       className="story"
       style={{ ['--s1' as string]: a.sky[0], ['--s2' as string]: a.sky[1], ['--sink' as string]: a.ink, ['--sacc' as string]: a.accent }}
-      initial={{ opacity: 0, scale: 0.96 }}
+      initial={{ scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
       role="dialog"
@@ -364,7 +364,7 @@ export function PlaceStory({ id }: { id: string }) {
         onDragEnd={(_, info) => (info.offset.x < -60 ? next() : info.offset.x > 60 ? prev() : undefined)}
       >
         <AnimatePresence mode="wait">
-          <motion.div key={slides[i].key} className="st-slide" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.28, ease: [0.2, 0.7, 0.2, 1] }}>
+          <motion.div key={slides[i].key} className="st-slide" initial={{ x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.28, ease: [0.2, 0.7, 0.2, 1] }}>
             {slides[i].render()}
           </motion.div>
         </AnimatePresence>

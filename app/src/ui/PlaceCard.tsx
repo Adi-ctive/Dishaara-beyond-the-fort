@@ -34,7 +34,7 @@ export function PlaceCard({ place, i = 0 }: { place: Place; i?: number }) {
       className="place-card2"
       onClick={() => open({ kind: 'story', id: place.id })}
       style={{ ['--pc1' as string]: a.sky[0], ['--pc2' as string]: a.sky[1], ['--pca' as string]: a.accent, ['--pcink' as string]: a.ink }}
-      initial={{ opacity: 0, y: 14 }}
+      initial={{ y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: i * 0.06, duration: 0.4 }}
       whileHover={{ y: -3 }}

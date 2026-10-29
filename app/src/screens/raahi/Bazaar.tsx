@@ -74,7 +74,7 @@ export function BazaarTab() {
           {list.map((b, i) => {
             const near = data.places.find((p) => p.id === b.near);
             return (
-              <motion.button key={b.id} className={`biz2${b.sponsored ? ' sponsored' : ''}`} onClick={() => open({ kind: 'biz', id: b.id })} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} whileTap={{ scale: 0.98 }}>
+              <motion.button key={b.id} className={`biz2${b.sponsored ? ' sponsored' : ''}`} onClick={() => open({ kind: 'biz', id: b.id })} initial={{ y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} whileTap={{ scale: 0.98 }}>
                 <span className="biz2-cover">{b.photos?.length ? <img className="biz-photo" src={mediaUrl(b.photos[0])} alt="" loading="lazy" style={{ height: 92 }} /> : <BizCover kind={b.kind} height={92} />}{b.sponsored && <span className="spons hero-spons">{hi ? 'प्रायोजित' : 'Sponsored'}</span>}</span>
                 <span className="biz2-body">
                   <span className="biz-top">
@@ -114,7 +114,7 @@ export function Alerts() {
     <LayerPage title={hi ? 'सूचनाएँ' : 'Alerts'}>
       {list === null && <p className="muted">{hi ? 'लोड हो रहा है' : 'Loading'}</p>}
       {list?.map((a, i) => (
-        <motion.div key={a.id} className={`alert card ${a.kind}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}>
+        <motion.div key={a.id} className={`alert card ${a.kind}`} initial={{ y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}>
           <Icon name={icon[a.kind] ?? 'news'} size={22} />
           <span className="grow">
             <b>{hi && a.hi ? a.hi : a.en}</b>

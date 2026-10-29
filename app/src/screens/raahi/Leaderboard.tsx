@@ -32,7 +32,7 @@ export function Leaderboard() {
       )}
       <ol className="leaders">
         {board?.rows.map((r, i) => (
-          <motion.li key={r.id} className={`leader${r.me ? ' me' : ''}${i < 3 ? ' top' : ''}`} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}>
+          <motion.li key={r.id} className={`leader${r.me ? ' me' : ''}${i < 3 ? ' top' : ''}`} initial={{ x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}>
             <span className="leader-rank">{MEDAL[i] ?? r.rank}</span>
             <Avatar id={r.avatar ?? 'peacock'} frame={r.frame ?? undefined} size={42} />
             <span className="grow">

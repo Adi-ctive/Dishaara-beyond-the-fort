@@ -331,10 +331,10 @@ export function ChatTab() {
       )}
       {msgs.length === 0 && (
         <>
-          <motion.p className="eyebrow" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <motion.p className="eyebrow" initial={false} animate={{ opacity: 1 }}>
             {t('hello', lang)}
           </motion.p>
-          <motion.h1 className="display" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+          <motion.h1 className="display" initial={{ y: 12 }} animate={{ opacity: 1, y: 0 }}>
             {t('where', lang)}
           </motion.h1>
           {!s.onboarded && (
@@ -344,7 +344,7 @@ export function ChatTab() {
               <Icon name="arrow" size={16} />
             </button>
           )}
-          <motion.button className="card quick" onClick={() => open({ kind: 'quick' })} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <motion.button className="card quick" onClick={() => open({ kind: 'quick' })} initial={{ y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <span className="quick-icon"><Icon name="sparkle" size={22} /></span>
             <span><b>{t('quick', lang)}</b><small>{t('quickSub', lang)}</small></span>
             <Icon name="arrow" size={18} />
@@ -372,7 +372,7 @@ export function ChatTab() {
       <div className="thread" aria-live="polite">
         <AnimatePresence initial={false}>
           {msgs.map((m) => { const v = (m.role === 'bot' && m.alt?.[to]) || { text: m.text, chips: m.chips }; return (
-            <motion.div key={m.id} className={`msg ${m.role}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={m.id} className={`msg ${m.role}`} initial={{ y: 10 }} animate={{ opacity: 1, y: 0 }}>
               {m.role === 'bot' ? (
                 <>
                   <div className="bubble bot">

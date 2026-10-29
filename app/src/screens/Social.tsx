@@ -78,7 +78,7 @@ export function LivePostCard({ post, i = 0, onChange }: { post: ServerPost; i?: 
   };
   if (gone) return <p className="muted small post-gone">{tr('Post deleted.', 'पोस्ट हटाई गई।')}</p>;
   return (
-    <motion.article className="post" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+    <motion.article className="post" initial={{ y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
       <header className="post-head">
         <button className="post-who" onClick={() => (p.biz ? open({ kind: 'biz', id: p.biz }) : p.byRole !== 'raahi' && open({ kind: 'saarthi', id: p.by }))}>
           {p.biz ? <span className="biz-kind shop"><BizIcon kind="shop" /></span> : <Avatar id="peacock" size={42} />}
@@ -263,7 +263,7 @@ export function Community() {
             <Icon name="camera" size={18} /> {busy ? tr('Uploading', 'अपलोड हो रहा है') : tr('Photo or clip', 'फ़ोटो या वीडियो')}
             <input type="file" accept="image/*,video/mp4,video/webm" hidden onChange={addPhoto} disabled={busy || photos.length >= 4} />
           </label>
-          <button className="btn primary" onClick={post}>{tr('Post', 'पोस्ट')}</button>
+          <button className="btn primary" onClick={post}>{tr('Share post', 'पोस्ट साझा करें')}</button>
         </div>
         {photos.length > 0 && <div className="post-photos n1">{photos.map((x) => x.video ? <video key={x.id} src={x.url} muted playsInline controls /> : <img key={x.id} src={x.url} alt="" />)}</div>}
         {note && <small className="err">{note}</small>}

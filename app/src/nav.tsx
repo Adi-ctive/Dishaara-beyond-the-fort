@@ -24,7 +24,7 @@ export type Layer =
   | { kind: 'look' }
   | { kind: 'biz'; id: string }
   | { kind: 'feed' }
-  | { kind: 'signin'; as?: import('./store').Role }
+  | { kind: 'signin'; as?: import('./store').Role; email?: boolean }
   | { kind: 'story'; id: string };
 
 type Ctx = { tab: Tab; go: (t: Tab) => void; layers: Layer[]; open: (l: Layer) => void; replace: (l: Layer) => void; back: () => void; closeAll: () => void };

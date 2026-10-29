@@ -76,7 +76,7 @@ export function PlaceView({ id }: { id: string }) {
 
   return (
     <LayerPage title={p.name[lang]}>
-      <motion.div className="place-hero2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ ['--pcink' as string]: artFor(id).ink }}>
+      <motion.div className="place-hero2" initial={false} animate={{ opacity: 1 }} style={{ ['--pcink' as string]: artFor(id).ink }}>
         {p.photo ? <img className="ph-photo" src={p.photo.img} alt={p.name[lang]} loading="lazy" /> : <PlaceCover id={id} height={190} />}
         <span className="pc-shade" />
         <div className="ph-text">
@@ -84,7 +84,7 @@ export function PlaceView({ id }: { id: string }) {
           <h1 className="ph-name">{p.name[lang]}</h1>
           {rarity === 'rare' && <span className="pc-rare static">★ {hi ? 'दुर्लभ स्टैम्प' : 'Rare stamp'}</span>}
         </div>
-        <motion.span className={`ph-stamp${s.stamps[id] ? ' got' : ''}`} initial={{ scale: 0.6, rotate: -20, opacity: 0 }} animate={{ scale: 1, rotate: -8, opacity: 1 }} transition={{ type: 'spring', damping: 14 }}>
+        <motion.span className={`ph-stamp${s.stamps[id] ? ' got' : ''}`} initial={{ scale: 0.6, rotate: -20 }} animate={{ scale: 1, rotate: -8, opacity: 1 }} transition={{ type: 'spring', damping: 14 }}>
           <StampArt place={p} got={!!s.stamps[id]} rarity={rarity} size={78} />
         </motion.span>
       </motion.div>

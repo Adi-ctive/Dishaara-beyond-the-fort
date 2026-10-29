@@ -56,7 +56,7 @@ export function Passport() {
           {data.places.map((p, i) => {
             const st = s.stamps[p.id];
             return (
-              <motion.button key={p.id} className={`stamp-cell${st ? ' got' : ''}`} style={{ ['--pc1' as string]: artFor(p.id).sky[0], ['--pc2' as string]: artFor(p.id).sky[1] }} onClick={() => open({ kind: 'story', id: p.id })} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.04 }}>
+              <motion.button key={p.id} className={`stamp-cell${st ? ' got' : ''}`} style={{ ['--pc1' as string]: artFor(p.id).sky[0], ['--pc2' as string]: artFor(p.id).sky[1] }} onClick={() => open({ kind: 'story', id: p.id })} initial={{ scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.04 }}>
                 <StampArt place={p} got={!!st} rarity={rarityOf(p)} size={92} date={st ? st.at.slice(5, 10) : undefined} />
                 <span className="small">{p.name[lang]}</span>
                 {st?.status === 'pending' && <span className="pending">{hi ? 'लंबित' : 'Pending'}</span>}
@@ -128,7 +128,7 @@ export function StampMoment({ id }: { id: string }) {
       <div className="stamp-stage">
         <AnimatePresence>
           {result === 'confirmed' || result === 'pending' ? (
-            <motion.div key="got" initial={{ scale: 2.4, opacity: 0, rotate: -25 }} animate={{ scale: 1, opacity: 1, rotate: 0 }} transition={{ type: 'spring', damping: 11, stiffness: 180 }}>
+            <motion.div key="got" initial={{ scale: 2.4, opacity: 0.5, rotate: -25 }} animate={{ scale: 1, opacity: 1, rotate: 0 }} transition={{ type: 'spring', damping: 11, stiffness: 180 }}>
               <StampArt place={p} got rarity={rarity} size={200} date={todayIST().slice(5, 10)} />
             </motion.div>
           ) : (
@@ -148,7 +148,7 @@ export function StampMoment({ id }: { id: string }) {
 
       <ul className="checks">
         {checks.map((c, i) => (
-          <motion.li key={i} className={c.state} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}>
+          <motion.li key={i} className={c.state} initial={{ x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}>
             <span className="check-dot">{c.state === 'ok' ? <Icon name="check" size={14} /> : c.state === 'fail' ? <Icon name="x" size={14} /> : c.state === 'warn' ? '!' : ''}</span>
             <span className="grow">{c.label}</span>
             {c.note && <span className="small muted">{c.note}</span>}
