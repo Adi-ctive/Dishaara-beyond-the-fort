@@ -95,7 +95,8 @@ export function QuickPlan({ hours: asked }: { hours?: number }) {
           <button className={`chip${date === tomorrow ? ' on' : ''}`} onClick={() => setDate(tomorrow)}>{t('Tomorrow', 'कल')}</button>
           <label className={`chip date-chip${date > tomorrow ? ' on' : ''}`}>
             <Icon name="calendar" size={14} /> {date > tomorrow ? dayLabel(date) : t('Pick a date', 'तारीख़ चुनें')}
-            <input type="date" min={today} max={plusDays(183)} value={date} onChange={(e) => e.target.value && setDate(e.target.value < today ? today : e.target.value)} aria-label={t('Date of your visit', 'घूमने की तारीख़')} />
+            {/* The input is invisible over the chip. Desktop Chrome opens the calendar only from its own icon, so open it on any click. */}
+            <input type="date" min={today} max={plusDays(183)} value={date} onClick={(e) => { try { e.currentTarget.showPicker(); } catch { /* older browsers open it themselves */ } }} onChange={(e) => e.target.value && setDate(e.target.value < today ? today : e.target.value)} aria-label={t('Date of your visit', 'घूमने की तारीख़')} />
           </label>
         </div>
         <EventNote events={onDay} />
