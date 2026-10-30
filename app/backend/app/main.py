@@ -17,13 +17,14 @@ import time
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Annotated
 
 import httpx
 from bson.binary import Binary
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import AfterValidator, BaseModel, Field
 from pymongo.errors import DuplicateKeyError
 
 from . import auth, cities, grounding, near, rag, rules, social
@@ -171,6 +172,20 @@ def twists() -> dict:
 EVERYONE = {"_id": "all"}  # app-wide caps on calls that cost money
 
 
+def capped(n: int):
+    """A JSON field (dict or list of dicts) at most n characters once written out. Free-form objects from the app are
+    stored or sent to the AI, so an unbounded one is a storage and cost attack (ASVS 5.0 V2.2.1, OWASP LLM10)."""
+    def check(v):
+        if v is not None and len(json.dumps(v, default=str, ensure_ascii=False)) > n:
+            raise ValueError(f"too large (max {n} characters)")
+        return v
+    return AfterValidator(check)
+
+
+Tag = Annotated[str, Field(max_length=60)]  # ids, names and chips the app sends
+Line = Annotated[str, Field(max_length=200)]  # one line of the raahi's own prompt
+
+
 def by_ip(request: Request) -> dict:
     """Guests have no account, so their rate limits go by network address (Vercel puts it in x-forwarded-for)."""
     ip = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip() or (request.client.host if request.client else "?")
@@ -290,9 +305,9 @@ def me_get(me: dict | None = Depends(current)):
 
 class ProfileIn(BaseModel):
     name: str | None = Field(default=None, max_length=40)
-    interests: list[str] | None = None
-    prefs: dict | None = None
-    prompt: list[str] | None = None
+    interests: list[Tag] | None = Field(default=None, max_length=30)
+    prefs: Annotated[dict | None, capped(2000)] = None
+    prompt: list[Line] | None = Field(default=None, max_length=10)
     avatar: str | None = Field(default=None, max_length=30)
     frame: str | None = Field(default=None, max_length=30)
     banner: str | None = Field(default=None, max_length=30)
@@ -359,15 +374,16 @@ def award(uid: str, key: str, points: int) -> int:
 
 # ---------------- plans ----------------
 class PlanIn(BaseModel):
-    input: dict
-    order: list[str] | None = None
-    done: list[str] = []
-    added: list[str] = []
-    city: str = "gwalior"
+    input: Annotated[dict, capped(4000)]
+    order: list[Tag] | None = Field(default=None, max_length=80)
+    done: list[Tag] = Field(default=[], max_length=80)
+    added: list[Tag] = Field(default=[], max_length=80)
+    city: str = Field(default="gwalior", max_length=30)
 
 
 @app.post("/plans")
-def create_plan(body: PlanIn, me: dict | None = Depends(current)):
+def create_plan(body: PlanIn, request: Request, me: dict | None = Depends(current)):
+    limit(me or by_ip(request), "plan", 30, 60)
     p = {"_id": uuid.uuid4().hex[:10], "user": me["_id"] if me else None, **body.model_dump(), "at": now()}
     get_db().plans.insert_one(p)
     return strip(p)
@@ -378,7 +394,8 @@ def update_plan(pid: str, body: PlanIn, me: dict | None = Depends(current)):
     p = get_db().plans.find_one({"_id": pid})
     if not p:
         raise HTTPException(404, "no such plan")
-    if p.get("user") and (not me or me["_id"] != p["user"]):
+    # Only the signed-in owner may change a plan. A guest plan has no owner, so nobody can overwrite it by its id.
+    if not p.get("user") or not me or me["_id"] != p["user"]:
         raise HTTPException(403, "not your plan")
     get_db().plans.update_one({"_id": pid}, {"$set": {**body.model_dump(), "at": now()}})
     return strip(get_db().plans.find_one({"_id": pid}))
@@ -409,10 +426,10 @@ class Reading(BaseModel):
 
 
 class StampIn(BaseModel):
-    placeId: str
-    readings: list[Reading] = []
-    code: str | None = None
-    ipCity: str | None = None
+    placeId: Tag
+    readings: list[Reading] = Field(default=[], max_length=60)
+    code: str | None = Field(default=None, max_length=40)
+    ipCity: str | None = Field(default=None, max_length=60)
 
 
 def rarity(p: dict) -> str:
@@ -550,10 +567,10 @@ def leaderboard(period: str = "week", city: str | None = None, me: dict | None =
 
 # ---------------- feedback, still true, tickets ----------------
 class FeedbackIn(BaseModel):
-    placeId: str
-    answers: dict = {}
+    placeId: Tag
+    answers: Annotated[dict, capped(2000)] = {}
     note: str = Field(default="", max_length=500)
-    proof: str | None = None
+    proof: str | None = Field(default=None, max_length=200)
 
 
 @app.post("/feedback")
@@ -571,7 +588,7 @@ def feedback(body: FeedbackIn, me: dict | None = Depends(current)):
 
 
 class StillIn(BaseModel):
-    placeId: str
+    placeId: Tag
     yes: bool
 
 
@@ -928,19 +945,19 @@ def sos_account(uid: str) -> dict | None:
 
 # ---------------- chat: retrieval agent + model ----------------
 class Turn(BaseModel):
-    role: str
-    text: str
+    role: str = Field(max_length=20)
+    text: str = Field(max_length=4000)
 
 
 class ChatIn(BaseModel):
     text: str = Field(max_length=1000)
-    history: list[Turn] = []
-    lang: str = "en"
-    prompt: list[str] = []
-    roadmap: dict | None = None  # summary of the raahi's plan, computed on the device
-    city: str = "gwalior"
-    origin: dict | None = None  # {"name", "lat", "lng"}: the raahi's roadmap start or shared location
-    lastPlaces: list[str] = []  # places the previous reply showed: "where is this listed?" follows on from them
+    history: list[Turn] = Field(default=[], max_length=20)  # the app sends the last 6
+    lang: str = Field(default="en", max_length=10)
+    prompt: list[Line] = Field(default=[], max_length=10)
+    roadmap: Annotated[dict | None, capped(12000)] = None  # summary of the raahi's plan, computed on the device
+    city: str = Field(default="gwalior", max_length=30)
+    origin: Annotated[dict | None, capped(300)] = None  # {"name", "lat", "lng"}: the raahi's roadmap start or shared location
+    lastPlaces: list[Tag] = Field(default=[], max_length=10)  # places the previous reply showed: "where is this listed?" follows on from them
     earlier: str = Field(default="", max_length=900)  # a short summary of this chat's older messages, made on the device
     chatId: str = Field(default="", max_length=40)
 
@@ -1720,11 +1737,11 @@ class ChatMsg(BaseModel):
     role: str = Field(pattern="^(user|bot)$")
     text: str = Field(max_length=4000)
     at: int | None = None
-    cards: list[dict] = []
-    chips: list[str] = []
+    cards: Annotated[list[dict], capped(6000)] = Field(default=[], max_length=12)
+    chips: list[Annotated[str, Field(max_length=160)]] = Field(default=[], max_length=8)
     ai: bool | None = None
     engine: str | None = Field(default=None, max_length=60)
-    note: str | None = None
+    note: str | None = Field(default=None, max_length=60)
 
 
 CHATS_PER_USER = 20  # saved chats per account
@@ -1807,13 +1824,13 @@ class EventIn(BaseModel):
 
 
 class FactIn(BaseModel):
-    placeId: str  # a place id, or "city" for an entry about the whole city (with city set)
-    city: str | None = None
-    unitId: str | None = None  # the part of a place (Gwalior Fort has four); empty = the whole place
+    placeId: Tag  # a place id, or "city" for an entry about the whole city (with city set)
+    city: str | None = Field(default=None, max_length=30)
+    unitId: str | None = Field(default=None, max_length=60)  # the part of a place (Gwalior Fort has four); empty = the whole place
     field: str = Field(max_length=60)
     value: str = Field(min_length=1, max_length=500)
-    label: str
-    proof: list[str] = []
+    label: Tag
+    proof: list[Annotated[str, Field(max_length=300)]] = Field(default=[], max_length=5)
     event: EventIn | None = None
 
 
@@ -2004,7 +2021,7 @@ def verify(vid: str, body: VerifyIn, me: dict | None = Depends(current)):
 class BusinessIn(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     kind: str = Field(pattern="^(food|craft|stay|guide|shop|activity)$")
-    city: str = "gwalior"
+    city: str = Field(default="gwalior", max_length=30)
     near: str = Field(default="", max_length=60)  # a place id the shop is near
     details: str = Field(default="", max_length=600)
     phone: str = Field(default="", max_length=20)

@@ -55,9 +55,9 @@ KINDS = {"raahi": {"post", "question", "blog", "video"}, "saarthi": {"post", "qu
 class PostIn(BaseModel):
     kind: str = Field(pattern="^(post|question|fact|photo|blog|video|offer)$")
     text: str = Field(min_length=1, max_length=1000)
-    placeId: str | None = None
-    city: str = "gwalior"
-    community: str | None = None  # gwalior, indore, mp (state) or india (national); defaults to the city
+    placeId: str | None = Field(default=None, max_length=60)
+    city: str = Field(default="gwalior", max_length=30)
+    community: str | None = Field(default=None, max_length=30)  # gwalior, indore, mp (state) or india (national); defaults to the city
     as_: str = Field(default="raahi", alias="as")  # the account type the person is using the app as
     media: list[str] = Field(default=[], max_length=4)  # photos from POST /posts/media, shown with the post
 

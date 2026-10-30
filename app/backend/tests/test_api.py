@@ -117,11 +117,14 @@ def test_saarthi_application_approved_by_a_moderator():
 # plans
 def test_plan_save_and_update():
     p = c.post("/plans", json={"input": {"hours": 4}}).json()
-    c.put(f"/plans/{p['id']}", json={"input": {"hours": 4}, "done": ["teli-ka-mandir"]})
-    assert c.get(f"/plans/{p['id']}").json()["done"] == ["teli-ka-mandir"]
+    # A guest plan has no owner, so nobody can overwrite it by its id.
+    assert c.put(f"/plans/{p['id']}", json={"input": {"hours": 4}, "done": ["teli-ka-mandir"]}).status_code == 403
+    assert c.get(f"/plans/{p['id']}").json()["done"] == []
     assert c.get("/plans/nope").status_code == 404
     h = signin()
     mine = c.post("/plans", json={"input": {"hours": 6}}, headers=h).json()
+    c.put(f"/plans/{mine['id']}", json={"input": {"hours": 6}, "done": ["teli-ka-mandir"]}, headers=h)
+    assert c.get(f"/plans/{mine['id']}", headers=h).json()["done"] == ["teli-ka-mandir"]
     assert c.put(f"/plans/{mine['id']}", json={"input": {}}, headers=signin("Other")).status_code == 403
     assert [x["id"] for x in c.get("/me/plans", headers=h).json()] == [mine["id"]]
 
@@ -924,3 +927,16 @@ def test_spot_answers_are_fixed_text(monkeypatch):
     assert near.phrase("whats near gopur in indore") == "gopur"
     r = c.post("/chat", json={"text": "whats near gopur in indore", "city": "indore"}).json()
     assert r["text"].startswith("**Near gopur") and r["anchor"]["name"] == "gopur"
+
+
+def test_open_inputs_have_size_limits():
+    """Free-form objects are stored or sent to the AI, so each has a cap (30 Oct, before the second Pro scan)."""
+    h = signin()
+    big = {"x": "a" * 5000}
+    assert c.post("/plans", json={"input": big}).status_code == 422
+    assert c.put("/me/profile", json={"prefs": big}, headers=h).status_code == 422
+    assert c.put("/me/profile", json={"interests": ["a"] * 31}, headers=h).status_code == 422
+    assert c.post("/chat", json={"text": "hi", "history": [{"role": "user", "text": "x"}] * 21}).status_code == 422
+    assert c.post("/chat", json={"text": "hi", "roadmap": {"x": "a" * 13000}}).status_code == 422
+    assert c.post("/feedback", json={"placeId": "teli-ka-mandir", "answers": big}, headers=h).status_code == 422
+    assert c.put("/me/profile", json={"prefs": {"pace": "slow"}, "interests": ["history"]}, headers=h).status_code == 200
