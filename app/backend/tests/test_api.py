@@ -1,5 +1,6 @@
 """One test or more per endpoint in app/docs/API.md. Runs on an in-memory database."""
 import os
+import re
 import time
 
 import mongomock
@@ -940,3 +941,9 @@ def test_open_inputs_have_size_limits():
     assert c.post("/chat", json={"text": "hi", "roadmap": {"x": "a" * 13000}}).status_code == 422
     assert c.post("/feedback", json={"placeId": "teli-ka-mandir", "answers": big}, headers=h).status_code == 422
     assert c.put("/me/profile", json={"prefs": {"pace": "slow"}, "interests": ["history"]}, headers=h).status_code == 200
+
+
+def test_hindi_question_gets_hindi_answer_in_english_app():
+    """30 Oct demo check: a question typed in Devanagari was answered in English because the app was set to English."""
+    r = c.post("/chat", json={"text": "आप क्या कर सकते हैं?", "lang": "en"}).json()
+    assert r.get("text") and re.search(r"[ऀ-ॿ]", r["text"])

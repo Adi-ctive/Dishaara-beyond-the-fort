@@ -1658,6 +1658,9 @@ COVERED_Q = re.compile(r"gwalior|indore|ग्वालियर|इंदौर
 @app.post("/chat")
 def chat(body: ChatIn, request: Request, me: dict | None = Depends(current)):
     """Returns {ai: false} when there is no key or the reply fails the checks; the app then shows its rule answer."""
+    # A question typed in Devanagari gets a Hindi answer even when the app is set to English (30 Oct demo check).
+    if body.lang != "hi" and re.search(r"[ऀ-ॿ]", body.text):
+        body.lang = "hi"
     # An emergency is answered first and never rate-limited.
     if EMERGENCY_Q.search(body.text):
         return {"ai": False, "emergency": True, "text": None}
@@ -1742,6 +1745,7 @@ class ChatMsg(BaseModel):
     ai: bool | None = None
     engine: str | None = Field(default=None, max_length=60)
     note: str | None = Field(default=None, max_length=60)
+    asked: str | None = Field(default=None, max_length=10)  # the app language when the reply came
 
 
 CHATS_PER_USER = 20  # saved chats per account

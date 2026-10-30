@@ -13,7 +13,7 @@ import { Md, plain } from '../../ui/Md';
 import { PlaceCard } from '../../ui/PlaceCard';
 import { canListen, listen, speak, warmVoice } from '../../voice';
 
-type Msg = { id: number; role: 'user' | 'bot'; text: string; cards: Card[]; chips: string[]; at?: number; ai?: boolean; engine?: string; note?: 'grounding' | 'error'; status?: 'failed' | 'working' | 'done'; alt?: Partial<Record<string, { text: string; chips: string[] }>> };
+type Msg = { id: number; role: 'user' | 'bot'; text: string; cards: Card[]; chips: string[]; at?: number; ai?: boolean; engine?: string; note?: 'grounding' | 'error'; status?: 'failed' | 'working' | 'done'; asked?: string; alt?: Partial<Record<string, { text: string; chips: string[] }>> };
 type Saved = { id: string; title: string; updated: string; count: number };
 
 // The open chat stays on the phone, so a refresh does not wipe it. Signed-in raahis also keep it on their account.
@@ -158,7 +158,8 @@ export function ChatTab() {
   useEffect(() => {
     if (!apiOn()) return;
     const tgt = to;
-    const todo = msgs.filter((m) => m.role === 'bot' && m.text && (tgt.length > 2 || tgt !== langOf(m.text)) && tgt !== langOf(m.text) && !m.alt?.[tgt] && !tried.current.has(`${m.id}:${tgt}`)).slice(-6).reverse();
+    // A reply in the question's language is left alone until the language is switched (`asked` = language at the time).
+    const todo = msgs.filter((m) => m.role === 'bot' && m.text && m.asked !== tgt && (tgt.length > 2 || tgt !== langOf(m.text)) && tgt !== langOf(m.text) && !m.alt?.[tgt] && !tried.current.has(`${m.id}:${tgt}`)).slice(-6).reverse();
     let stop = false;
     (async () => {
       for (const m of todo) {
@@ -241,7 +242,9 @@ export function ChatTab() {
     const key = getKey();
     let r: Reply & { ai?: boolean; engine?: string; note?: Msg['note'] };
     const last = lastPlaceIds(msgs);
-    const local = respond(query, data, today, lang, last, plan, s.prefs.payment, s.twists);
+    // A question typed in Hindi is answered in Hindi, whatever the app language.
+    const ql = langOf(query) === 'hi' ? 'hi' : lang;
+    const local = respond(query, data, today, ql, last, plan, s.prefs.payment, s.twists);
     if (apiOn()) {
       // The backend holds the key and picks the places; the cards follow the places it answered about.
       setThinking(true);
@@ -260,7 +263,7 @@ export function ChatTab() {
         : undefined;
       const from = s.quick?.startPoint ?? data.landmarks[0]?.id;
       const origin = from ? { name: startName(data, from)[lang], lat: startCoord(data, from)[0], lng: startCoord(data, from)[1] } : undefined;
-      const res = await api.chat({ text: query, history, lang, prompt: s.prompt, roadmap, city: s.city, origin, lastPlaces: last, earlier, chatId: cur.id });
+      const res = await api.chat({ text: query, history, lang: ql, prompt: s.prompt, roadmap, city: s.city, origin, lastPlaces: last, earlier, chatId: cur.id });
       mark(res ? 'done' : 'failed');
       const ids = (res?.placeIds ?? []).filter((id) => data.places.some((p) => p.id === id));
       const keep = local.cards.filter((c) => c.kind !== 'place' && c.kind !== 'places');
@@ -275,21 +278,21 @@ export function ChatTab() {
       else if (res?.text && res.note !== 'no-key') r = { ...local, text: res.text, cards, chips };
       else if (res && res.note !== 'no-key') r = { ...local, cards, chips, note: res.note === 'grounding' ? 'grounding' : undefined };
       // The server has no key but this browser does: ask the model from here instead.
-      else if ((!res || res.note === 'no-key') && key) r = await respondAI(query, history, { data, today, lang, plan, added: s.added, prompt: s.prompt }, key);
+      else if ((!res || res.note === 'no-key') && key) r = await respondAI(query, history, { data, today, lang: ql, plan, added: s.added, prompt: s.prompt }, key);
       else r = { ...local, note: res ? undefined : 'error' };
       setThinking(false);
     } else if (key) {
       setThinking(true);
       const history = msgs.map((m) => ({ role: m.role, text: m.text }));
-      r = await respondAI(query, history, { data, today, lang, plan, added: s.added, prompt: s.prompt }, key);
+      r = await respondAI(query, history, { data, today, lang: ql, plan, added: s.added, prompt: s.prompt }, key);
       setThinking(false);
       mark('done');
     } else {
       r = local;
       mark('done');
     }
-    setMsgs((m) => [...m, { id: n + 1, role: 'bot', at: Date.now(), ...r }]);
-    if (s.prefs.autoVoice) speak(plain(r.text), lang);
+    setMsgs((m) => [...m, { id: n + 1, role: 'bot', at: Date.now(), asked: to, ...r }]);
+    if (s.prefs.autoVoice) speak(plain(r.text), ql);
   };
 
   const mic = () => {
